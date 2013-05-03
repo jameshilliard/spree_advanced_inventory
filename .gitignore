@@ -1,3 +1,9 @@
+.DS_Store
+*.sw*
+*~*
+._*
+.AppleDouble
+:2e*
 *.rbc
 *.sassc
 .sass-cache
@@ -14,3 +20,4 @@ capybara-*.html
 **.orig
 rerun.txt
 pickle-email-*.html
+
