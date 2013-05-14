@@ -7,7 +7,9 @@ class CreateSpreeSupplierContacts < ActiveRecord::Migration
       t.string :job_title
       t.string :url
       t.string :phone
+      t.string :intl_phone
       t.string :fax
+      t.string :intl_fax
       t.string :address1
       t.string :address2
       t.string :address3
@@ -15,6 +17,7 @@ class CreateSpreeSupplierContacts < ActiveRecord::Migration
       t.string :state
       t.string :zip
       t.string :country
+      t.text :comments
 
       t.timestamps
     end

@@ -6,6 +6,7 @@ class CreateSpreePurchaseOrders < ActiveRecord::Migration
       t.string :status
       t.boolean :dropship
       t.datetime :due_at
+      t.text :comments
 
       t.timestamps
     end
