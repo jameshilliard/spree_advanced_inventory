@@ -1,21 +1,23 @@
 Spree::Core::Engine.routes.draw do
+
   namespace :spree do
-    resources :purchase_order_line_items
+    namespace :admin do
+      resources :purchase_orders
+    end
   end
 
 
   namespace :spree do
-    resources :purchase_orders
+    namespace :admin do
+      resources :supplier_contacts
+    end
   end
 
 
   namespace :spree do
-    resources :supplier_contacts
-  end
-
-
-  namespace :spree do
-    resources :suppliers
+    namespace :admin do
+      resources :suppliers
+    end
   end
 
 
