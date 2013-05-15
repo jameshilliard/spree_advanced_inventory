@@ -2,6 +2,7 @@ class CreateSpreeSuppliers < ActiveRecord::Migration
   def change
     create_table :spree_suppliers do |t|
       t.string :name
+      t.string :abbreviation
       t.string :account_number
       t.string :email
       t.string :url
