@@ -1,0 +1,55 @@
+<%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:purchase_orders) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <li>
+    <%= button_link_to t(:new_purchase_order), new_admin_purchase_order_path, :icon => 'icon-plus' %>
+  </li>
+<% end %>
+
+<% unless @purchase_orders and @purchase_orders.any? %>
+  <div class="no-objects-found">
+    <%= t(:no_results) %>
+  </div>
+<% else %>
+  <table class="index">
+    <colgroup>
+	    <col style="width: 25%">
+      <col style="width: 25%">
+      <col style="width: 25%">
+      <col style="width: 25%">
+    </colgroup>
+    <thead>
+      <tr data-hook="rate_header">
+        <th><%= t(:order) %></th>
+        <th><%= t(:supplier) %></th>
+        <th><%= t(:details) %></th>
+        <th class="actions"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @purchase_orders.each do |purchase_order|%>
+        <tr id="<%= spree_dom_id purchase_order %>" data-hook="rate_row" class="<%= cycle('odd', 'even')%>">
+
+          <td><%= purchase_order.order.number %></td>
+          <td><%= purchase_order.supplier.abbreviation %></td>
+          <td><%= purchase_order.order.line_items.map { |l| "#{l.variant.product.name} x#{l.quantity}" }.join("<br/>") %> </td>
+
+          <td class="actions">
+            <%= link_to_edit purchase_order, :no_text => true %>
+            <%= link_to_delete purchase_order, :no_text => true %>
+          </td>
+
+        </tr>
+
+      <% end %>
+
+    </tbody>
+  </table>
+<% end %>
+
+
+

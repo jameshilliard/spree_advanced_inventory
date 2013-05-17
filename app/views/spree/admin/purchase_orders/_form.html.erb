@@ -1,0 +1,53 @@
+<div data-hook="admin_volume_discount_form_fields">
+  <div class="alpha twelve columns">
+    <fieldset data-hook="volume_discounts" class=" no-border-bottom">
+      <legend align="center"><%= t(:general_settings) %></legend>
+
+      <div class="twelve columns alpha omega">
+        <div data-hook="title" class="field">
+          <%= f.label :title, t(:title) %>
+          <%= f.text_field :title, :class => 'fullwidth' %>
+        </div>
+      </div>
+
+      <div class="clear"></div>
+
+      <div class="alpha six columns">
+
+        <div data-hook="quantities" class="field">
+          <%= f.label :quantities, t(:quantities) %>
+          <%= f.text_area :quantities, :class => 'fullwidth', :rows => 6, :cols => 10 %>
+        </div>
+
+        <div data-hook="free_shipping" class="field">
+          <%= f.label :free_shipping, t(:free_shipping) %>
+          <%= f.select :free_shipping, %w{Yes No}, {},  { :class => 'fullwidth' } %>
+        </div>
+
+      </div>
+
+      <div class="omega six columns">
+
+        <div data-hook="discounts" class="field">
+          <%= f.label :discounts, t(:discounts) %>
+          <%= f.text_area :discounts, :class => 'fullwidth', :rows => 6, :cols => 10 %>
+        </div>
+
+        <div data-hook="free_shipping_minimum_quantity" class="field">
+          <%= f.label :free_shipping_minimum_quantity, t(:free_shipping_minimum_quantity) %>
+          <%= f.text_field :free_shipping_minimum_quantity, :class => 'fullwidth' %>
+        </div>
+
+
+      </div>
+
+    </fieldset>
+  </div>
+
+  <div class="clear"></div>
+
+</div>
+
+<script>
+  $("#volume_discount_free_shipping").select2();
+</script>

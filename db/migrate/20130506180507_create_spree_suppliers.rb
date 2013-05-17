@@ -23,3 +23,4 @@ class CreateSpreeSuppliers < ActiveRecord::Migration
     end
   end
 end
+

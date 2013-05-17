@@ -1,0 +1,25 @@
+<%= render :partial => 'spree/admin/shared/configuration_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:new_volume_discount) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <li>
+    <%= button_link_to t(:back_to_volume_discounts_list), spree.admin_volume_discounts_path, :icon => 'icon-arrow-left' %>
+  </li>
+<% end %>
+
+<%= render :partial => 'spree/shared/error_messages', :locals => { :target => @volume_discount } %>
+
+<%= form_for [:admin, @volume_discount] do |f| %>
+  <fieldset class="no-border-top">
+    
+    <%= render :partial => 'form', :locals => { :f => f } %>
+
+    <div class="clear"></div>
+
+    <%= render :partial => 'spree/admin/shared/new_resource_links' %>
+
+  </fieldset>
+<% end %>

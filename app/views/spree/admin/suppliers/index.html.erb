@@ -1,0 +1,70 @@
+<%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:suppliers) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <li>
+    <%= button_link_to t(:new_supplier), new_admin_supplier_path, :icon => 'icon-plus' %>
+  </li>
+<% end %>
+
+<% unless @suppliers and @suppliers.any? %>
+  <div class="no-objects-found">
+    <%= t(:no_results) %>
+  </div>
+<% else %>
+  <table class="index">
+    <colgroup>
+	    <col style="width: 40%">
+      <col style="width: 20%">
+      <col style="width: 15%">
+      <col style="width: 25%">
+    </colgroup>
+    <thead>
+      <tr data-hook="rate_header">
+        <th><%= t(:name) %></th>
+        <th><%= t(:account_number) %></th>
+        <th><%= t(:contacts) %></th>
+        <th class="actions"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @suppliers.each do |supplier|%>
+        <tr id="<%= spree_dom_id supplier %>" data-hook="rate_row" class="<%= cycle('odd', 'even')%>">
+
+          <td>
+            <% if not supplier.url.blank? %>
+              <%= link_to supplier.name, supplier.url, target: "_NEW" %>
+            <% else %>
+              <%= supplier.name %>
+            <% end %>
+            
+            (<%= supplier.abbreviation.upcase %>)
+            
+            <% unless supplier.email.blank? %>
+              <br/>
+              <%= link_to supplier.email, "mailto:#{supplier.email}" %>
+            <% end %>
+
+            
+          </td>
+          <td><%= supplier.account_number %></td>
+          <td><%= supplier.supplier_contacts.size %></td>
+
+          <td class="actions">
+            <%= link_to_edit supplier, :no_text => true %>
+            <%= link_to_delete supplier, :no_text => true %>
+          </td>
+
+        </tr>
+
+      <% end %>
+
+    </tbody>
+  </table>
+<% end %>
+
+
+

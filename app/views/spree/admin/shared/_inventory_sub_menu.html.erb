@@ -1,0 +1,9 @@
+<% content_for :sub_menu do %>
+<ul id="sub_nav" data-hook="admin_inventory_sub_tabs" class="inline-menu">
+    <%= tab :purchase_orders %>
+    <%= tab :receive_inventory, url: receive_admin_purchase_orders_path %>
+    <%= tab :adjust_inventory, url: inventory_update_admin_purchase_orders_path %>
+    <%= tab :suppliers %> 
+    <%= tab :reports, url: reports_admin_purchase_orders_path %>
+</ul>
+<% end %>
