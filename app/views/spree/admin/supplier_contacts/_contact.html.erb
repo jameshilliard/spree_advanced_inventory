@@ -8,6 +8,8 @@
     
     <span style="float: right">
       <%= link_to "Edit", edit_admin_supplier_contact_path(contact.id) %>
+      <br/>
+      <%= link_to "Remove", admin_supplier_contact_path(contact.id), method: "delete" %>
     </span>
 
     <br/>

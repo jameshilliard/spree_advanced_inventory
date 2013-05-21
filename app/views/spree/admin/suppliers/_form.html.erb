@@ -87,7 +87,7 @@
 
           <%= render partial: "spree/admin/supplier_contacts/contact", collection: @supplier.supplier_contacts %>
 
-          <% unless @supplier.supplier_contacts.size > 0 %>
+          <% unless @supplier.supplier_contacts.size > 1 %>
             None
           <% end %>
         </fieldset>
@@ -98,7 +98,7 @@
       <fieldset data-hook="new-supplier-contact" class=" no-border-bottom">
         <legend align="center"><%= t(:new_supplier_contact) %></legend>
 
-        <%= f.fields_for :supplier_contacts, @supplier_contact do |sc| %>
+        <%= f.fields_for :supplier_contacts, @supplier.supplier_contacts.new do |sc| %>
 
           <div data-hook="supplier_contact_name" class="field">
             <%= sc.label :name, t(:name) %>

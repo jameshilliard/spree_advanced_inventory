@@ -4,7 +4,11 @@ module Spree
       before_filter :load_data, only: [:new, :create, :edit, :update, :destroy]
 
       def index
-        redirect_to edit_admin_supplier_path(request.env["HTTP_REFERER"].split(/\//).last)
+        if request.env["HTTP_REFERER"] =~ /update/
+          redirect_to edit_admin_supplier_path(request.env["HTTP_REFERER"].split(/\//).last), success: "Supplier Contact Updated"
+        else
+          redirect_to admin_suppliers_path, success: "Supplier Contact removed"
+        end
       end
 
       def load_data
