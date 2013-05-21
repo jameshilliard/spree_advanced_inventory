@@ -6,7 +6,7 @@ module Spree
 
       end
 
-      def inventory_update
+      def adjust
       end
 
       def reports

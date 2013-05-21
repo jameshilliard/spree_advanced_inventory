@@ -2,12 +2,14 @@ Spree::Core::Engine.routes.draw do
 
 
   namespace :admin do
+    get 'purchase_orders/reports' => 'purchase_orders#reports',
+      as: 'purchase_order_reports'
+
     resources :purchase_orders do
       collection do
         match 'receive'
-        match 'inventory_update'
+        match 'adjust'
 
-        get 'reports'
         get 'supplier_report'
         get 'inventory_report'
         get 'open_dropship_report'
@@ -25,6 +27,5 @@ Spree::Core::Engine.routes.draw do
     resources :suppliers
   end
 
-  match 'admin/purchase_orders/reports' => 'spree/admin/purchase_orders#reports', as: 'admin_inventory'
   # Add your extension routes here
 end
