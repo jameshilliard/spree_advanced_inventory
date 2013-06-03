@@ -7,7 +7,14 @@ Spree::Core::Engine.routes.draw do
         get 'inventory_report'
         get 'open_dropship_report'
       end
+
+      match 'submit'
+      match 'source'
+      match 'item'
+
     end
+
+    resources :purchase_order_line_items
 
     resources :supplier_contacts
     resources :suppliers do

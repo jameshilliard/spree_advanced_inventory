@@ -61,7 +61,7 @@
 
           <div data-hook="supplier_contact_country" class="field">
             <%= f.label :country, t(:country) %>
-            <%= f.text_field :country, :class => 'fullwidth' %>
+            <%= f.collection_select :country, available_countries, :name, :name, {}, {:class => 'select2 fullwidth'} %>
           </div>
 
         <% end  %>
@@ -70,3 +70,6 @@
   </div>
 </div>
 
+<script>
+	$("#supplier_contact_country").select2();
+</script>

@@ -7,9 +7,13 @@ class Spree::Supplier < ActiveRecord::Base
 
   accepts_nested_attributes_for :supplier_contacts,
     allow_destroy: true,
-    reject_if: :all_blank
+    reject_if: proc { |attributes| attributes['name'].blank? }
 
   validates :name, :address1, :city, :state, :zip, :country, :phone,
     presence: true
+
+  def to_s
+    abbreviation ? abbreviation : name
+  end
 
 end

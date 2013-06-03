@@ -3,7 +3,7 @@
   
     <div class="eight columns alpha">
       <fieldset data-hook="suppliers" class=" no-border-bottom">
-        <legend align="center"><%= t(:general_settings) %></legend>
+        <legend align="center"><%= t(:supplier_details) %></legend>
 
         <div data-hook="name" class="field">
           <%= f.label :name, t(:name) %>
@@ -74,7 +74,7 @@
 
         <div data-hook="country" class="field">
           <%= f.label :country, t(:country) %>
-          <%= f.text_field :country, :class => 'fullwidth' %>
+          <%= f.collection_select :country, available_countries, :name, :name, {}, {:class => 'select2 fullwidth'} %>
         </div>
 
       </fieldset>
@@ -85,9 +85,9 @@
         <fieldset data-hook="supplier-contacts" class=" no-border-bottom">
           <legend align="center"><%= t(:existing_contacts) %></legend>
 
-          <%= render partial: "spree/admin/supplier_contacts/contact", collection: @supplier.supplier_contacts %>
+          <%= render partial: "spree/admin/supplier_contacts/contact", collection: @supplier.supplier_contacts.order("name asc") %>
 
-          <% unless @supplier.supplier_contacts.size > 1 %>
+          <% unless @supplier.supplier_contacts.size > 0 %>
             None
           <% end %>
         </fieldset>
@@ -154,7 +154,7 @@
 
           <div data-hook="supplier_contact_country" class="field">
             <%= sc.label :country, t(:country) %>
-            <%= sc.text_field :country, :class => 'fullwidth' %>
+            <%= sc.collection_select :country, available_countries, :name, :name, {}, {:class => 'select2 fullwidth'} %>
           </div>
 
         <% end  %>
@@ -165,3 +165,7 @@
   </div>
 </div>
 
+<script>
+	$("#supplier_contact_country").select2();
+	$("#supplier_country").select2();
+</script>

@@ -1,13 +1,21 @@
 <%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
 
 <% content_for :page_title do %>
-  <%= t(:purchase_orders) %>
+  <%= t(:purchase_orders_and_drop_ships) %>
 <% end %>
 
 <% content_for :page_actions do %>
   <li>
-    <%= button_link_to t(:new_purchase_order), new_admin_purchase_order_path, :icon => 'icon-plus' %>
+    <%= button_link_to t(:new_purchase_order), 
+      new_admin_purchase_order_path + "?type=PO", 
+      icon: 'icon-plus' %>
   </li>
+  <li>
+    <%= button_link_to t(:new_drop_ship), 
+      new_admin_purchase_order_path + "?type=DS", 
+      icon: 'icon-plus' %>
+  </li>
+    
 <% end %>
 
 <% unless @purchase_orders and @purchase_orders.any? %>
@@ -17,16 +25,18 @@
 <% else %>
   <table class="index">
     <colgroup>
-	    <col style="width: 25%">
-      <col style="width: 25%">
-      <col style="width: 25%">
-      <col style="width: 25%">
+	    <col style="width: 15%">
+      <col style="width: 10%">
+      <col style="width: 35%">
+      <col style="width: 30%">
+      <col style="width: 10%">
     </colgroup>
     <thead>
       <tr data-hook="rate_header">
-        <th><%= t(:order) %></th>
+        <th><%= t(:order_number) %></th>
         <th><%= t(:supplier) %></th>
         <th><%= t(:details) %></th>
+        <th><%= t(:ship_to) %></th>
         <th class="actions"></th>
       </tr>
     </thead>
@@ -34,11 +44,24 @@
       <% @purchase_orders.each do |purchase_order|%>
         <tr id="<%= spree_dom_id purchase_order %>" data-hook="rate_row" class="<%= cycle('odd', 'even')%>">
 
-          <td><%= purchase_order.order.number %></td>
-          <td><%= purchase_order.supplier.abbreviation %></td>
-          <td><%= purchase_order.order.line_items.map { |l| "#{l.variant.product.name} x#{l.quantity}" }.join("<br/>") %> </td>
-
+          <td>
+            <b><%= purchase_order.dropship ? "Dropship" : "Purchase Order" %></b><br/>
+            <%= purchase_order.number %><br/>
+            <br/>
+            Status: <%= purchase_order.status %>
+          </td>
+          <td><%= purchase_order.supplier %></td>
+          <td><%= purchase_order.details.split(/\n/).join(", ") %> </td>
+          <td>
+            <%= purchase_order.address %><br/>
+            Via: <%= purchase_order.shipping_method.name.upcase %>
+          </td>
           <td class="actions">
+            <% if purchase_order.status == "Entered" %>
+              <%= link_to "Submit to supplier", admin_purchase_order_submit_path(purchase_order) %>
+              <br/>
+            <% end %>
+
             <%= link_to_edit purchase_order, :no_text => true %>
             <%= link_to_delete purchase_order, :no_text => true %>
           </td>
