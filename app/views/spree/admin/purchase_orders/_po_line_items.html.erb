@@ -1,0 +1,15 @@
+<table width="100%" cellspacing="3" cellpadding="0" class="no-border" id="purchase-order-line-item-table">
+  <thead>
+    <th>Title</th>              
+    <th>QTY</th>
+    <th>Cost</th>
+  </thead>
+  <%= render partial: "spree/admin/purchase_order_line_items/inline_edit", 
+    collection: @purchase_order.purchase_order_line_items,
+    as: :line_item,
+    locals: { f: f, po: @purchase_order }
+  %>
+</table>
+<% unless @purchase_order.has_line_items? %>
+  <b>None added yet</b>
+<% end %>

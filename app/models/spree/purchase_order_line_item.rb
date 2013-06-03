@@ -2,9 +2,11 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
   belongs_to :purchase_order
   belongs_to :variant
   belongs_to :line_item
+  belongs_to :user
 
   attr_accessible :price, :quantity, :quantity_received, :received_at,
-    :purchase_order_id, :variant_id, :line_item_id
+    :purchase_order_id, :variant_id, :line_item_id, :user_id
+
 
   def searcher
     purchase_order.dropship ? Spree::LineItem : Spree::Variant

@@ -2,6 +2,7 @@ module Spree
   module Admin
     class PurchaseOrdersController < ResourceController
 
+      before_filter :remove_unused, only: [:index]
       before_filter :set_type, only: [:new]
       before_filter :find_or_create_office_address
       before_filter :find_or_build_address, only: [:create, :update]
@@ -28,7 +29,10 @@ module Spree
         def set_type
           @purchase_order = Spree::PurchaseOrder.new
           @purchase_order.dropship = (params[:type] == "DS" ? true : false)
+          @purchase_order.user_id = spree_current_user.id
+          @purchase_order.save
           @purchase_order.purchase_order_line_items.build
+
         end
 
         def find_resource
@@ -40,7 +44,7 @@ module Spree
                                        address2: "Ste 3a",
                                        company: "800-CEO-READ",
                                        city: "Milwaukee",
-                                       state_name: "WI",
+                                       state_id: 4,
                                        zipcode: "53202",
                                        country_id: 49,
                                        phone: "800-236-7323",
@@ -75,6 +79,11 @@ module Spree
 
             params[:purchase_order][:address_id] = @address.id
           end
+        end
+
+        def remove_unused
+          Spree::PurchaseOrder.destroy_all(status: nil,
+                                           user_id: spree_current_user.id)
         end
 
     end

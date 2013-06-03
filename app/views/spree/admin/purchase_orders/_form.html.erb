@@ -12,7 +12,7 @@
 
       <div class="clear"></div>
 
-      
+  <%= form_for [:admin, @purchase_order] do |f| %>      
       <% if @purchase_order.purchase_order_line_items.size > 0 %>
         <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
           <legend align="center">
@@ -20,16 +20,8 @@
           </legend>
         </fieldset>
 
-        <div id="purchase-order-line-items">
-          <%= render partial: "spree/admin/purchase_order_line_items/inline_edit", 
-            collection: @purchase_order.purchase_order_line_items,
-            as: :line_item,
-            locals: { f: f, po: @purchase_order }
-          %>
-
-          <% if @purchase_order.purchase_order_line_items.size == 1 %>
-            <b>None added yet</b>
-          <% end %>
+      	<div id="purchase-order-line-items">
+          <%= render partial: "po_line_items", locals: { f: f } %>
         </div>
       <% end %>
                  
@@ -37,7 +29,7 @@
 
 
     <div class="eight columns omega">
-      <fieldset data-hook="purchase-order-details" class=" no-border-bottom">
+      <fieldset data-hook="purchase-order-details" class="no-border-bottom">
         <legend align="center">
           <%= t(:shipping) %>
         </legend>
@@ -53,43 +45,11 @@
 
       </fieldset>
 
-      <fieldset data-hook="purchase-order-details" class=" no-border-bottom">
+      <fieldset data-hook="purchase-order-details" class="no-border-bottom">
         <legend align="center">
           <%= t(:other_details) %>
         </legend>
           
-
-        <div data-hook="purchase_order_due_at" class="field">
-          <%= f.label :due_at, t(:date_needed_by) %> 
-          <br/>
-          <%= f.text_field :due_at, 
-            value: datepicker_field_value(@purchase_order.due_at), 
-            class: 'datepicker datepicker-from fullwidth' %>
-        </div>
-
-
-        <div data-hook="purchase_order_adjustments" class="field">
-          <%= f.label :adjustments, t(:balance_adjustments) %>
-          <div class="clear"></div>
-
-          <div class="three columns alpha">
-            <%= f.text_field :discount, 
-              class: 'fullwidth', 
-                placeholder: "Discount" %>
-          </div>
-          <div class="three columns">
-            <%= f.text_field :shipping, 
-              class: 'fullwidth', 
-                placeholder: "Shipping" %>
-          </div>
-          <div class="two columns omega">
-            <%= f.text_field :deposit,
-              class: 'fullwidth', 
-                placeholder: "Deposit" %>
-           </div>
-           <div class="clear"></div>
-        </div>
-
         <div data-hook="purchase_order_supplier_id" class="field">
           <%= f.label :supplier_id, t(:supplier) %> 
           <%= f.collection_select :supplier_id, 
@@ -100,12 +60,56 @@
             {class: 'fullwidth' } %>
         </div>
 
+        <div data-hook="purchase_order_due_at" class="field">
+          <%= f.label :due_at, t(:date_needed_by) %> 
+          <br/>
+          <%= f.text_field :due_at, 
+            value: datepicker_field_value(@purchase_order.due_at), 
+            class: 'datepicker datepicker-from fullwidth' %>
+        </div>
+
+        <div data-hook="purchase_order_comments" class="field">
+          <%= f.label :comments, t(:comments) %> 
+          <br/>
+          <%= f.text_area :comments, class: 'fullwidth', rows: 3 %>
+        </div>
 
 
-        
+        <div data-hook="purchase_order_adjustments" class="field">
+          <%= f.label :balance_adjustments, t(:balance_adjustments) %>
+          <table width="100%" cellspacing="3" cellpadding="0">
+          <thead>
+            <th>Discount</th>              
+            <th>Shipping</th>
+            <th>Deposit</th>
+          </thead>
+
+          <tr valign="top">
+            <td width="33%">
+              <%= f.text_field :discount, 
+                class: 'fullwidth', 
+                  placeholder: "Discount" %>
+            </td>
+            <td width="33%">
+
+              <%= f.text_field :shipping, 
+                class: 'fullwidth', 
+                  placeholder: "Shipping" %>
+            </td>
+            <td width="33%">
+
+              <%= f.text_field :deposit,
+                class: 'fullwidth', 
+                  placeholder: "Deposit" %>
+             </td>
+           </tr>
+          </table>
+
+        </div>
       </fieldset>
     </div>
-
+    <%= render :partial => 'spree/admin/shared/edit_resource_links' %>
+    <% end %>
   </div>
 </div>
 
@@ -120,4 +124,3 @@
 <% content_for :head do %>
   <%= javascript_tag 'var expand_variants = true;' %>
 <% end %>
-

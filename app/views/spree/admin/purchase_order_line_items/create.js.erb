@@ -1,0 +1,1 @@
+$('#purchase-order-line-item-table > tbody:last').append(<%= escape_javascript(render(partial: "spree/admin/purchase_order_line_items/inline_edit", collection: [@purchase_order_line_item, as: :line_item })) %>);
