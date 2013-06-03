@@ -3,6 +3,7 @@ module Spree
     class PurchaseOrdersController < ResourceController
 
       before_filter :set_type, only: [:new]
+      before_filter :find_or_create_office_address
       before_filter :find_or_build_address, only: [:create, :update]
 
       def submit
@@ -31,21 +32,23 @@ module Spree
         end
 
         def find_resource
-          @office_address = Spree::Address.where(address1: "219 N. Milwaukee St",
-                                                 address2: "Ste 3a",
-                                                 company: "800-CEO-READ",
-                                                 city: "Milwaukee",
-                                                 state_name: "WI",
-                                                 zipcode: "53202",
-                                                 country_id: 49,
-                                                 phone: "800-236-7323",
-                                                 user_id: 1,
-                                                 firstname: "Shipping",
-                                                 lastname: "Receiving").first_or_create
-
-          logger.info @office_address.errors.inspect
-
           @purchase_order ||= Spree::PurchaseOrder.find_by_number(params[:id])
+        end
+
+        def find_or_create_office_address
+          @office_address = Spree::Address.where(address1: "219 N. Milwaukee St",
+                                       address2: "Ste 3a",
+                                       company: "800-CEO-READ",
+                                       city: "Milwaukee",
+                                       state_name: "WI",
+                                       zipcode: "53202",
+                                       country_id: 49,
+                                       phone: "800-236-7323",
+                                       user_id: 1,
+                                       firstname: "Shipping",
+                                       lastname: "Receiving").first_or_create
+
+
         end
 
         def find_or_build_address

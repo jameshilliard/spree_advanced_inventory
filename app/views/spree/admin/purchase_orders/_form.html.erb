@@ -21,11 +21,15 @@
         </fieldset>
 
         <div id="purchase-order-line-items">
-          <%= render partial: "purchase_order_line_item/inline_edit", 
+          <%= render partial: "spree/admin/purchase_order_line_items/inline_edit", 
             collection: @purchase_order.purchase_order_line_items,
             as: :line_item,
             locals: { f: f, po: @purchase_order }
           %>
+
+          <% if @purchase_order.purchase_order_line_items.size == 1 %>
+            <b>None added yet</b>
+          <% end %>
         </div>
       <% end %>
                  

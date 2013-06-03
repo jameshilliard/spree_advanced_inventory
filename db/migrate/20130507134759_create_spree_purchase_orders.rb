@@ -1,14 +1,12 @@
 class CreateSpreePurchaseOrders < ActiveRecord::Migration
   def change
     create_table :spree_purchase_orders do |t|
-      t.string :number
       t.references :supplier
-      t.references :line_item
-      t.references :variant
       t.references :user
       t.references :address
       t.references :shipping_method
       t.string :status
+      t.string :number
       t.boolean :dropship
       t.datetime :due_at
       t.decimal :discount

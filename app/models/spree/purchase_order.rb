@@ -2,6 +2,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   belongs_to :supplier
   belongs_to :address
   belongs_to :shipping_method
+  belongs_to :user
   has_many :purchase_order_line_items
 
   attr_accessible :dropship, :due_at, :status, :address_id, :supplier_id,

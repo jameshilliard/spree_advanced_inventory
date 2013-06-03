@@ -1,0 +1,7 @@
+<% unless line_item.new_record? %>
+	<%= f.fields_for :purchase_order_line_items, line_item do |l| %>
+	  <%= line_item.variant.product.name %> 
+	  <%= line_item.variant.sku %>
+  <% end %>
+<% end %>
+
