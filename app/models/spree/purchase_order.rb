@@ -14,6 +14,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   before_validation :generate_number, :on => :create
 
+  validates :address_id, :supplier_id, :shipping_method_id, presence: true
+
+  default_scope order("created_at desc")
+
   def generate_number
     record = true
     prefix = "PO"
@@ -35,7 +39,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
     unless purchase_order_line_items.size == 0
       purchase_order_line_items.each do |l|
-        item_list += "(#{l.quantity}) #{l.product.name.split(":").first} - #{l.variant.sku}\n"
+        item_list += "(#{l.quantity}) #{l.variant.product.name.split(":").first} - #{l.variant.sku}\n"
       end
     end
 

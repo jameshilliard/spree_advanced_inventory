@@ -46,9 +46,12 @@
 
           <td>
             <b><%= purchase_order.dropship ? "Dropship" : "Purchase Order" %></b><br/>
-            <%= purchase_order.number %><br/>
+            <%= purchase_order.number %>            
             <br/>
             Status: <%= purchase_order.status %>
+            <br/>
+            <%= purchase_order.created_at.strftime("%m/%d/%Y %H:%M") %>
+
           </td>
           <td><%= purchase_order.supplier %></td>
           <td><%= purchase_order.details.split(/\n/).join(", ") %> </td>

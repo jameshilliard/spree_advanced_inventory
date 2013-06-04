@@ -37,12 +37,3 @@
 
 </div>
 
- <div data-hook="purchase_order_shipping_method_id" class="field">
-  <%= f.label :shipping_method_id, t(:shipping_method) %> 
-  <%= f.collection_select :shipping_method_id, 
-    Spree::ShippingMethod.order("name asc"), 
-    :id, 
-    :name, 
-    {},  
-    {class: 'fullwidth' } %>
-  </div>

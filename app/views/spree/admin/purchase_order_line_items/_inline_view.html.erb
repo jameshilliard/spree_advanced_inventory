@@ -1,0 +1,17 @@
+<tr valign="top">
+  <td width="40%">
+    <%= line_item.variant.product.name.split(":").first %>
+    &mdash;
+    <%= link_to("Edit", edit_admin_product_variant_path(line_item.variant.product.to_param, line_item.variant_id), target: "_NEW") %>
+    <br/>
+    SKU: <%= line_item.variant.sku %>
+    <br/>
+    On hand: <%= line_item.variant.on_hand %>
+
+  </td>
+  <td width="30%"><%= line_item.quantity  %></td>
+  <td width="30%"><%= number_to_currency(line_item.price) %></td>
+</tr>
+
+
+

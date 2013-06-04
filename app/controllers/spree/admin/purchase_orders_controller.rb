@@ -30,13 +30,16 @@ module Spree
           @purchase_order = Spree::PurchaseOrder.new
           @purchase_order.dropship = (params[:type] == "DS" ? true : false)
           @purchase_order.user_id = spree_current_user.id
-          @purchase_order.save
+          @purchase_order.save validate: false
           @purchase_order.purchase_order_line_items.build
 
         end
 
         def find_resource
-          @purchase_order ||= Spree::PurchaseOrder.find_by_number(params[:id])
+          @purchase_order = Spree::PurchaseOrder.find_by_number(params[:id])
+	  @purchase_order_line_items = @purchase_order.purchase_order_line_items
+
+	  return @purchase_order
         end
 
         def find_or_create_office_address
@@ -56,7 +59,7 @@ module Spree
         end
 
         def find_or_build_address
-          if @purchase_order.dropship
+          if @purchase_order.dropship and not params[:purchase_order][:address_id]
             @address = Spree::Address.where(firstname: params[:address][:firstname],
                                             lastname: params[:address][:lastname],
                                             company: params[:address][:company],

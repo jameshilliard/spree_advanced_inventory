@@ -5,14 +5,13 @@ module Spree
 
       def create
         @purchase_order_line_item =
-          Spree::PurchaseOrderLineItem.create(
+          Spree::PurchaseOrderLineItem.where(
             user_id: spree_current_user.id,
             purchase_order_id: params[:purchase_order_id],
             variant_id: params[:add_variant_id],
             price: params[:add_price],
-            quantity: params[:add_quantity])
+            quantity: params[:add_quantity]).first_or_create
 
-        redirect_to edit_admin_purchase_order_path(@purchase_order_line_item.purchase_order.number)
       end
     end
   end

@@ -11,5 +11,5 @@
   %>
 </table>
 <% unless @purchase_order.has_line_items? %>
-  <b>None added yet</b>
+  <div id="no-purchase-order-line-items">None added yet</div>
 <% end %>
