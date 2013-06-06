@@ -1,34 +1,8 @@
-
 <div data-hook="admin_purchase_order_form_fields">
   <div class="alpha eighteen columns omega">
+    <%= form_for [:admin, @purchase_order] do |f| %>
+
     <div class="eight columns alpha">
-      <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
-        <legend align="center">
-          <%= @purchase_order.dropship ? t(:line_item) : t(:line_items) %>
-        </legend>
-        
-        <%= render partial: "spree/admin/shared/add_purchase_order_product" %>
-      </fieldset> 
-
-      <div class="clear"></div>
-
-  <%= form_for [:admin, @purchase_order] do |f| %>      
-      <% if @purchase_order.purchase_order_line_items.size > 0 %>
-        <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
-          <legend align="center">
-            <%= t(:existing_line_items) %>
-          </legend>
-        </fieldset>
-
-      	<div id="purchase-order-line-items">
-          <%= render partial: "po_line_items", locals: { f: f } %>
-        </div>
-      <% end %>
-                 
-    </div>
-
-
-    <div class="eight columns omega">
       <fieldset data-hook="purchase-order-details" class="no-border-bottom">
         <legend align="center">
           <%= t(:shipping) %>
@@ -56,7 +30,6 @@
 
         <% if @purchase_order.status.blank? %>
           <%= f.hidden_field :status, value: "Entered" %>
-
         <% end %>
 
       </fieldset>
@@ -124,7 +97,36 @@
         </div>
       </fieldset>
     </div>
-    <%= render :partial => 'spree/admin/shared/edit_resource_links' %>
+
+    <div class="eight columns omega">
+      <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
+        <legend align="center">
+          <%= @purchase_order.dropship ? t(:line_item) : t(:line_items) %>
+        </legend>
+
+        <div id="purchase-order-line-items">
+          <%= render partial: "po_line_items", locals: { f: f } %>
+        </div>
+
+        <div class="form-buttons filter-actions actions" data-hook="edit-line-item-buttons">
+          <%= button_link_to t(:edit_line_items), admin_purchase_order_edit_line_items_path(@purchase_order.number) , :icon => 'icon-arrow-left' %>
+
+        </div>
+      </fieldset>
+                 
+    </div>
+
+  <div class="clear"></div>
+  <br/>
+
+
+    <div class="form-buttons filter-actions actions" data-hook="buttons">
+
+      <%= button t(:save), 'icon-arrow-right' %>
+      <span class="or"><%= t(:or) %></span>
+      <%= button_link_to t(:cancel), collection_url, :icon => 'icon-remove' %>
+    </div>
+
     <% end %>
   </div>
 </div>
@@ -137,6 +139,4 @@
   
 </script>
 
-<% content_for :head do %>
-  <%= javascript_tag 'var expand_variants = true;' %>
-<% end %>
+

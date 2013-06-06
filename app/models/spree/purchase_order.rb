@@ -10,13 +10,13 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     :shipping, :deposit, :shipping_method_id
 
   accepts_nested_attributes_for :purchase_order_line_items,
-   :reject_if => proc { |attributes| attributes['variant_id'].blank? }
+   :reject_if => proc { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
 
   before_validation :generate_number, :on => :create
 
   validates :address_id, :supplier_id, :shipping_method_id, presence: true
 
-  default_scope order("created_at desc")
+  default_scope order("spree_purchase_orders.created_at desc")
 
   def generate_number
     record = true
@@ -34,17 +34,6 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     self.number
   end
 
-  def details
-    item_list = ""
-
-    unless purchase_order_line_items.size == 0
-      purchase_order_line_items.each do |l|
-        item_list += "(#{l.quantity}) #{l.variant.product.name.split(":").first} - #{l.variant.sku}\n"
-      end
-    end
-
-    return item_list
-  end
 
   def to_param
     number.to_s.to_url.upcase
@@ -54,8 +43,22 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     if purchase_order_line_items.size > 1
       true
     else
-      purchase_order_line_items.first.new_record? ? false : true
+      (not purchase_order_line_items.first or purchase_order_line_items.first.new_record?) ? false : true
     end
+  end
+
+  def line_item_total
+    sum = Spree::Money.new(0)
+
+    purchase_order_line_items.each do |l|
+      sum += l.line_total
+    end
+
+    return sum
+  end
+
+  def total
+    (line_item_total + Spree::Money.new(shipping - discount - deposit))
   end
 
 end

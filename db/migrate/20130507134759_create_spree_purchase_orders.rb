@@ -13,6 +13,7 @@ class CreateSpreePurchaseOrders < ActiveRecord::Migration
       t.text :comments
       t.text :status
       t.text :number
+      t.text :terms
 
       t.timestamps
     end

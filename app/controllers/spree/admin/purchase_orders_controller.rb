@@ -2,10 +2,106 @@ module Spree
   module Admin
     class PurchaseOrdersController < ResourceController
 
+      respond_to :html, :json, only: [:index, :show]
+
       before_filter :remove_unused, only: [:index]
-      before_filter :set_type, only: [:new]
       before_filter :find_or_create_office_address
       before_filter :find_or_build_address, only: [:create, :update]
+
+      def index
+        params[:q] ||= {}
+
+        # As date params are deleted if @show_only_completed, store
+        # the original date so we can restore them into the params
+        # after the search
+        created_at_gt = params[:q][:created_at_gt]
+        created_at_lt = params[:q][:created_at_lt]
+
+        if !params[:q][:created_at_gt].blank?
+          params[:q][:created_at_gt] = Time.zone.parse(params[:q][:created_at_gt]).beginning_of_day rescue ""
+        end
+
+        if !params[:q][:created_at_lt].blank?
+          params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
+        end
+
+        @search = Spree::PurchaseOrder.ransack(params[:q])
+        @purchase_orders = @search.result.includes([:purchase_order_line_items, :user, :address]).
+          page(params[:page]).
+          per(params[:per_page] || Spree::Config[:orders_per_page])
+
+        # Restore dates
+        params[:q][:created_at_gt] = created_at_gt
+        params[:q][:created_at_lt] = created_at_lt
+
+        respond_with(@purchase_orders)
+      end
+
+      def show
+        @purchase_order = find_resource
+
+        respond_with(@purchase_order)
+      end
+
+
+      def new
+        set_type
+
+        redirect_to admin_purchase_order_edit_line_items_path(@purchase_order.number)
+      end
+
+      def edit_line_items
+        @purchase_order = find_resource
+
+        total_line_items = @purchase_order.purchase_order_line_items.size
+
+        @line_item_limit = @purchase_order.dropship ? 1 : (10 - total_line_items)
+
+        if @purchase_order.dropship
+          if total_line_items == 0
+            @purchase_order.purchase_order_line_items.build
+          end
+        else
+          1.upto(@line_item_limit).each do |num|
+            @purchase_order.purchase_order_line_items.build
+          end
+        end
+
+        if request.put? or request.post?
+
+          params[:purchase_order][:purchase_order_line_items_attributes].each do |k,line_item|
+
+            l = Spree::PurchaseOrderLineItem.where(purchase_order_id: @purchase_order.id,
+                                                   variant_id: line_item["variant_id"]).first
+
+            if l
+
+              if line_item["quantity"].to_i > 0
+
+                l.update_attributes(quantity: line_item["quantity"],
+                                    price: line_item["price"])
+              else
+                l.destroy
+
+              end
+
+            else
+              if line_item["variant_id"].to_i > 0 and
+                line_item["quantity"].to_i > 0
+
+                Spree::PurchaseOrderLineItem.create(variant_id: line_item["variant_id"],
+                                                    purchase_order_id: @purchase_order.id,
+                                                    quantity: line_item["quantity"],
+                                                    price: line_item["price"],
+                                                    user_id: spree_current_user.id)
+              end
+            end
+          end
+
+          redirect_to edit_admin_purchase_order_path(@purchase_order.number)
+
+        end
+      end
 
       def submit
 
@@ -30,16 +126,16 @@ module Spree
           @purchase_order = Spree::PurchaseOrder.new
           @purchase_order.dropship = (params[:type] == "DS" ? true : false)
           @purchase_order.user_id = spree_current_user.id
+          @purchase_order.generate_number
           @purchase_order.save validate: false
           @purchase_order.purchase_order_line_items.build
 
+          return @purchase_order
         end
 
         def find_resource
-          @purchase_order = Spree::PurchaseOrder.find_by_number(params[:id])
-	  @purchase_order_line_items = @purchase_order.purchase_order_line_items
-
-	  return @purchase_order
+          param_id = params[:id] ? params[:id] : params[:purchase_order_id]
+          return Spree::PurchaseOrder.find_by_number(param_id)
         end
 
         def find_or_create_office_address
@@ -59,7 +155,7 @@ module Spree
         end
 
         def find_or_build_address
-          if @purchase_order.dropship and not params[:purchase_order][:address_id]
+          if @purchase_order.dropship and params[:purchase_order][:address_id].to_i == 0
             @address = Spree::Address.where(firstname: params[:address][:firstname],
                                             lastname: params[:address][:lastname],
                                             company: params[:address][:company],

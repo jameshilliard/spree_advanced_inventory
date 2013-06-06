@@ -6,8 +6,10 @@ Spree::Core::Engine.routes.draw do
       collection do
         get 'inventory_report'
         get 'open_dropship_report'
+
       end
 
+      match 'edit_line_items'
       match 'submit'
       match 'source'
       match 'item'
@@ -23,8 +25,10 @@ Spree::Core::Engine.routes.draw do
       end
     end
 
-    match 'adjust_inventory' => 'adjust_inventory#index', as: 'adjust_inventory'
-    match 'receive_inventory' => 'receive_inventory#index', as: 'receive_inventory'
+    get 'manage_stock' => 'manage_stock#index', as: 'manage_stock'
+    match 'manage_stock/:variant_id/update' => 'manage_stock#update',
+      as: 'update_stock'
+
   end
 
 end

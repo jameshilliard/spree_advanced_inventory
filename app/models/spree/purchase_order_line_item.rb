@@ -4,15 +4,24 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
   belongs_to :line_item
   belongs_to :user
 
-  attr_accessible :price, :quantity, :quantity_received, :received_at,
-    :purchase_order_id, :variant_id, :line_item_id, :user_id
+  has_many :received_purchase_order_line_items
 
-
-  def searcher
-    purchase_order.dropship ? Spree::LineItem : Spree::Variant
-  end
+  attr_accessible :price, :quantity, :purchase_order_id, :variant_id
 
   def product
-    purchase_order.dropship ? line_item.product : variant.product
+    variant.product
   end
+
+  def status
+    (received_purchase_order_line_items.sum(:quantity) == quantity) ? "Complete" : "Incomplete"
+  end
+
+  def receive(qty_recv)
+    received_purchase_order_line_items.create(quantity: qty_recv, received_at: Time.now)
+  end
+
+  def line_total
+    Spree::Money.new(quantity * price)
+  end
+
 end

@@ -4,7 +4,7 @@
     <th>QTY</th>
     <th>Cost</th>
   </thead>
-  <%= render partial: "spree/admin/purchase_order_line_items/inline_edit", 
+  <%= render partial: "spree/admin/purchase_order_line_items/inline_view", 
     collection: @purchase_order.purchase_order_line_items,
     as: :line_item,
     locals: { f: f, po: @purchase_order }
