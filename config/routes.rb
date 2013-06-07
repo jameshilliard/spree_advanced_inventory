@@ -26,8 +26,9 @@ Spree::Core::Engine.routes.draw do
     end
 
     get 'manage_stock' => 'manage_stock#index', as: 'manage_stock'
-    match 'manage_stock/:variant_id/update' => 'manage_stock#update',
-      as: 'update_stock'
+
+    match 'manage_stock/update' => 'manage_stock#update',
+      as: 'stock_update'
 
   end
 

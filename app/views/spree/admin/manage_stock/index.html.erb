@@ -4,4 +4,28 @@
   <%= t(:manage_stock) %>
 <% end %>
 
+<%= render :partial => "spree/admin/variants/autocomplete", :formats => :js %>
 
+<%= form_tag(admin_stock_update_path, method: "get") do |f| %>
+
+  <div data-hook="admin-manage-stock-index">
+    <div class="alpha eighteen columns omega">
+      <div class="sixteen columns alpha omega">
+        <fieldset class="no-border-bottom">
+          <legend align="center">
+            <%= t(:look_up_stock_by_name_or_sku) %>
+          </legend>
+
+          <%= text_field_tag :variant_id, "", class: "variant_autocomplete fullwidth", placeholder: "Search for a product" %>
+          <br/>
+          <br/>
+
+          <div class="form-buttons filter-actions actions" data-hook="buttons">
+            <%= button t(:next), 'icon-arrow-right' %>
+          </div>
+                
+        </fieldset>
+      </div>
+    </div>
+  </div>
+<% end %>

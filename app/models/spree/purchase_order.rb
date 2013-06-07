@@ -61,4 +61,19 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     (line_item_total + Spree::Money.new(shipping - discount - deposit))
   end
 
+  def items_received
+    completed_line_items = 0
+
+    purchase_order_line_items.each do |l|
+      unless l.status == "Incomplete"
+        completed_line_items += 1
+      end
+    end
+
+    if completed_line_items == purchase_order_line_items.sum(:quantity)
+      self.status = "Completed"
+      self.save
+    end
+  end
+
 end
