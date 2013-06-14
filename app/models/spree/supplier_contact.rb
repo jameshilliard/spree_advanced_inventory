@@ -4,4 +4,8 @@ class Spree::SupplierContact < ActiveRecord::Base
   attr_accessible :address1, :address2, :address3, :city, :country, :email, :fax, :job_title, :name, :phone, :state, :supplier, :url, :zip
 
   validates :supplier, presence: true
+
+  def name_with_supplier
+    "#{supplier.name} - #{name}"
+  end
 end

@@ -30,6 +30,13 @@ Spree::Core::Engine.routes.draw do
     match 'manage_stock/update' => 'manage_stock#update',
       as: 'stock_update'
 
+    get "advanced_inventory_settings" => "advanced_inventory_settings#show",
+      as: "advanced_inventory_settings"
+
+    get "advanced_inventory_settings/edit" => "advanced_inventory_settings#edit",
+      as: "edit_advanced_inventory_settings"
+
+    put "advanced_inventory_settings" => "advanced_inventory_settings#update"
   end
 
 end

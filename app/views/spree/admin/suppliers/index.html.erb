@@ -25,7 +25,7 @@
     <thead>
       <tr data-hook="rate_header">
         <th><%= t(:name) %></th>
-        <th><%= t(:account_number) %></th>
+        <th><%= t(:account_numbers) %></th>
         <th><%= t(:contacts) %></th>
         <th class="actions"></th>
       </tr>
@@ -48,9 +48,21 @@
               <%= link_to supplier.email, "mailto:#{supplier.email}" %>
             <% end %>
 
+            <% unless supplier.phone.blank? %>
+              <br/>
+              <%= supplier.phone %>
+            <% end %>
+
             
           </td>
-          <td><%= supplier.account_number %></td>
+          <td>
+            <%= supplier.account_number %>
+
+            <% unless supplier.nr_account_number.blank? %>
+               / NR: <%= supplier.nr_account_number %>
+            <% end %>
+
+          </td>
           <td><%= supplier.supplier_contacts.size %></td>
 
           <td class="actions">

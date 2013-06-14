@@ -1,13 +1,15 @@
 class Spree::PurchaseOrder < ActiveRecord::Base
   belongs_to :supplier
+  belongs_to :supplier_contact
   belongs_to :address
   belongs_to :shipping_method
   belongs_to :user
   has_many :purchase_order_line_items, dependent: :destroy
 
   attr_accessible :dropship, :due_at, :status, :address_id, :supplier_id,
-    :user_id, :comments, :purchase_order_line_items_attributes, :discount,
-    :shipping, :deposit, :shipping_method_id
+    :supplier_contact_id, :user_id, :comments,
+    :purchase_order_line_items_attributes, :discount, :shipping, :deposit,
+    :shipping_method_id
 
   accepts_nested_attributes_for :purchase_order_line_items,
    :reject_if => proc { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
@@ -47,7 +49,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     end
   end
 
-  def line_item_total
+  def gross_amount
     sum = Spree::Money.new(0)
 
     purchase_order_line_items.each do |l|
@@ -58,7 +60,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   end
 
   def total
-    (line_item_total + Spree::Money.new(shipping - discount - deposit))
+    (gross_amount + Spree::Money.new(shipping - discount - deposit))
   end
 
   def items_received
@@ -70,9 +72,15 @@ class Spree::PurchaseOrder < ActiveRecord::Base
       end
     end
 
-    if completed_line_items == purchase_order_line_items.sum(:quantity)
+    if completed_line_items == purchase_order_line_items.size
       self.status = "Completed"
       self.save
+    end
+  end
+
+  def self.update_status
+	  where('status != ?', 'Completed').each do |po|
+      po.items_received
     end
   end
 

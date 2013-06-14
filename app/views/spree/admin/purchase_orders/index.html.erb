@@ -120,10 +120,9 @@
             <b><%= purchase_order.dropship ? "Dropship" : "Purchase Order" %></b><br/>
             <%= purchase_order.number %>            
             <br/>
+            <br/>
             Status: <%= purchase_order.status %>
             <br/>
-            <%= purchase_order.created_at.strftime("%m/%d/%Y %H:%M") %> by <%= purchase_order.user.email %>
-
           </td>
           <td>
             <% if purchase_order.supplier.email %>
@@ -135,19 +134,43 @@
             <br/>
             <%= purchase_order.supplier.phone %>
           </td>
-          <td><%= line_item_details(purchase_order.purchase_order_line_items) %> </td>
+          <td>
+            
+            <%= line_item_details(purchase_order.purchase_order_line_items) %> 
+            <br/>
+
+            By: <%= purchase_order.user.email.split("@").first.capitalize %> - <%= purchase_order.created_at.strftime("%m/%d/%Y %H:%M") %>
+
+          </td>
           <td>
             <%= purchase_order.address %><br/>
             Via: <%= purchase_order.shipping_method.name.upcase %>
           </td>
           <td class="actions">
             <% if purchase_order.status == "Entered" %>
-              <%= link_to_with_icon("icon-envelope", "Submit to supplier", admin_purchase_order_submit_path(purchase_order) , no_text: true, confirm: "E-mail invoice to #{purchase_order.supplier.email}?")  %>
+              <%= link_to_with_icon("icon-envelope", 
+                                    "Submit to supplier", 
+                                    admin_purchase_order_submit_path(purchase_order), 
+                                    no_text: true, 
+                                    style: "margin-bottom: 4px",
+                                    confirm: "E-mail invoice to #{purchase_order.supplier.email}?")  %>
+              <br/>
+
             <% end %>
-            
+                        
+            <%= link_to_with_icon("icon-file", 
+                                  "Download PDF", 
+                                  admin_purchase_order_path(id: purchase_order.number, format:  "pdf"), 
+                                  style: "margin-bottom: 4px",
+                                  no_text: true)  %>            
             <br/>
 
-            <%= link_to_with_icon("icon-edit", "Edit", admin_purchase_order_edit_line_items_path(purchase_order) , no_text: true)  %>
+            <%= link_to_with_icon("icon-edit", 
+                                  "Edit", 
+                                  admin_purchase_order_edit_line_items_path(purchase_order), 
+                                  style: "margin-bottom: 4px",
+                                  no_text: true)  %>
+            <br/>
 
             <%= link_to_delete purchase_order, :no_text => true %>
 

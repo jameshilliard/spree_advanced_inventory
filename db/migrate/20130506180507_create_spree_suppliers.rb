@@ -4,6 +4,7 @@ class CreateSpreeSuppliers < ActiveRecord::Migration
       t.string :name
       t.string :abbreviation
       t.string :account_number
+      t.string :nr_account_number
       t.string :email
       t.string :url
       t.string :phone

@@ -3,9 +3,11 @@ module Spree
     class PurchaseOrdersController < ResourceController
 
       respond_to :html, :json, only: [:index, :show]
+      respond_to :pdf, only: [:show]
 
       before_filter :remove_unused, only: [:index]
       before_filter :find_or_create_office_address
+      before_filter :load_supplier, only: [:create, :update]
       before_filter :find_or_build_address, only: [:create, :update]
 
       def index
@@ -40,7 +42,15 @@ module Spree
       def show
         @purchase_order = find_resource
 
-        respond_with(@purchase_order)
+        respond_with(@purchase_order) do |format|
+          format.html
+          format.json { render(json: @purchase_order) }
+          format.pdf { render(layout: false) }
+        end
+      end
+
+      def purchase_order
+
       end
 
 
@@ -139,14 +149,26 @@ module Spree
         end
 
         def find_or_create_office_address
-          @office_address = Spree::Address.where(address1: "219 N. Milwaukee St",
-                                       address2: "Ste 3a",
-                                       company: "800-CEO-READ",
-                                       city: "Milwaukee",
-                                       state_id: 4,
-                                       zipcode: "53202",
-                                       country_id: 49,
-                                       phone: "800-236-7323",
+          country = Spree::Country.where('name = ? or iso = ? or iso3 = ? or iso_name = ?',
+                                         Spree::Config.advanced_inventory_office_country,
+                                         Spree::Config.advanced_inventory_office_country,
+                                         Spree::Config.advanced_inventory_office_country,
+                                         Spree::Config.advanced_inventory_office_country).first
+
+          state = Spree::State.where('country_id = ? and (name = ? or abbr = ?)',
+                                     country.id,
+                                     Spree::Config.advanced_inventory_office_state.titleize,
+                                     Spree::Config.advanced_inventory_office_state.upcase).first
+
+
+          @office_address = Spree::Address.where(address1: Spree::Config.advanced_inventory_office_address1,
+                                       address2: Spree::Config.advanced_inventory_office_address2,
+                                       company: Spree::Config.advanced_inventory_company,
+                                       city: Spree::Config.advanced_inventory_office_city,
+                                       state_id: state.id,
+                                       zipcode: Spree::Config.advanced_inventory_office_zip,
+                                       country_id: country.id,
+                                       phone: Spree::Config.advanced_inventory_office_phone,
                                        user_id: 1,
                                        firstname: "Shipping",
                                        lastname: "Receiving").first_or_create
@@ -183,6 +205,11 @@ module Spree
         def remove_unused
           Spree::PurchaseOrder.destroy_all(status: nil,
                                            user_id: spree_current_user.id)
+        end
+
+        def load_supplier
+          supplier_contact = Spree::SupplierContact.find(params[:purchase_order][:supplier_contact_id])
+          params[:purchase_order][:supplier_id] = supplier_contact.supplier_id
         end
 
     end

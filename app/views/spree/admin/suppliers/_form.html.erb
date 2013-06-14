@@ -20,6 +20,11 @@
           <%= f.text_field :account_number, :class => 'fullwidth' %>
         </div>
 
+        <div data-hook="nr_account_number" class="field">
+          <%= f.label :nr_account_number, t(:non_returnable_account_number) %>
+          <%= f.text_field :nr_account_number, :class => 'fullwidth' %>
+        </div>
+        
         <div data-hook="email" class="field">
           <%= f.label :email, t(:email_address) %>
           <%= f.text_field :email, :class => 'fullwidth' %>

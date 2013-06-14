@@ -1,7 +1,7 @@
 class Spree::Supplier < ActiveRecord::Base
-  attr_accessible :account_number, :address1, :address2, :address3, :city,
-    :country, :email, :fax, :name, :phone, :state, :url, :zip, :abbreviation,
-    :intl_phone, :intl_fax, :supplier_contacts_attributes
+  attr_accessible :account_number, :nr_account_number, :address1, :address2,
+    :address3, :city, :country, :email, :fax, :name, :phone, :state, :url,
+    :zip, :abbreviation, :intl_phone, :intl_fax, :supplier_contacts_attributes
 
   has_many :supplier_contacts, dependent: :destroy, inverse_of: :supplier
 
@@ -14,6 +14,18 @@ class Spree::Supplier < ActiveRecord::Base
 
   def to_s
     abbreviation ? abbreviation : name
+  end
+
+  def firstname
+    name
+  end
+
+  def lastname
+    ""
+  end
+
+  def zipcode
+    zip
   end
 
 end

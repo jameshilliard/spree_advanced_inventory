@@ -39,14 +39,14 @@
           <%= t(:other_details) %>
         </legend>
           
-        <div data-hook="purchase_order_supplier_id" class="field">
-          <%= f.label :supplier_id, t(:supplier) %> 
-          <%= f.collection_select :supplier_id, 
-            Spree::Supplier.order("name asc"), 
+        <div data-hook="purchase_order_supplier" class="field">
+          <%= f.label :supplier_id, t(:supplier_and_contact) %> 
+          <%= f.collection_select :supplier_contact_id, 
+            Spree::SupplierContact.joins(:supplier).order("spree_suppliers.name asc, spree_supplier_contacts.name asc"), 
             :id, 
-            :name, 
+            :name_with_supplier, 
             {},  
-            {class: 'fullwidth' } %>
+            {class: 'fullwidth select2' } %>
         </div>
 
         <div data-hook="purchase_order_due_at" class="field">
