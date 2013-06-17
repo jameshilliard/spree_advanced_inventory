@@ -147,6 +147,18 @@
             Via: <%= purchase_order.shipping_method.name.upcase %>
           </td>
           <td class="actions">
+            <%= link_to_with_icon("icon-edit", 
+                                  "Edit", 
+                                  admin_purchase_order_edit_line_items_path(purchase_order), 
+                                  style: "margin-bottom: 4px",
+                                  no_text: true)  %>
+            <br/>
+
+            <%= link_to_delete purchase_order, :no_text => true %>
+
+            <br/>
+            <br/>
+
             <% if purchase_order.status == "Entered" %>
               <%= link_to_with_icon("icon-envelope", 
                                     "Submit to supplier", 
@@ -164,15 +176,6 @@
                                   style: "margin-bottom: 4px",
                                   no_text: true)  %>            
             <br/>
-
-            <%= link_to_with_icon("icon-edit", 
-                                  "Edit", 
-                                  admin_purchase_order_edit_line_items_path(purchase_order), 
-                                  style: "margin-bottom: 4px",
-                                  no_text: true)  %>
-            <br/>
-
-            <%= link_to_delete purchase_order, :no_text => true %>
 
           </td>
 

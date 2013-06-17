@@ -12,20 +12,25 @@ if @purchase_order.dropship
 else
   text "Purchase Order", align: :right, style: :bold, size: 18
 end
+
 fill_color "000000"
 
-move_down 4
+move_down 2
 
 font "Helvetica",  size: 10,  style: :bold
-text "Order Number: #{@purchase_order.number}", align: :right
+text "Purchase Order #: #{@purchase_order.number}", align: :right
 
-move_down 2
 font "Helvetica", size: 10
-text "#{@purchase_order.created_at.strftime("%m/%d/%Y")}", align: :right
+
+if @purchase_order.order_id 
+  move_down 2
+  text "Reference #: #{@purchase_order.order.number}", align: :right
+end
 
 render partial: "spree/admin/purchase_orders/prawn/company_info"
 
 stroke_color "d8d8d8"
+
 render partial: "spree/admin/purchase_orders/prawn/supplier", 
   locals: { address: @purchase_order.supplier }
 
@@ -35,11 +40,10 @@ render partial: "spree/admin/purchase_orders/prawn/account",
 render partial: "spree/admin/purchase_orders/prawn/ship_to", 
   locals: { address: @purchase_order.address }
 
+move_down 10
+font "Helvetica", size: 18
+text "#{@purchase_order.created_at.strftime("%m/%d/%Y")}", align: :left
 
-
-
-move_down 30
-text "Test"
 
 render partial: "spree/admin/purchase_orders/prawn/purchase_order_line_items"
 

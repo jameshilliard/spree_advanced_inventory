@@ -39,6 +39,16 @@
           <%= t(:other_details) %>
         </legend>
           
+        <div data-hook="purchase_order_order" class="field">
+          <%= f.label :order_id, t(:corresponding_order) %> 
+          <%= f.collection_select :order_id, 
+            Spree::Order.where(state: "complete").order("spree_orders.created_at asc").limit(100), 
+            :id, 
+            :to_select, 
+            { prompt: "Select optional reference order"},  
+            {class: 'fullwidth select2' } %>
+        </div>          
+
         <div data-hook="purchase_order_supplier" class="field">
           <%= f.label :supplier_id, t(:supplier_and_contact) %> 
           <%= f.collection_select :supplier_contact_id, 
@@ -47,6 +57,13 @@
             :name_with_supplier, 
             {},  
             {class: 'fullwidth select2' } %>
+        </div>
+
+        
+        <div data-hook="purchase_order_terms" class="field">
+          <%= f.label :terms, t(:payment_terms) %> 
+          <br/>
+          <%= f.text_field :terms, class: 'fullwidth' %>
         </div>
 
         <div data-hook="purchase_order_due_at" class="field">
@@ -62,8 +79,6 @@
           <br/>
           <%= f.text_area :comments, class: 'fullwidth', rows: 3 %>
         </div>
-
-
         <div data-hook="purchase_order_adjustments" class="field">
           <%= f.label :balance_adjustments, t(:balance_adjustments) %>
           <table width="100%" cellspacing="3" cellpadding="0">

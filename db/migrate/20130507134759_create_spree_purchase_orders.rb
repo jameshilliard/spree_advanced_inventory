@@ -6,6 +6,7 @@ class CreateSpreePurchaseOrders < ActiveRecord::Migration
       t.belongs_to :user
       t.belongs_to :address
       t.belongs_to :shipping_method
+      t.belongs_to :order
       t.boolean :dropship
       t.datetime :due_at
       t.decimal :discount
@@ -24,5 +25,6 @@ class CreateSpreePurchaseOrders < ActiveRecord::Migration
     add_index :spree_purchase_orders, :supplier_id
     add_index :spree_purchase_orders, :supplier_contact_id
     add_index :spree_purchase_orders, :address_id
+    add_index :spree_purchase_orders, :order_id
   end
 end

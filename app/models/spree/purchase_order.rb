@@ -3,11 +3,12 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   belongs_to :supplier_contact
   belongs_to :address
   belongs_to :shipping_method
+  belongs_to :order
   belongs_to :user
   has_many :purchase_order_line_items, dependent: :destroy
 
   attr_accessible :dropship, :due_at, :status, :address_id, :supplier_id,
-    :supplier_contact_id, :user_id, :comments,
+    :supplier_contact_id, :user_id, :comments, :terms, :order_id,
     :purchase_order_line_items_attributes, :discount, :shipping, :deposit,
     :shipping_method_id
 
@@ -50,7 +51,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   end
 
   def gross_amount
-    sum = Spree::Money.new(0)
+    sum = 0.0
 
     purchase_order_line_items.each do |l|
       sum += l.line_total
@@ -60,7 +61,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   end
 
   def total
-    (gross_amount + Spree::Money.new(shipping - discount - deposit))
+    gross_amount.to_f + shipping.to_f - discount.to_f - deposit.to_f
   end
 
   def items_received

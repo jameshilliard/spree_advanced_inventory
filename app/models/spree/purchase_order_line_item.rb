@@ -21,7 +21,7 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
   end
 
   def line_total
-    Spree::Money.new(quantity * price)
+    quantity * price
   end
 
 end
