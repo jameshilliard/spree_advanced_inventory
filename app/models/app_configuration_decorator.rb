@@ -1,7 +1,7 @@
 Spree::AppConfiguration.class_eval do
   preference :advanced_inventory_office_address1, :string
   preference :advanced_inventory_office_address2, :string
-  preference :advanced_inventory_company, :string
+  preference :advanced_inventory_office_company, :string
   preference :advanced_inventory_office_phone, :string
   preference :advanced_inventory_office_email, :string
   preference :advanced_inventory_office_city, :string

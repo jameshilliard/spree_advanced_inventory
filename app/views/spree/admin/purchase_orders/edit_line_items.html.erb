@@ -1,3 +1,4 @@
+<%= csrf_meta_tags %>
 <%= render :partial => "spree/admin/variants/autocomplete", :formats => :js %>
 
 <div data-hook="admin_purchase_order_form_fields">
@@ -16,13 +17,13 @@
 
 
         <%= f.fields_for :purchase_order_line_items  do |l| %>
+            <div data-hook="add_product_name" style="float: left">
 
           <% if l.object.new_record? %>
             <%= l.text_field :variant_id, 
               class: "variant_autocomplete", 
-                placeholder: "Search for a product", 
-                style: "width: 300px" %>
-
+		          placeholder: "Search for a product", 
+              style: "width: 300px" %>
           <% else %>
             <%= text_field_tag "variant_product_name#{l.object.variant.id}", 
               "#{l.object.variant.product.name.split(":").first} SKU: #{l.object.variant.sku}", 
@@ -33,9 +34,11 @@
             <%= l.hidden_field :variant_id %>
 
           <% end %>
-          <%= l.number_field :quantity, class: "field", placeholder: "Quantity", size: 10 %>
+          <%= l.number_field :quantity, class: "field", placeholder: "Quantity", size: 4 %>
 
           <%= l.text_field :price, class: "field", placeholder: "Cost", size: 6 %>
+            </div>
+
 
         <% end %>
 
@@ -102,3 +105,6 @@
 
 </div>
 
+<% content_for :head do %>
+	<%= javascript_tag 'var expand_variants = true;' %>
+<% end %>

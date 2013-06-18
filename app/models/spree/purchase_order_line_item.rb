@@ -6,7 +6,8 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
 
   has_many :received_purchase_order_line_items
 
-  attr_accessible :price, :quantity, :purchase_order_id, :variant_id
+  attr_accessible :price, :quantity, :purchase_order_id, :variant_id,
+    :user_id
 
   def product
     variant.product

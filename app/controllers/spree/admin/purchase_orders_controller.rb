@@ -163,7 +163,7 @@ module Spree
 
           @office_address = Spree::Address.where(address1: Spree::Config.advanced_inventory_office_address1,
                                        address2: Spree::Config.advanced_inventory_office_address2,
-                                       company: Spree::Config.advanced_inventory_company,
+                                       company: Spree::Config.advanced_inventory_office_company,
                                        city: Spree::Config.advanced_inventory_office_city,
                                        state_id: state.id,
                                        zipcode: Spree::Config.advanced_inventory_office_zip,

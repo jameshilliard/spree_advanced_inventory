@@ -1,10 +1,11 @@
 <tr valign="top">
   <td width="40%">
-    <%= image_tag(line_item.variant.product.images.first.attachment.url(:mini), 
-                  valign: "middle", 
-                  align: "left",
-                  style: "margin-right: 10px") %>
-
+    <% if line_item.variant.product.images.first and line_item.variant.product.images.first.attachment %>
+      <%= image_tag(line_item.variant.product.images.first.attachment.url(:mini), 
+                    valign: "middle", 
+                    align: "left",
+                    style: "margin-right: 10px") %>
+    <% end %>
     <%= line_item.variant.product.name.split(":").first %>
    
     <br/>
