@@ -51,9 +51,14 @@ module Spree
                 redirect_to action: :update, variant_id: @variant.id, method: "get"
               end
             end
+            
+            if @variant.on_hand > 0
+              receive_total = @variant.on_hand + params[:receive].to_i
+            else
+              receive_total = params[:receive].to_i
+            end
 
-            @variant.on_hand = @variant.on_hand += params[:receive].to_i
-            @variant.save
+            @variant.update_attributes({ on_hand: receive_total})
           else
             flash[:error] = "Quantity received must be greater than 0"
             redirect_to action: :update, variant_id: @variant.id, method: "get"

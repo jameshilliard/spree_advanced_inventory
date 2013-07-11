@@ -3,7 +3,7 @@
 <% content_for :page_title do %>
   <%= t(:manage_stock) %>
 <% end %>
-<%= csrf_meta_tags %>
+
 <%= render :partial => "spree/admin/variants/autocomplete", :formats => :js %>
 
 <%= form_tag(admin_stock_update_path, method: "get") do |f| %>
@@ -34,5 +34,6 @@
 <% end %>
 
 <% content_for :head do %>
+  <%= csrf_meta_tags %>
 	<%= javascript_tag 'var expand_variants = true;' %>
 <% end %>
