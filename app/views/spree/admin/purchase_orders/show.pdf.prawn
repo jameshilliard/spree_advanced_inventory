@@ -49,4 +49,4 @@ render partial: "spree/admin/purchase_orders/prawn/purchase_order_line_items"
 
 move_down 8
 
-
+pdf.render_file(File.join(Rails.root, "tmp", @purchase_order.number + ".pdf"))

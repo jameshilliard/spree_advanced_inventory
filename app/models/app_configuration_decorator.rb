@@ -9,4 +9,5 @@ Spree::AppConfiguration.class_eval do
   preference :advanced_inventory_office_zip, :string
   preference :advanced_inventory_office_country, :string
   preference :advanced_inventory_tax_id, :string
+  preference :advanced_inventory_admin_views_path, :string
 end

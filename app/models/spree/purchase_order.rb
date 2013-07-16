@@ -85,4 +85,8 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     end
   end
 
+  def po_type
+    dropship ? "Dropship" : "Purchase Order"
+  end
+
 end

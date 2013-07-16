@@ -1,0 +1,19 @@
+<%= @po.supplier.name %>,
+
+Attached you will find a PDF for <%= @po.po_type %> #<%= @po.number %>
+
+This e-mail was sent to <%= @po.supplier.email %> and <%= @po.supplier_contact.email %>.
+
+Please direct any questions or corrections to <%= @po.user.email %>.
+
+Thank you!
+
+<%= Spree::Config.advanced_inventory_office_company %>
+<%= Spree::Config.advanced_inventory_office_address1 %>
+<%= Spree::Config.advanced_inventory_office_address2 %>
+<%= Spree::Config.advanced_inventory_office_city %> <%= Spree::Config.advanced_inventory_office_state %> <%= Spree::Config.advanced_inventory_office_zip %>
+
+Ph: <%= Spree::Config.advanced_inventory_office_phone %> 
+E-mail: <%= Spree::Config.advanced_inventory_office_email %>
+Tax ID:  <%= Spree::Config.advanced_inventory_tax_id %>
+

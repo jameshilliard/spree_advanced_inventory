@@ -162,10 +162,11 @@
             <% if purchase_order.status == "Entered" %>
               <%= link_to_with_icon("icon-envelope", 
                                     "Submit to supplier", 
-                                    admin_purchase_order_submit_path(purchase_order), 
+                                    admin_purchase_order_submit_path(purchase_order) + ".pdf", 
                                     no_text: true, 
                                     style: "margin-bottom: 4px",
-                                    confirm: "E-mail invoice to #{purchase_order.supplier.email}?")  %>
+                                    target: "_NEW",
+                                    confirm: "E-mail invoice to #{purchase_order.supplier.email} and then view PDF?")  %>
               <br/>
 
             <% end %>
@@ -174,6 +175,7 @@
                                   "Download PDF", 
                                   admin_purchase_order_path(id: purchase_order.number, format:  "pdf"), 
                                   style: "margin-bottom: 4px",
+                                  target: "_NEW",
                                   no_text: true)  %>            
             <br/>
 

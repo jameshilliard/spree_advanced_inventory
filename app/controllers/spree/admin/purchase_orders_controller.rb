@@ -3,7 +3,7 @@ module Spree
     class PurchaseOrdersController < ResourceController
 
       respond_to :html, :json, only: [:index, :show]
-      respond_to :pdf, only: [:show]
+      respond_to :pdf, only: [:show, :submit]
 
       before_filter :remove_unused, only: [:index]
       before_filter :find_or_create_office_address
@@ -114,20 +114,19 @@ module Spree
       end
 
       def submit
+        @purchase_order = find_resource
 
-      end
+        Thread.new do
+          sleep 10
+          Spree::PurchaseOrderMailer.email_supplier(@purchase_order, false).deliver
+          @purchase_order.status = "Submitted"
+          @purchase_order.save validate: false
+        end
 
-      def sku_report
+        respond_with(@purchase_order) do |format|
+          format.pdf { render(action: "show", layout: false) }
+        end
 
-      end
-
-      def supplier_report
-      end
-
-      def inventory_report
-      end
-
-      def open_dropship_report
       end
 
       protected
