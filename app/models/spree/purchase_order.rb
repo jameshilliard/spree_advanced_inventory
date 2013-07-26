@@ -21,6 +21,9 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   default_scope order("spree_purchase_orders.created_at desc")
 
+  scope :complete, lambda { where{(status == "Completed")} }
+  scope :incomplete, lambda { where{(status != "Completed")} }
+
   def generate_number
     record = true
     prefix = "PO"
