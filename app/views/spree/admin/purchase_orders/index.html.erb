@@ -122,6 +122,10 @@
             <br/>
             <br/>
             Status: <%= purchase_order.status %>
+            <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
+              <br/>
+              <%= link_to "Mark as complete?", admin_purchase_order_complete_path(purchase_order) %>
+            <% end %>
             <br/>
           </td>
           <td>
@@ -136,7 +140,7 @@
           </td>
           <td>
             
-            <%= line_item_details(purchase_order.purchase_order_line_items) %> 
+            <%= line_item_details(purchase_order.purchase_order_line_items).html_safe %> 
             <br/>
 
             By: <%= purchase_order.user.email.split("@").first.capitalize %> - <%= purchase_order.created_at.strftime("%m/%d/%Y %H:%M") %>
@@ -162,17 +166,17 @@
             <% if purchase_order.status == "Entered" %>
               <%= link_to_with_icon("icon-envelope", 
                                     "Submit to supplier", 
-                                    admin_purchase_order_submit_path(purchase_order) + ".pdf", 
+                                    admin_purchase_order_submit_path(purchase_order) + ".#{purchase_order.hardcopy_extension}", 
                                     no_text: true, 
                                     style: "margin-bottom: 4px",
                                     target: "_NEW",
-                                    confirm: "E-mail invoice to #{purchase_order.supplier.email} and then view PDF?")  %>
+                                    confirm: "E-mail invoice to #{purchase_order.supplier.email} and then view #{purchase_order.hardcopy_extension.upcase}?")  %>
               <br/>
             <% end %>
                         
             <%= link_to_with_icon("icon-file", 
-                                  "Download PDF", 
-                                  admin_purchase_order_path(id: purchase_order.number, format:  "pdf"), 
+                                  "Download #{purchase_order.hardcopy_extension.upcase}", 
+                                  admin_purchase_order_path(id: purchase_order.number, format:  purchase_order.hardcopy_extension), 
                                   style: "margin-bottom: 4px",
                                   target: "_NEW",
                                   no_text: true)  %>            

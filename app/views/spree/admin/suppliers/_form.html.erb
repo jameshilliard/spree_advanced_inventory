@@ -164,7 +164,21 @@
 
         <% end  %>
       </fieldset>
-     
+      <br/>
+
+      <fieldset data-hook="rtf-template" class=" no-border-bottom">
+        <legend align="center"><%= t(:optional_rtf_template) %></legend>
+          <div data-hook="supplier_rtf_template" class="field">
+            <%= file_field_tag "rtf_template" %>
+            <% if @supplier.try(:rtf_template) %>
+              <br/>
+              Previously uploaded template is <%= @supplier.rtf_template.size %> characters.
+            <% end %>
+          </div>
+         
+      </fieldset>
+      <br/>
+ 
     </div>
 
   </div>

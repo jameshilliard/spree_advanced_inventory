@@ -6,7 +6,8 @@ module Spree
 
       subject = "[#{Spree::Config[:site_name]}] New #{@po.po_type} ##{@po.number}"
       sleep 1
-      attachments["#{@po.number}.pdf"] = File.join(Rails.root,"tmp",@po.number + ".pdf")
+      ext = @po.hardcopy_extension
+      attachments["#{@po.number}.#{ext}"] = File.join(Rails.root,"tmp",@po.number + ".#{ext}")
       mail(:to => @po.supplier.email, :cc => @po.supplier_contact.email, :bcc => @po.user.email, :reply_to => @po.user.email, :subject => subject)
 
     end

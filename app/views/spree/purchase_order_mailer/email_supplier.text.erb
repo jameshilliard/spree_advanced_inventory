@@ -1,6 +1,6 @@
 <%= @po.supplier.name %>,
 
-Attached you will find a PDF for <%= @po.po_type %> #<%= @po.number %>
+Attached you will find a <%= @po.hardcopy_extension.upcase %> for <%= @po.po_type %> #<%= @po.number %>
 
 This e-mail was sent to <%= @po.supplier.email %> and <%= @po.supplier_contact.email %>.
 

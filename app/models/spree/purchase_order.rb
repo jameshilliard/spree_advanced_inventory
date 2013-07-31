@@ -40,6 +40,13 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     self.number
   end
 
+  def hardcopy_extension
+    if supplier.try(:rtf_template)
+      "rtf"
+    else
+      "pdf"
+    end
+  end
 
   def to_param
     number.to_s.to_url.upcase
@@ -90,6 +97,37 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   def po_type
     dropship ? "Dropship" : "Purchase Order"
+  end
+
+  def save_rtf
+    if supplier and supplier.rtf_template and supplier.rtf_template.size > 0
+      line_item = purchase_order_line_items.first
+
+      t = supplier.rtf_template
+      t.gsub!(/\|\|PONUM\|\|/, "#{number}")
+      t.gsub!(/\|\|DATE\|\|/, "#{created_at.strftime("%m-%d-%Y")}")
+      t.gsub!(/\|\|SPECIAL\|\|/, "#{shipping_method.name}")
+      t.gsub!(/\|\|TU\|\|/, "#{line_item.quantity}")
+      t.gsub!(/\|\|BUYER\|\|/, "#{user.email.split(/\@/).first}")
+      t.gsub!(/\|\|SHIP1\|\|/, "#{address.company}")
+      t.gsub!(/\|\|SHIP2\|\|/, "#{address.firstname} #{address.lastname}")
+      t.gsub!(/\|\|SHIP3\|\|/, "#{address.address1}")
+      t.gsub!(/\|\|SHIP4\|\|/, "#{address.address2}")
+      t.gsub!(/\|\|SHIP5\|\|/, "#{address.city}")
+      t.gsub!(/\|\|SHIP6\|\|/, "#{address.state.abbr}")
+      t.gsub!(/\|\|SHIP7\|\|/, "#{address.zipcode}")
+      t.gsub!(/\|\|ARRIVE\|\|/, "#{due_at}")
+      t.gsub!(/\|\|SKU\|\|/, "#{line_item.variant.sku}")
+      t.gsub!(/\|\|QTY\|\|/, "#{line_item.quantity}")
+      t.gsub!(/\|\|TITLE\|\|/, "#{line_item.variant.product.name}")
+
+      r = File.new(File.join(Rails.root, "tmp", "#{number}.rtf"), "w")
+      r.write(t)
+
+      return File.open(File.join(Rails.root, "tmp", "#{number}.rtf"), "r").read
+    else 
+      nil
+    end
   end
 
 end

@@ -1,7 +1,8 @@
 class Spree::Supplier < ActiveRecord::Base
   attr_accessible :account_number, :nr_account_number, :address1, :address2,
     :address3, :city, :country, :email, :fax, :name, :phone, :state, :url,
-    :zip, :abbreviation, :intl_phone, :intl_fax, :supplier_contacts_attributes
+    :zip, :abbreviation, :intl_phone, :intl_fax, :supplier_contacts_attributes,
+    :rtf_template
 
   has_many :supplier_contacts, dependent: :destroy, inverse_of: :supplier
 

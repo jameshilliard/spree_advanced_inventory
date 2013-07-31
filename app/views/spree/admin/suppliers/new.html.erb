@@ -12,7 +12,7 @@
 
 <%= render :partial => 'spree/shared/error_messages', :locals => { :target => @supplier } %>
 
-<%= form_for [:admin, @supplier] do |f| %>
+<%= form_for [:admin, @supplier], html: { multipart: true } do |f| %>
   <fieldset class="no-border-top">
     
     <%= render :partial => 'form', :locals => { :f => f } %>

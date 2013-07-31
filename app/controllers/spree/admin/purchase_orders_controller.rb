@@ -4,6 +4,7 @@ module Spree
 
       respond_to :html, :json, only: [:index, :show]
       respond_to :pdf, only: [:show, :submit]
+      respond_to :rtf, only: [:show, :submit]
 
       before_filter :remove_unused, only: [:index]
       before_filter :find_or_create_office_address
@@ -46,6 +47,8 @@ module Spree
           format.html
           format.json { render(json: @purchase_order) }
           format.pdf { render(layout: false) }
+          format.rtf { send_data(@purchase_order.save_rtf, type: "application/rtf; charset=utf-8; header=present", disposition: "attachment; filename=#{@purchase_order.number}.rtf") }
+
         end
       end
 
@@ -124,9 +127,24 @@ module Spree
         end
 
         respond_with(@purchase_order) do |format|
+          format.rtf { send_data(@purchase_order.save_rtf, type: "application/rtf; charset=utf-8; header=present", disposition: "attachment; filename=#{@purchase_order.number}.rtf") }
           format.pdf { render(action: "show", layout: false) }
         end
 
+      end
+
+      def complete
+        @purchase_order = find_resource
+
+        if @purchase_order.dropship and @purchase_order.status == "Submitted"
+            @purchase_order.status = "Completed"
+            @purchase_order.save
+            flash[:success] = "#{@purchase_order.number} marked as complete"
+        else
+          flash[:error] = "#{@purchase_order.number} is not a dropship or has not yet been submitted"
+        end
+
+        redirect_to admin_purchase_orders_path
       end
 
       protected
