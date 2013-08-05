@@ -10,6 +10,51 @@
   </li>
 <% end %>
 
+<% content_for :table_filter do %>
+  <div data-hook="admin_suppliers_index_search">
+    <%= search_form_for [:admin, @search] do |f| %>
+      <div class="field-block alpha four columns">
+        <div class="field">
+          <%= label_tag nil, t(:name) %>
+          <%= f.text_field :name_cont %>
+        </div>
+      </div>
+
+
+      <div class="four columns ">
+        <div class="field">
+          <%= label_tag nil, t(:vendor_id) %>
+          <%= f.text_field :abbreviation_cont %>
+        </div>
+      </div>
+
+
+      <div class="four columns ">
+        <div class="field">
+          <%= label_tag nil, t(:account_number) %>
+          <%= f.text_field :account_number_cont, :size => 25 %>
+        </div>
+      </div>
+
+
+      <div class="four columns omega">        
+        <div class="field">
+          <%= label_tag nil, t(:contact_name) %>
+          <%= f.text_field :supplier_contacts_name_cont, :size => 25%>
+        </div>
+      </div>
+
+      <div class="clearfix"></div>
+
+      <div class="actions filter-actions">
+        <div data-hook="admin_suppliers_index_search_buttons">
+          <%= button t(:filter_results), 'icon-search' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
 <% unless @suppliers and @suppliers.any? %>
   <div class="no-objects-found">
     <%= t(:no_results) %>
@@ -78,5 +123,5 @@
   </table>
 <% end %>
 
-
+<%= paginate @suppliers %>
 

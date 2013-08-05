@@ -40,6 +40,13 @@
           <%= f.text_field :phone, :class => 'fullwidth' %>
         </div>
 
+        <div data-hook="comments" class="field">
+          <%= f.label :comments, t(:comments) %>
+          <%= f.text_area :comments, :class => 'fullwidth', :rows => 5, :cols => 20 %>
+        </div>
+
+
+
         <div data-hook="intl_phone" class="field">
           <%= f.label :intl_phone, t(:international_phone_number) %>
           <%= f.text_field :intl_phone, :class => 'fullwidth' %>
