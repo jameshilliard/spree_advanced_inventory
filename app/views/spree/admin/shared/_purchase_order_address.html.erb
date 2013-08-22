@@ -2,7 +2,7 @@
   <%= f.label :address_id, t(:select_existing_delivery_address) %> 
   <br/>
   <%= f.collection_select :address_id, 
-    Spree::Address.order("lastname asc, firstname asc"), 
+    Spree::Address.eligible_for_po(@purchase_order), 
     :id, 
     :to_select, 
     { prompt: "Select an address" },  

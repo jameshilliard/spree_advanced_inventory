@@ -42,11 +42,11 @@
         <div data-hook="purchase_order_order" class="field">
           <%= f.label :order_id, t(:corresponding_order) %> 
           <%= f.collection_select :order_id, 
-            Spree::Order.where(state: "complete").order("spree_orders.created_at asc").limit(100), 
+            Spree::Order.eligible_for_po(@purchase_order), 
             :id, 
             :to_select, 
             { prompt: "Select optional reference order"},  
-            {class: 'fullwidth select2' } %>
+            { class: 'fullwidth select2' } %>
         </div>          
 
         <div data-hook="purchase_order_supplier" class="field">
