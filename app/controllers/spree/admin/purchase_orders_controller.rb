@@ -135,16 +135,22 @@ module Spree
 
       def complete
         @purchase_order = find_resource
+        next_url = admin_purchase_orders_path
 
         if @purchase_order.dropship and @purchase_order.status == "Submitted"
-            @purchase_order.status = "Completed"
-            @purchase_order.save
-            flash[:success] = "#{@purchase_order.number} marked as complete"
+
+          if @purchase_order.order
+            next_url = admin_order_shipments_path(@purchase_order.order)
+          end
+
+          @purchase_order.status = "Completed"
+          @purchase_order.save
+          flash[:success] = "#{@purchase_order.number} marked as complete - Mark corresponding shipment as shipped"
         else
           flash[:error] = "#{@purchase_order.number} is not a dropship or has not yet been submitted"
         end
 
-        redirect_to admin_purchase_orders_path
+        redirect_to next_url
       end
 
       protected
