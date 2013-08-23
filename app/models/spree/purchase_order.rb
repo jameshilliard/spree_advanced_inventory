@@ -95,6 +95,14 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     end
   end
 
+  def can_destroy?
+    if order and order.shipment_state == "shipped"
+      false
+    else
+      true
+    end
+  end
+
   def po_type
     dropship ? "Dropship" : "Purchase Order"
   end

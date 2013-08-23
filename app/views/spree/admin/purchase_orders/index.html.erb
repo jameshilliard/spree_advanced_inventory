@@ -158,9 +158,16 @@
                                   no_text: true)  %>
             <br/>
 
-            <%= link_to_delete purchase_order, :no_text => true %>
-
-            <br/>
+            <% if purchase_order.can_destroy? %>
+              <%= link_to_with_icon("icon-trash", 
+                                    "Remove", 
+                                    admin_purchase_order_path(purchase_order), 
+                                    style: "margin-bottom: 4px",
+                                    no_text: true,
+                                    method: "delete",
+                                    confirm: "Remove #{purchase_order.po_type} #{purchase_order.number}?" )  %>
+                                  <br/>
+            <% end %>
             <br/>
 
             <% if purchase_order.status == "Entered" %>

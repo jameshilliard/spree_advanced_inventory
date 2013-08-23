@@ -2,7 +2,8 @@ module Spree
   module Admin
     class PurchaseOrdersController < ResourceController
 
-      respond_to :html, :json, only: [:index, :show]
+      respond_to :html, only: [:index, :show, :destroy]
+      respond_to :json, only: [:index, :show]
       respond_to :pdf, only: [:show, :submit]
       respond_to :rtf, only: [:show, :submit]
 
@@ -140,16 +141,35 @@ module Spree
         if @purchase_order.dropship and @purchase_order.status == "Submitted"
 
           if @purchase_order.order
-            next_url = admin_order_shipments_path(@purchase_order.order)
+            next_url = admin_order_payments_path(@purchase_order.order)
           end
 
           @purchase_order.status = "Completed"
           @purchase_order.save
-          flash[:success] = "#{@purchase_order.number} marked as complete - Mark corresponding shipment as shipped"
+          flash[:success] = "#{@purchase_order.number} complete - Capture payment before updating shipment status"
         else
           flash[:error] = "#{@purchase_order.number} is not a dropship or has not yet been submitted"
         end
 
+        redirect_to next_url
+      end
+
+      def destroy
+        @purchase_order = Spree::PurchaseOrder.find_by_number(params[:id])
+        next_url = admin_purchase_orders_url
+
+        if @purchase_order
+          flash[:success] = "#{@purchase_order.po_type} removed"
+
+          if @purchase_order.order
+            next_url = admin_order_url(@purchase_order.order)
+            flash[:success] += " - Review the associated order" 
+          end
+
+          @purchase_order.destroy
+        else
+          flash[:error] = "Could not load #{params[:id]}"
+        end
         redirect_to next_url
       end
 
