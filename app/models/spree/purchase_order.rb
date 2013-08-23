@@ -130,4 +130,8 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     end
   end
 
+  def self.states
+    %w{Entered Submitted Completed}
+  end
+
 end

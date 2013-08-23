@@ -30,7 +30,7 @@
         <div class="field">
           <%= label_tag nil, t(:status) %>
           <br/>
-          <%= f.select :status_cont, %w{Entered Submitted Completed}, {:include_blank => true}, :class => 'select2 fullwidth'%>
+          <%= f.select :status_cont, Spree::PurchaseOrder.states, {:include_blank => true}, :class => 'select2 fullwidth'%>
         </div>
       </div>
 

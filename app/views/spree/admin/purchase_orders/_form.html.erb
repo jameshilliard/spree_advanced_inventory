@@ -30,6 +30,9 @@
 
         <% if @purchase_order.status.blank? %>
           <%= f.hidden_field :status, value: "Entered" %>
+        <% else %>
+            <%= f.label :status, t(:manually_override_status) %> 
+            <%= f.select :status, Spree::PurchaseOrder.states, {},  {class: 'fullwidth' } %>
         <% end %>
 
       </fieldset>
