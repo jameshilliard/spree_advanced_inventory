@@ -9,6 +9,9 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
   attr_accessible :price, :quantity, :purchase_order_id, :variant_id,
     :user_id
 
+  validates :variant_id, presence: true
+  validates :quantity, :price, numericality: true
+
   def product
     variant.product
   end
