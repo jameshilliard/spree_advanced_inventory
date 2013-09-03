@@ -16,8 +16,9 @@ class Spree::PurchaseOrder < ActiveRecord::Base
    :reject_if => proc { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
 
   before_validation :generate_number, :on => :create
+  before_validation :copy_supplier_id
 
-  validates :address_id, :supplier_id, :shipping_method_id, presence: true
+  validates :address_id, :shipping_method_id, presence: true
 
   default_scope order("spree_purchase_orders.created_at desc")
 
@@ -140,6 +141,13 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   def self.states
     %w{Entered Submitted Completed}
+  end
+
+  def copy_supplier_id
+    if supplier_contact
+      self.supplier_id = supplier_contact.supplier_id
+    end
+    return true
   end
 
 end

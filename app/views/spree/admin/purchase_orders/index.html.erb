@@ -129,7 +129,7 @@
             <br/>
           </td>
           <td>
-            <% if purchase_order.supplier.email %>
+            <% if purchase_order.supplier and purchase_order.supplier.email %>
               <%= link_to purchase_order.supplier, "mailto:#{purchase_order.supplier.email}", title: "E-mail this supplier" %>
             <% else %>
               <%= purchase_order.supplier %>

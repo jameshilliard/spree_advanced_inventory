@@ -42,18 +42,18 @@ module Spree
 
                 @line_item.purchase_order.items_received
 
-                flash[:success] = "Received #{params[:receive]} units of #{@variant.product.name}"
+                flash[:success] = flash_message_for(@variant, "received stock")
                 redirect_to action: :index
 
 
               else
-                flash[:error] = "Could not find that purchase order line item"
+                flash[:error] = flash_message_for(@variant, "Could not find that purchase order line item")
                 redirect_to action: :update, variant_id: @variant.id, method: "get"
               end
             end
 
           else
-            flash[:error] = "Quantity received must be greater than 0"
+            flash[:error] = flash_message_for(@variant, "Quantity received must be greater than 0")
             redirect_to action: :update, variant_id: @variant.id, method: "get"
 
           end
