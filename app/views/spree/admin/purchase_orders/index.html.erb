@@ -114,89 +114,90 @@
     </thead>
     <tbody>
       <% @purchase_orders.each do |purchase_order|%>
-        <tr id="<%= spree_dom_id purchase_order %>" data-hook="rate_row" class="<%= cycle('odd', 'even')%>">
+        <% unless purchase_order.status.blank? %>
+          <tr id="<%= spree_dom_id purchase_order %>" data-hook="rate_row" class="<%= cycle('odd', 'even')%>">
 
-          <td>
-            <b><%= purchase_order.dropship ? "Dropship" : "Purchase Order" %></b><br/>
-            <%= purchase_order.number %>            
-            <br/>
-            <br/>
-            Status: <%= purchase_order.status %>
-            <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
+            <td>
+              <b><%= purchase_order.dropship ? "Dropship" : "Purchase Order" %></b><br/>
+              <%= purchase_order.number %>            
               <br/>
-              <%= link_to "Mark as complete?", admin_purchase_order_complete_path(purchase_order) %>
-            <% end %>
-            <br/>
-          </td>
-          <td>
-            <% if purchase_order.supplier and purchase_order.supplier.email %>
-              <%= link_to purchase_order.supplier, "mailto:#{purchase_order.supplier.email}", title: "E-mail this supplier" %>
-            <% else %>
-              <%= purchase_order.supplier %>
-            <% end %>
+              <br/>
+              Status: <%= purchase_order.status %>
+              <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
+                <br/>
+                <%= link_to "Mark as complete?", admin_purchase_order_complete_path(purchase_order) %>
+              <% end %>
+              <br/>
+            </td>
+            <td>
+              <% if purchase_order.supplier and purchase_order.supplier.email %>
+                <%= link_to purchase_order.supplier, "mailto:#{purchase_order.supplier.email}", title: "E-mail this supplier" %>
+              <% else %>
+                <%= purchase_order.supplier %>
+              <% end %>
 
-            <br/>
-            <% if purchase_order.supplier and purchase_order.supplier.phone %>
-              <%= purchase_order.supplier.phone %>
-            <% end %>
-          </td>
-          <td>
-            
-            <%= line_item_details(purchase_order.purchase_order_line_items).html_safe %> 
-            <br/>
+              <br/>
+              <% if purchase_order.supplier and purchase_order.supplier.phone %>
+                <%= purchase_order.supplier.phone %>
+              <% end %>
+            </td>
+            <td>
+              
+              <%= line_item_details(purchase_order.purchase_order_line_items).html_safe %> 
+              <br/>
 
-            By: <%= purchase_order.user.email.split("@").first.capitalize %> - <%= purchase_order.created_at.strftime("%m/%d/%Y %H:%M") %>
+              By: <%= purchase_order.user.email.split("@").first.capitalize %> - <%= purchase_order.created_at.strftime("%m/%d/%Y %H:%M") %>
 
-          </td>
-          <td>
-            <%= purchase_order.address %><br/>
-            <% unless not purchase_order.shipping_method %>
-              Via: <%= purchase_order.shipping_method.name.upcase %>
-            <% end %>
-          </td>
-          <td class="actions">
-            <%= link_to_with_icon("icon-edit", 
-                                  "Edit", 
-                                  admin_purchase_order_edit_line_items_path(purchase_order), 
-                                  style: "margin-bottom: 4px",
-                                  no_text: true)  %>
-            <br/>
-
-            <% if purchase_order.can_destroy? %>
-              <%= link_to_with_icon("icon-trash", 
-                                    "Remove", 
-                                    admin_purchase_order_path(purchase_order), 
+            </td>
+            <td>
+              <%= purchase_order.address %><br/>
+              <% unless not purchase_order.shipping_method %>
+                Via: <%= purchase_order.shipping_method.name.upcase %>
+              <% end %>
+            </td>
+            <td class="actions">
+              <%= link_to_with_icon("icon-edit", 
+                                    "Edit", 
+                                    admin_purchase_order_edit_line_items_path(purchase_order), 
                                     style: "margin-bottom: 4px",
-                                    no_text: true,
-                                    method: "delete",
-                                    confirm: "Remove #{purchase_order.po_type} #{purchase_order.number}?" )  %>
-                                  <br/>
-            <% end %>
-            <br/>
+                                    no_text: true)  %>
+              <br/>
 
-            <% if purchase_order.status == "Entered" %>
-              <%= link_to_with_icon("icon-envelope", 
-                                    "Submit to supplier", 
-                                    admin_purchase_order_submit_path(purchase_order) + ".#{purchase_order.hardcopy_extension}", 
-                                    no_text: true, 
+              <% if purchase_order.can_destroy? %>
+                <%= link_to_with_icon("icon-trash", 
+                                      "Remove", 
+                                      admin_purchase_order_path(purchase_order), 
+                                      style: "margin-bottom: 4px",
+                                      no_text: true,
+                                      method: "delete",
+                                      confirm: "Remove #{purchase_order.po_type} #{purchase_order.number}?" )  %>
+                                    <br/>
+              <% end %>
+              <br/>
+
+              <% if purchase_order.status == "Entered" %>
+                <%= link_to_with_icon("icon-envelope", 
+                                      "Submit to supplier", 
+                                      admin_purchase_order_submit_path(purchase_order) + ".#{purchase_order.hardcopy_extension}", 
+                                      no_text: true, 
+                                      style: "margin-bottom: 4px",
+                                      target: "_NEW",
+                                      confirm: "E-mail invoice to #{purchase_order.supplier.email} and then view #{purchase_order.hardcopy_extension.upcase}?")  %>
+                <br/>
+              <% end %>
+                          
+              <%= link_to_with_icon("icon-file", 
+                                    "Download #{purchase_order.hardcopy_extension.upcase}", 
+                                    admin_purchase_order_path(id: purchase_order.number, format:  purchase_order.hardcopy_extension), 
                                     style: "margin-bottom: 4px",
                                     target: "_NEW",
-                                    confirm: "E-mail invoice to #{purchase_order.supplier.email} and then view #{purchase_order.hardcopy_extension.upcase}?")  %>
+                                    no_text: true)  %>            
               <br/>
-            <% end %>
-                        
-            <%= link_to_with_icon("icon-file", 
-                                  "Download #{purchase_order.hardcopy_extension.upcase}", 
-                                  admin_purchase_order_path(id: purchase_order.number, format:  purchase_order.hardcopy_extension), 
-                                  style: "margin-bottom: 4px",
-                                  target: "_NEW",
-                                  no_text: true)  %>            
-            <br/>
 
-          </td>
+            </td>
 
-        </tr>
-
+          </tr>
+        <% end %>
       <% end %>
 
     </tbody>
