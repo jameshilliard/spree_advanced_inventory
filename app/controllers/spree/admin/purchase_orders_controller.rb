@@ -117,29 +117,6 @@ module Spree
         end
       end
 
-      def update
-        @purchase_order = find_resource
-        @purchase_order.attributes = params[:purchase_order]
-
-        @purchase_order.valid?
-
-        @sc = @purchase_order.supplier_contact
-        @s = @sc.supplier
-
-        unless @sc.valid? and @s.valid?
-          @purchase_order.errors.add(:supplier_contact_id, "or supplier are missing information")
-        end
-
-        if not @purchase_order.errors
-          @purchase_order.save
-          flash[:success] = flash_message_for(@purchase_order, :successfully_updated)
-
-          redirect_to admin_purchase_orders_path, success: flash[:success]
-        else
-          render "edit"
-        end
-      end
-
       def submit
         @purchase_order = find_resource
 

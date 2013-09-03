@@ -10,8 +10,7 @@ class Spree::Supplier < ActiveRecord::Base
     allow_destroy: true,
     reject_if: proc { |attributes| attributes['name'].blank? }
 
-  validates :account_number, :email, :name, :address1, :city, :state, :zip, :country, :phone,
-    presence: true
+  validates :account_number, :email, :name, :abbreviation, :phone, presence: true
 
 
   def to_s

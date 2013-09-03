@@ -10,10 +10,11 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   attr_accessible :dropship, :due_at, :status, :address_id, :supplier_id,
     :supplier_contact_id, :user_id, :comments, :terms, :order_id,
     :purchase_order_line_items_attributes, :discount, :shipping, :deposit,
-    :shipping_method_id
+    :shipping_method_id, :address_attributes
 
   accepts_nested_attributes_for :purchase_order_line_items,
    :reject_if => proc { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
+
 
   before_validation :generate_number, :on => :create
   before_validation :copy_supplier_id
