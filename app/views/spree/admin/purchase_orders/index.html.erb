@@ -150,7 +150,9 @@
           </td>
           <td>
             <%= purchase_order.address %><br/>
-            Via: <%= purchase_order.shipping_method.name.upcase %>
+            <% unless not purchase_order.shipping_method %>
+              Via: <%= purchase_order.shipping_method.name.upcase %>
+            <% end %>
           </td>
           <td class="actions">
             <%= link_to_with_icon("icon-edit", 
