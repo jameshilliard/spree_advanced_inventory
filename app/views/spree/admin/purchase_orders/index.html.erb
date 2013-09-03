@@ -136,7 +136,9 @@
             <% end %>
 
             <br/>
-            <%= purchase_order.supplier.phone %>
+            <% if purchase_order.supplier and purchase_order.supplier.phone %>
+              <%= purchase_order.supplier.phone %>
+            <% end %>
           </td>
           <td>
             
