@@ -5,6 +5,18 @@ class Spree::SupplierContact < ActiveRecord::Base
 
   validates :email, :name, presence: true
 
+  scope :eligible_for_select, lambda {
+    where{
+      (supplier.name != "") &
+      (supplier.email != "") &
+      (supplier.phone != "") &
+      (name != "") &
+      (email != "")
+    }.
+    joins(:supplier).
+    order("spree_suppliers.name asc, spree_supplier_contacts.name asc") 
+  }
+
   def name_with_supplier
     "#{supplier.name} - #{name}"
   end

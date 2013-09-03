@@ -55,7 +55,7 @@
         <div data-hook="purchase_order_supplier" class="field">
           <%= f.label :supplier_contact_id, t(:supplier_and_contact) %> 
           <%= f.collection_select :supplier_contact_id, 
-            Spree::SupplierContact.joins(:supplier).order("spree_suppliers.name asc, spree_supplier_contacts.name asc"), 
+            Spree::SupplierContact.eligible_for_select, 
             :id, 
             :name_with_supplier, 
             {},  

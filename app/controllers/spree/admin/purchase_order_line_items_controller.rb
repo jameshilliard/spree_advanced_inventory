@@ -9,8 +9,8 @@ module Spree
             user_id: spree_current_user.id,
             purchase_order_id: params[:purchase_order_id],
             variant_id: params[:add_variant_id],
-            price: params[:add_price],
-            quantity: params[:add_quantity]).first_or_create
+            price: params[:add_price].to_f,
+            quantity: params[:add_quantity].to_i).first_or_create
 
       end
     end
