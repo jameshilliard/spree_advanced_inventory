@@ -120,12 +120,14 @@ module Spree
       def submit
         @purchase_order = find_resource
 
-        Thread.new do
-          sleep 10
+        ::ActiveRecord::Base.clear_all_connections!
+        fork do
+          sleep 30
           Spree::PurchaseOrderMailer.email_supplier(@purchase_order, false).deliver
           @purchase_order.status = "Submitted"
           @purchase_order.save validate: false
         end
+        ::ActiveRecord::Base.establish_connection
 
         respond_with(@purchase_order) do |format|
           format.rtf { send_data(@purchase_order.save_rtf, type: "application/rtf; charset=utf-8; header=present", disposition: "attachment; filename=#{@purchase_order.number}.rtf") }

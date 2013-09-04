@@ -14,8 +14,9 @@ module Spree
       subject = "[#{Spree::Config[:site_name]}] #{type} #{@po.po_type} ##{@po.number}"
       sleep 1
       ext = @po.hardcopy_extension
-      attachments["#{@po.number}.#{ext}"] = File.join(Rails.root,"tmp",@po.number + ".#{ext}")
+      attachments["#{@po.number}.#{ext}"] = File.read(File.join(Rails.root,"tmp",@po.number + ".#{ext}"))
       mail(:to => @po.supplier.email.split(";"), 
+           :from => "webserver@800ceoread.com",
            :cc => @po.supplier_contact.email.split(";"), 
            :bcc => [@po.user.email, "zach@800ceoread.com"], 
            :reply_to => @po.user.email, 
