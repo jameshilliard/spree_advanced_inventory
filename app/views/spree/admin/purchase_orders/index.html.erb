@@ -121,12 +121,14 @@
               <b><%= purchase_order.dropship ? "Dropship" : "Purchase Order" %></b><br/>
               <%= purchase_order.number %>            
               <br/>
+              
               <% if purchase_order.order %>
                 <%= link_to purchase_order.order.number, admin_order_url(purchase_order.order), target: "_NEW" %>
               <% else %>
                  No reference order
               <% end %>
               <br/>
+              
               Status: <%= purchase_order.status %>
               <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
                 <br/>
