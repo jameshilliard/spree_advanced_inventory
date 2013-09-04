@@ -9,6 +9,11 @@ if address.attributes["address3"] and address.attributes["address3"].size > 0
   data << [address.address3]
 end
 
+
+if address.attributes["company"] and address.attributes["company"].size > 0
+  data << [address.company]
+end
+
 data << ["#{address.city}, #{address.state} #{address.zipcode}"]
 data << [address.country]
 

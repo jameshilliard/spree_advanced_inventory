@@ -2,7 +2,50 @@
   <div class="alpha eighteen columns omega">
     <%= form_for [:admin, @purchase_order] do |f| %>
 
-    <div class="eight columns alpha">
+      <div class="eight columns alpha">
+
+      <fieldset data-hook="purchase-order-details" class="no-border-bottom">
+        <legend align="center">
+          General Information
+        </legend>
+
+        <% if @purchase_order.status.blank? %>
+          <%= f.hidden_field :status, value: "Entered" %>
+        <% else %>
+          <%= f.label :status, t(:manually_override_status) %> 
+          <%= f.select :status, Spree::PurchaseOrder.states, {},  {class: 'fullwidth select2' } %>
+        <% end %>
+
+        <div data-hook="purchase_order_order" class="field">
+          <%= f.label :order_id, t(:corresponding_order) %> 
+          <%= f.collection_select :order_id, 
+            Spree::Order.eligible_for_po(@purchase_order), 
+            :id, 
+            :to_select, 
+            { prompt: "Select optional reference order"},  
+            { class: 'fullwidth select2' } %>
+        </div>          
+
+          
+        <div data-hook="purchase_order_supplier" class="field">
+          <%= f.label :supplier_contact_id, t(:supplier_and_contact) %> 
+          <%= f.collection_select :supplier_contact_id, 
+            Spree::SupplierContact.eligible_for_select, 
+            :id, 
+            :name_with_supplier, 
+            {},  
+            {class: 'fullwidth select2' } %>
+        </div>
+
+        <div data-hook="purchase_order_email_subject" class="field">
+          <%= f.label :terms, "Subject to use in e-mail to supplier" %> 
+          <br/>
+          <%= f.text_field :email_subject, class: 'fullwidth' %>
+        </div>
+
+
+      </fieldset>
+
       <fieldset data-hook="purchase-order-details" class="no-border-bottom">
         <legend align="center">
           <%= t(:shipping) %>
@@ -27,41 +70,12 @@
           {},  
           {class: 'fullwidth' } %>
         </div>
-
-        <% if @purchase_order.status.blank? %>
-          <%= f.hidden_field :status, value: "Entered" %>
-        <% else %>
-            <%= f.label :status, t(:manually_override_status) %> 
-            <%= f.select :status, Spree::PurchaseOrder.states, {},  {class: 'fullwidth' } %>
-        <% end %>
-
       </fieldset>
 
       <fieldset data-hook="purchase-order-details" class="no-border-bottom">
         <legend align="center">
-          <%= t(:other_details) %>
+          Informational Stuff
         </legend>
-          
-        <div data-hook="purchase_order_order" class="field">
-          <%= f.label :order_id, t(:corresponding_order) %> 
-          <%= f.collection_select :order_id, 
-            Spree::Order.eligible_for_po(@purchase_order), 
-            :id, 
-            :to_select, 
-            { prompt: "Select optional reference order"},  
-            { class: 'fullwidth select2' } %>
-        </div>          
-
-        <div data-hook="purchase_order_supplier" class="field">
-          <%= f.label :supplier_contact_id, t(:supplier_and_contact) %> 
-          <%= f.collection_select :supplier_contact_id, 
-            Spree::SupplierContact.eligible_for_select, 
-            :id, 
-            :name_with_supplier, 
-            {},  
-            {class: 'fullwidth select2' } %>
-        </div>
-
         
         <div data-hook="purchase_order_terms" class="field">
           <%= f.label :terms, t(:payment_terms) %> 

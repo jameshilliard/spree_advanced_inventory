@@ -24,6 +24,14 @@ bounding_box [0,370], :width => 540, :height => 300 do
       row << item.quantity
       row << number_to_currency(item.price * item.quantity) unless @hide_prices
       content << row
+
+      unless item.comment.blank?
+        row = ["",item.comment]
+        row << "" unless @hide_prices
+        row << "" 
+        row << "" unless @hide_prices
+        content << row
+      end
     end
 
 

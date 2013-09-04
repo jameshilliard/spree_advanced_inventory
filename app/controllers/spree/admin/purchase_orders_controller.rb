@@ -93,6 +93,7 @@ module Spree
               if line_item["quantity"].to_i > 0
 
                 l.update_attributes(quantity: line_item["quantity"],
+                                    comment: line_item["comment"],
                                     price: line_item["price"])
               else
                 l.destroy
@@ -106,6 +107,7 @@ module Spree
                 Spree::PurchaseOrderLineItem.create(variant_id: line_item["variant_id"],
                                                     purchase_order_id: @purchase_order.id,
                                                     quantity: line_item["quantity"].to_i,
+                                                    comment: line_item["comment"],
                                                     price: line_item["price"].to_f,
                                                     user_id: spree_current_user.id)
               end

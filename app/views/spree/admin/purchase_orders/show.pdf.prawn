@@ -42,11 +42,17 @@ render partial: "spree/admin/purchase_orders/prawn/ship_to",
 
 move_down 10
 font "Helvetica", size: 18
-text "#{@purchase_order.created_at.strftime("%m/%d/%Y")}", align: :left
-
+text "#{@purchase_order.created_at.strftime("%m/%d/%Y")}"
 
 render partial: "spree/admin/purchase_orders/prawn/purchase_order_line_items"
 
-move_down 8
+unless @purchase_order.comments.blank?
+  move_up 80
+  font "Helvetica", size: 12
+  text "COMMENTS:"
+  font "Helvetica", size: 9
+  text @purchase_order.comments
+end
+
 
 pdf.render_file(File.join(Rails.root, "tmp", @purchase_order.number + ".pdf"))

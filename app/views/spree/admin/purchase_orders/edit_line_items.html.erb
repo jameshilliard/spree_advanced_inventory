@@ -6,7 +6,7 @@
 
   <%= form_for [:admin, @purchase_order], url: admin_purchase_order_edit_line_items_path(@purchase_order.number), method: "post" do |f| %>
 
-    <div class="ten columns alpha">
+    <div class="twelve columns alpha">
 
       <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
         <legend align="center">
@@ -34,9 +34,9 @@
             <%= l.hidden_field :variant_id %>
 
           <% end %>
-          <%= l.number_field :quantity, class: "field", placeholder: "Quantity", size: 4 %>
-
-          <%= l.text_field :price, class: "field", placeholder: "Cost", size: 6 %>
+          <%= l.text_field :comment, class: "field", placeholder: "Line item comment", size: 20, default: "" %>
+          <%= l.text_field :quantity, class: "field", placeholder: "Quantity", size: 5, default: "1" %>
+          <%= l.text_field :price, class: "field", placeholder: "Cost", size: 5, default: "0.00" %>
             </div>
 
 
@@ -49,7 +49,7 @@
       </fieldset>
     </div>
 
-    <div class="six columns omega">
+    <div class="four columns omega">
       <fieldset data-hook="purchase-order-info" class="no-border-bottom">
         <legend align="center">
           <%= t(@purchase_order.number) %>
