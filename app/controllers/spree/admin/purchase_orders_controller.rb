@@ -67,7 +67,7 @@ module Spree
       def edit_line_items
         @purchase_order = find_resource
 
-        total_line_items = @purchase_order.purchase_order_line_items.size
+        total_line_items = @purchase_order.purchase_order_line_items ? @purchase_order.purchase_order_line_items.size : 0
 
         @line_item_limit = @purchase_order.dropship ? 1 : (10 - total_line_items)
 
