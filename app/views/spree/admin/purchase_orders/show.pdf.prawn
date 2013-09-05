@@ -18,7 +18,7 @@ fill_color "000000"
 move_down 2
 
 font "Helvetica",  size: 10,  style: :bold
-text "Purchase Order #: #{@purchase_order.number}", align: :right
+text "##{@purchase_order.number}", align: :right
 
 font "Helvetica", size: 10
 
@@ -42,7 +42,7 @@ render partial: "spree/admin/purchase_orders/prawn/ship_to",
 
 move_down 10
 font "Helvetica", size: 18
-text "#{@purchase_order.created_at.strftime("%m/%d/%Y")}"
+text "#{@purchase_order.created_at.strftime("%m/%d/%Y")} - #{@purchase_order.id}"
 
 render partial: "spree/admin/purchase_orders/prawn/purchase_order_line_items"
 
