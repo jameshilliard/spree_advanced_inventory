@@ -109,7 +109,7 @@ if @purchase_order.supplier.phone
 end
 
 if @purchase_order.supplier.attributes["fax"] and @purchase_order.supplier.attributes["fax"].size > 0
-  fax_number = address.fax
+  fax_number = @purchase_order.supplie.fax
 
   if @purchase_order.supplier.attributes["intl_fax"] and @purchase_order.supplier.attributes["intl_fax"].size > 0
     fax_number += " Intl: #{@purchase_order.supplier.intl_fax}"
