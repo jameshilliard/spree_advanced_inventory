@@ -1,11 +1,28 @@
 Spree::Order.class_eval do
   has_many :purchase_orders
-  attr_accessible :is_dropship
+
+  attr_accessible :is_dropship, :inventory_adjusted
+
+  before_validation :dropship_conversion
 
   def to_select
     value = "#{number} - From: #{email} - $#{total}"
 
     return value
+  end
+
+  def dropship_conversion 
+    if is_dropship and is_dropship_changed? and not inventory_adjusted
+      # The first time an order is changed from non_dropship
+      # to a dropship, this adds the units back into inventory 
+      line_items.each do |l|
+        l.variant.increment!(:count_on_hand, l.quantity)
+      end
+
+      self.inventory_adjusted = true
+      
+    end
+    return true
   end
 
   def self.eligible_for_po(po)
