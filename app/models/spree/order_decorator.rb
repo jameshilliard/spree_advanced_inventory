@@ -3,7 +3,7 @@ Spree::Order.class_eval do
   attr_accessible :is_dropship
 
   def to_select
-    value = "#{number} - #{created_at.strftime("%m/%d/%Y %H:%M")} - From: #{email} - $#{total}"
+    value = "#{number} - From: #{email} - $#{total}"
 
     return value
   end
