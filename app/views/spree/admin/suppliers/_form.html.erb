@@ -1,9 +1,12 @@
+<%= render :partial => 'spree/shared/error_messages', :locals => { :target => @supplier } %>
 <div data-hook="admin_supplier_form_fields">
   <div class="alpha eighteen columns omega">
   
     <div class="eight columns alpha">
       <fieldset data-hook="suppliers" class=" no-border-bottom">
         <legend align="center"><%= t(:supplier_details) %></legend>
+        
+        
 
         <div data-hook="name" class="field">
           <%= f.label :name, t(:name) %>
@@ -109,8 +112,8 @@
       
       <fieldset data-hook="new-supplier-contact" class=" no-border-bottom">
         <legend align="center"><%= t(:new_supplier_contact) %></legend>
-
-        <%= f.fields_for :supplier_contacts, @supplier.supplier_contacts.new do |sc| %>
+        
+        <%= f.fields_for :supplier_contacts, @new_supplier_contact do |sc| %>
 
           <div data-hook="supplier_contact_name" class="field">
             <%= sc.label :name, t(:name) %>

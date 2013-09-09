@@ -2,6 +2,8 @@ module Spree
   module Admin
     class SuppliersController < ResourceController
       before_filter :copy_rtf, only: [:create, :update]
+      before_filter :setup_new_supplier_contact, only: [:new, :edit]
+      before_filter :setup_entered_supplier_contact, only: [:create, :update]
 
       def index
         params[:q] ||= {}
@@ -24,6 +26,27 @@ module Spree
           end
         end
       end 
+
+      def setup_new_supplier_contact
+        @new_supplier_contact = Spree::SupplierContact.new
+
+        if @supplier
+          @new_supplier_contact.supplier = @supplier
+        end
+      end
+
+      def setup_entered_supplier_contact
+        if params[:supplier] and 
+          params[:supplier][:supplier_contacts_attributes] and 
+          params[:supplier][:supplier_contacts_attributes]["0"]
+
+          logger.info "\n\n*** #{params[:supplier][:supplier_contacts_attributes]["0"].inspect}"
+          @new_supplier_contact = Spree::SupplierContact.new(params[:supplier][:supplier_contacts_attributes]["0"])
+        else
+          logger.info "\n\n--- New supplier contact"
+          setup_new_supplier_contact
+        end
+      end
 
     end
   end
