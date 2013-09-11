@@ -27,6 +27,8 @@ Spree::Core::Engine.routes.draw do
     end
 
     get 'manage_stock' => 'manage_stock#index', as: 'manage_stock'
+    get 'manage_stock/full_inventory_report' => 'manage_stock#full_inventory_report',
+      as: 'full_inventory_report'
 
     match 'manage_stock/update' => 'manage_stock#update',
       as: 'stock_update'

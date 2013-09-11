@@ -7,8 +7,7 @@ module Spree
       end
 
       def full_inventory_report
-        @products = Spree::Products.join(:variants).
-                                    where("spree_variants.on_hand" > 0).
+        @inventory = Spree::Variant.where("spree_variants.count_on_hand > 0").select("spree_variants.*, spree_products.name as title").joins(:product).
                                     order("spree_products.name asc, spree_variants.sku asc")
         render layout: false
       end
@@ -43,13 +42,16 @@ module Spree
                 @line_item.purchase_order.items_received
 
                 flash[:success] = flash_message_for(@variant, "received stock")
-                redirect_to action: :index
-
+                redirect_to action: :update, variant_id: @variant.id
 
               else
                 flash[:error] = flash_message_for(@variant, "Could not find that purchase order line item")
                 redirect_to action: :update, variant_id: @variant.id, method: "get"
               end
+            elsif params[:receive_type] == "independent"
+              @variant.increment!(:count_on_hand, params[:receive].to_i)
+              flash[:success] = "Received #{params[:receive]} units of #{@variant.product.name}"
+              redirect_to action: :update, variant_id: @variant.id
             end
 
           else

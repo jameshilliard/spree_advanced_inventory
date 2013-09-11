@@ -3,21 +3,30 @@
     <title>Full Inventory Report</title>
   </head>
   <body>
-    <table width="100%" border="0" cellspacing="1" cellpadding="3" bgcolor="#d8d8d8">
+    <table width="100%" border="0" cellspacing="1" cellpadding="5" bgcolor="#d8d8d8">
       <colgroup>
-        <col style="width: %">
+        <col style="width: 45%">
         <col style="width: 15%">
-        <col style="width: 35%">
-        <col style="width: 30%">
+        <col style="width: 15%">
+        <col style="width: 15%">
         <col style="width: 10%">
       </colgroup>
       <thead>
         <th><%= t(:title) %></th>
         <th><%= t(:sku) %></th>
+        <th><%= t(:publisher) %></th>
         <th><%= t(:format) %></th>
         <th><%= t(:on_hand) %></th>
       </thead>
-    </table>
-
+    <% @inventory.each do |i| %>
+      <tr bgcolor="#ffffff" valign="top">
+        <td><%= i.title.split(":").first %></td>
+        <td><%= i.sku %></td>
+        <td><%= i.publisher %></td>
+        <td><%= i.options_text.split(": ").last %></td>
+        <td><%= i.count_on_hand %></td>
+      </tr>
+    <% end %>
+  </table>
   </body>
 </html>

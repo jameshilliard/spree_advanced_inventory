@@ -22,13 +22,7 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
 
   def receive(qty_recv)
     received_purchase_order_line_items.create(quantity: qty_recv, received_at: Time.now)
-    receive_total = qty_recv
-
-    if variant.on_hand > 0
-      receive_total = variant.on_hand + qty_recv
-    end
-
-    variant.update_attributes({ on_hand: receive_total})
+    variant.increment!(:count_on_hand, qty_recv)
   end
 
   def line_total
