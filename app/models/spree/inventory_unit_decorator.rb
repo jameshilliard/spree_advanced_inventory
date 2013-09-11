@@ -24,10 +24,6 @@ Spree::InventoryUnit.class_eval do
     def self.determine_backorder(o, v, q)
 
       if o.is_dropship
-        # Dropships immediately create stock for use with this order
-        if self.track_levels?(v)
-          v.increment!(:count_on_hand, q)
-        end
         0
       else
         if v.on_hand == 0 
