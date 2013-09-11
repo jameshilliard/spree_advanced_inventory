@@ -24,6 +24,7 @@ Spree::InventoryUnit.class_eval do
     def self.determine_backorder(o, v, q)
 
       if o.is_dropship
+        v.increment!(:count_on_hand, q)
         0
       else
         if v.on_hand == 0 
