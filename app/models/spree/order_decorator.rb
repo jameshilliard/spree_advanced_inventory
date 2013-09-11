@@ -16,7 +16,9 @@ Spree::Order.class_eval do
       # The first time an order is changed from non_dropship
       # to a dropship, this adds the units back into inventory 
       line_items.each do |l|
-        l.variant.increment!(:count_on_hand, l.quantity)
+        l.inventory_units.each do |i|
+          i.state = "sold"
+        end
       end
 
       self.inventory_adjusted = true
