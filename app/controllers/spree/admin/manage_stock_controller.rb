@@ -12,6 +12,20 @@ module Spree
         render layout: false
       end
 
+      def receive_entire_po
+        @po = Spree::PurchaseOrder.find_by_number(params[:purchase_order_id])
+
+        @po.purchase_order_line_items.each do |p|
+          if p.status != "Complete"
+            p.receive(p.quantity - p.received)
+          end
+        end
+
+        @po.items_received
+        flash[:success] = "PO #{@po.number} fully received"
+        redirect_to admin_purchase_orders_path
+      end
+
       def update
         @variant = Spree::Variant.find(params[:variant_id])
 

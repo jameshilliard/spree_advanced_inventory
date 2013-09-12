@@ -33,6 +33,9 @@ Spree::Core::Engine.routes.draw do
     match 'manage_stock/update' => 'manage_stock#update',
       as: 'stock_update'
 
+    match 'manage_stock/:purchase_order_id/receive_entire_po' => 'manage_stock#receive_entire_po',
+      as: 'receive_entire_po'
+    
     get "advanced_inventory_settings" => "advanced_inventory_settings#show",
       as: "advanced_inventory_settings"
 
