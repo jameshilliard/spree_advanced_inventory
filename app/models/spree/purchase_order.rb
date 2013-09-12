@@ -62,6 +62,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     end
   end
 
+  def can_be_received?
+    status == "Submitted" and not dropship
+  end
+
   def gross_amount
     sum = 0.0
 
