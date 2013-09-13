@@ -70,16 +70,10 @@ module Spree
 
         total_line_items = @purchase_order.purchase_order_line_items ? @purchase_order.purchase_order_line_items.size : 0
 
-        @line_item_limit = @purchase_order.dropship ? 1 : (10 - total_line_items)
+        @line_item_limit = 10 - total_line_items
 
-        if @purchase_order.dropship
-          if total_line_items == 0
-            @purchase_order.purchase_order_line_items.build
-          end
-        else
-          1.upto(@line_item_limit).each do |num|
-            @purchase_order.purchase_order_line_items.build
-          end
+        1.upto(@line_item_limit).each do |num|
+          @purchase_order.purchase_order_line_items.build
         end
 
         if request.put? or request.post?
@@ -109,7 +103,7 @@ module Spree
                                                     purchase_order_id: @purchase_order.id,
                                                     quantity: line_item["quantity"].to_i,
                                                     comment: line_item["comment"],
-                                                    price: line_item["price"].to_f,
+                                                   price: line_item["price"].to_f,
                                                     user_id: spree_current_user.id)
               end
             end
@@ -261,20 +255,22 @@ module Spree
         end
 
         def update_orders
-          Spree::Order.where(purchase_order_id: @purchase_order.id).each do |o|
-            unless params[:order_ids] and params[:order_ids].include?(o.id)
-              o.purchase_order_id = nil
-              o.save
-            end
-          end
-
-          if params[:order_ids]
-            params[:order_ids].each do |oid|
-              o = Spree::Order.find(oid)
-
-              if o and o.purchase_order_id != @purchase_order.id
-                o.purchase_order_id = @purchase_order.id
+          unless @purchase_order.errors
+            Spree::Order.where(purchase_order_id: @purchase_order.id).each do |o|
+              unless params[:order_ids] and params[:order_ids].include?(o.id)
+                o.purchase_order_id = nil
                 o.save
+              end
+            end
+
+            if params[:order_ids]
+              params[:order_ids].each do |oid|
+                o = Spree::Order.find(oid)
+
+                if o and o.purchase_order_id != @purchase_order.id
+                  o.purchase_order_id = @purchase_order.id
+                  o.save
+                end
               end
             end
           end
