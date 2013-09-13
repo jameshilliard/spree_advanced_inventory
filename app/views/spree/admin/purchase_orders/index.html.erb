@@ -59,7 +59,7 @@
 
       <div class="four columns">
         <div class="field">
-          <%= label_tag nil, t(:order_num) %>
+          <%= label_tag nil, t(:po_num) %>
           <%= f.text_field :number_cont %>
         </div>
         <div class="field">
@@ -125,8 +125,12 @@
               <%= purchase_order.number %>            
               <br/>
               
-              <% if purchase_order.order %>
-                <%= link_to purchase_order.order.number, admin_order_url(purchase_order.order), target: "_NEW" %>
+              <% if purchase_order.orders %>
+                <span class="small">
+                <% purchase_order.orders.each do |o| %>
+                  <%= link_to o.number, admin_order_url(o), target: "_NEW" %><br/>
+                <% end %>
+                </span>
               <% else %>
                  No reference order
               <% end %>

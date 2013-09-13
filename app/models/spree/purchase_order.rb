@@ -3,10 +3,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   belongs_to :supplier_contact
   belongs_to :address
   belongs_to :shipping_method
-  belongs_to :order
   belongs_to :user
   has_many :purchase_order_line_items, dependent: :destroy
   has_many :variants, through: :purchase_order_line_items
+  has_many :orders
 
   attr_accessible :dropship, :due_at, :status, :address_id, :supplier_id,
     :supplier_contact_id, :user_id, :comments, :terms, :order_id,
@@ -103,8 +103,14 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   end
 
   def can_destroy?
-    if order and order.shipment_state == "shipped"
-      false
+    if orders 
+      destroy_ok = true
+      orders.collect(&:shipment_state).each do |s|
+        if destroy_ok and s == "shipped"
+          destroy_ok = false
+        end
+      end
+      destroy_ok
     else
       true
     end
@@ -154,6 +160,14 @@ class Spree::PurchaseOrder < ActiveRecord::Base
       self.supplier_id = supplier_contact.supplier_id
     end
     return true
+  end
+
+  def self.convert_order_association
+    where("order_id is not null").each do |po|
+      o = Spree::Order.find(po.order_id)
+      o.purchase_order_id = po.id
+      o.save
+    end
   end
 
 end

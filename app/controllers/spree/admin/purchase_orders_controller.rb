@@ -11,6 +11,7 @@ module Spree
       before_filter :find_or_create_office_address
       before_filter :load_supplier, only: [:create, :update]
       before_filter :find_or_build_address, only: [:create, :update]
+      after_filter :update_orders, only: [:create, :update]
 
       def index
         params[:q] ||= {}
@@ -257,6 +258,24 @@ module Spree
         def load_supplier
           supplier_contact = Spree::SupplierContact.find(params[:purchase_order][:supplier_contact_id])
           params[:purchase_order][:supplier_id] = supplier_contact.supplier_id
+        end
+
+        def update_orders
+          Spree::Order.where(purchase_order_id: @purchase_order.id).each do |o|
+            unless params[:order_ids].include?(o.id)
+              o.purchase_order_id = nil
+              o.save
+            end
+          end
+
+          params[:order_ids].each do |oid|
+            o = Spree::Order.find(oid)
+
+            if o and o.purchase_order_id != @purchase_order.id
+              o.purchase_order_id = @purchase_order.id
+              o.save
+            end
+          end
         end
 
     end

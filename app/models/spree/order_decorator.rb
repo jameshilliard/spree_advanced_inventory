@@ -1,6 +1,5 @@
 Spree::Order.class_eval do
-  has_many :purchase_orders
-
+  belongs_to :purchase_order
   attr_accessible :is_dropship, :inventory_adjusted
 
   before_validation :dropship_conversion
