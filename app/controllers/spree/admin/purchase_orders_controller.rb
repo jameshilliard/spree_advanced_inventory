@@ -191,7 +191,7 @@ module Spree
         end
 
         def find_or_create_office_address
-          @shipping_methods = ShippingMethod.where("display_on is null or display_on = 'back_end'")
+          @shipping_methods = ShippingMethod.where("display_on is null or display_on = '' or display_on = 'back_end'")
 
           country = Spree::Country.where('name = ? or iso = ? or iso3 = ? or iso_name = ?',
                                          Spree::Config.advanced_inventory_office_country,
