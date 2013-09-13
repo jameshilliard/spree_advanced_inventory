@@ -262,18 +262,20 @@ module Spree
 
         def update_orders
           Spree::Order.where(purchase_order_id: @purchase_order.id).each do |o|
-            unless params[:order_ids].include?(o.id)
+            unless params[:order_ids] and params[:order_ids].include?(o.id)
               o.purchase_order_id = nil
               o.save
             end
           end
 
-          params[:order_ids].each do |oid|
-            o = Spree::Order.find(oid)
+          if params[:order_ids]
+            params[:order_ids].each do |oid|
+              o = Spree::Order.find(oid)
 
-            if o and o.purchase_order_id != @purchase_order.id
-              o.purchase_order_id = @purchase_order.id
-              o.save
+              if o and o.purchase_order_id != @purchase_order.id
+                o.purchase_order_id = @purchase_order.id
+                o.save
+              end
             end
           end
         end
