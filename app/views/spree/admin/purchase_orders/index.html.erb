@@ -70,15 +70,18 @@
 
       <div class="four columns omega">
         <div class="field">
-          <%= label_tag nil, t(:ship_to_first_name_begins_with) %>
-          <%= f.text_field :address_firstname_start, :size => 25 %>
+          <%= label_tag nil, t(:ship_to) %>
+          <br/>
+          <%= f.text_field :address_firstname_start, :size => 12, placeholder: "First name", style: "width: 49% !important" %>
+          <%= f.text_field :address_lastname_start, :size => 12, placeholder: "Last name", style: "width: 49% !important" %>
         </div>
+
         <div class="field">
-          <%= label_tag nil, t(:ship_to_last_name_begins_with) %>
-          <%= f.text_field :address_lastname_start, :size => 25%>
+          <%= label_tag nil, t(:product_search) %>
+          <%= f.text_field :variants_sku_cont, placeholder: "SKU", class: "fullwidth" %>
         </div>
       </div>
-
+    
       <div class="clearfix"></div>
 
       <div class="actions filter-actions">

@@ -6,6 +6,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   belongs_to :order
   belongs_to :user
   has_many :purchase_order_line_items, dependent: :destroy
+  has_many :variants, through: :purchase_order_line_items
 
   attr_accessible :dropship, :due_at, :status, :address_id, :supplier_id,
     :supplier_contact_id, :user_id, :comments, :terms, :order_id,
