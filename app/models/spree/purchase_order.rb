@@ -166,7 +166,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     where("order_id is not null").each do |po|
       o = Spree::Order.find(po.order_id)
       o.purchase_order_id = po.id
-      o.save
+      o.save validate: false
     end
   end
 
