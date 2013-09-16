@@ -77,6 +77,8 @@ module Spree
         end
 
         if request.put? or request.post?
+          @purchase_order.status = "New"
+          @purchase_order.save validate: false
 
           params[:purchase_order][:purchase_order_line_items_attributes].each do |k,line_item|
 
