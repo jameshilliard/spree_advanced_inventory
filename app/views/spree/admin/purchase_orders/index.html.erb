@@ -117,7 +117,7 @@
     </thead>
     <tbody>
       <% @purchase_orders.each do |purchase_order|%>
-        <% unless purchase_order.status.blank? %>
+        <% unless purchase_order.status.blank? or purchase_order.status == "New" %>
           <tr id="<%= spree_dom_id purchase_order %>" data-hook="rate_row" class="<%= cycle('odd', 'even')%>">
 
             <td>
