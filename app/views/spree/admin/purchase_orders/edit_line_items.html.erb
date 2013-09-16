@@ -63,7 +63,7 @@
         Status: <%= @purchase_order.status ? @purchase_order.status : "Pending" %>
         <br/>
   
-        <% if @purchase_order.status %>
+        <% if @purchase_order.valid_status %>
           Supplier: <%= @purchase_order.supplier.name %>
           <br/>
 

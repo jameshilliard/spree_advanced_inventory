@@ -14,7 +14,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     :shipping_method_id, :address_attributes, :email_subject
 
   accepts_nested_attributes_for :purchase_order_line_items,
-   :reject_if => proc { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
+   :reject_if => Proc.new { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
 
 
   before_validation :generate_number, :on => :create
@@ -26,6 +26,14 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   scope :complete, lambda { where{(status == "Completed")} }
   scope :incomplete, lambda { where{(status != "Completed")} }
+
+  def valid_status
+    if not status.blank? and status != "New"
+      true
+    else 
+      false
+    end
+  end
 
   def generate_number
     record = true

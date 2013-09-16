@@ -67,6 +67,8 @@ module Spree
 
       def edit_line_items
         @purchase_order = find_resource
+        @purchase_order.status = "New"
+        @purchase_order.save validate: false
 
         total_line_items = @purchase_order.purchase_order_line_items ? @purchase_order.purchase_order_line_items.size : 0
 
@@ -77,9 +79,6 @@ module Spree
         end
 
         if request.put? or request.post?
-          @purchase_order.status = "New"
-          @purchase_order.save validate: false
-
           params[:purchase_order][:purchase_order_line_items_attributes].each do |k,line_item|
 
             l = Spree::PurchaseOrderLineItem.where(purchase_order_id: @purchase_order.id,
@@ -87,7 +86,7 @@ module Spree
 
             if l
 
-              if line_item["quantity"].to_i > 0
+              if line_item["quantity"].to_i > 0 and not line_item["quantity"].blank?
 
                 l.update_attributes(quantity: line_item["quantity"],
                                     comment: line_item["comment"],
@@ -98,8 +97,13 @@ module Spree
               end
 
             else
-              if line_item["variant_id"].to_i > 0 and
-                line_item["quantity"].to_i > 0
+              logger.info line_item.inspect
+
+              if not line_item["variant_id"].blank? and
+                not line_item["quantity"].blank? and 
+                line_item["variant_id"].to_i > 0 and
+                line_item["quantity"].to_i > 0 
+                
 
                 Spree::PurchaseOrderLineItem.create(variant_id: line_item["variant_id"],
                                                     purchase_order_id: @purchase_order.id,
@@ -109,6 +113,8 @@ module Spree
                                                     user_id: spree_current_user.id)
               end
             end
+
+
           end
 
           redirect_to edit_admin_purchase_order_path(@purchase_order.number)
