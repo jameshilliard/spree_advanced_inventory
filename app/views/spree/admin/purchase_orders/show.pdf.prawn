@@ -17,14 +17,13 @@ fill_color "000000"
 
 move_down 2
 
-font "Helvetica",  size: 10,  style: :bold
+font "Helvetica",  size: 9,  style: :bold
 text "##{@purchase_order.number}", align: :right
 
-font "Helvetica", size: 10
-
-if @purchase_order.order_id 
+if @purchase_order.orders 
   move_down 2
-  text "Reference #: #{@purchase_order.order.number}", align: :right
+  font "Helvetica", size: 8
+  text "Reference #: #{@purchase_order.orders.collect(&:number).join(", ")}", align: :right
 end
 
 bounding_box [0,660], :width => 200 do
@@ -123,7 +122,7 @@ table data,
   :border_width => 0.5,
   :vertical_padding   => 1,
   :horizontal_padding => 0,
-  :font_size => 10,
+  :font_size => 9,
   :border_style => :underline_header,
   :column_widths => { 0 => 170 }
 
@@ -163,7 +162,7 @@ bounding_box [180,560], :width => 170, :height => 150 do
     :border_width => 0.5,
     :vertical_padding   => 1,
     :horizontal_padding => 0,
-    :font_size => 10,
+    :font_size => 9,
     :border_style => :underline_header,
     :column_widths => { 0 => 170 }
 
@@ -226,13 +225,13 @@ table data,
   :border_width => 0.5,
   :vertical_padding   => 1,
   :horizontal_padding => 0,
-  :font_size => 10,
+  :font_size => 9,
   :border_style => :underline_header,
   :column_widths => { 0 => 170 }
 
   move_down 4
 
-  text "Method: #{@purchase_order.shipping_method.name}", align: :left, style: :bold, size: 10
+  text "Method: #{@purchase_order.shipping_method.name}", align: :left, style: :bold, size: 9
  
 
   stroke do

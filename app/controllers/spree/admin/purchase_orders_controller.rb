@@ -141,13 +141,9 @@ module Spree
 
         if @purchase_order.dropship and @purchase_order.status == "Submitted"
 
-          if @purchase_order.order
-            next_url = admin_order_payments_path(@purchase_order.order)
-          end
-
           @purchase_order.status = "Completed"
           @purchase_order.save
-          flash[:success] = "#{@purchase_order.number} complete - Capture payment before updating shipment status"
+          flash[:success] = "#{@purchase_order.number} complete - You may capture payment on these orders now"
         else
           flash[:error] = "#{@purchase_order.number} is not a dropship or has not yet been submitted"
         end
@@ -163,7 +159,6 @@ module Spree
           flash[:success] = "#{@purchase_order.po_type} removed"
 
           if @purchase_order.order
-            next_url = admin_order_url(@purchase_order.order)
             flash[:success] += " - Review the associated order" 
           end
 
