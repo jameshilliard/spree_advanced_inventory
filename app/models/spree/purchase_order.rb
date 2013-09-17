@@ -17,7 +17,6 @@ class Spree::PurchaseOrder < ActiveRecord::Base
    :reject_if => Proc.new { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
 
 
-  before_validation :generate_number, :on => :create
   before_validation :copy_supplier_id
 
   validates :address_id, :shipping_method_id, presence: true
@@ -36,19 +35,16 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   end
 
   def generate_number
-    record = true
-    prefix = "PO"
+    unless number and number.size > 0
+      prefix = "P"
 
-    if dropship == true
-      prefix = "DS"
-    end
+      if dropship == true
+        prefix = "D"
+      end
 
-    while record
-      random = "#{prefix}#{Array.new(9){rand(9)}.join}"
-      record = self.class.where(:number => random).first
+      self.number = "#{prefix}#{sprintf("%06d", id)}"
+      self.save validate: false
     end
-    self.number = random if self.number.blank?
-    self.number
   end
 
   def hardcopy_extension
