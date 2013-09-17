@@ -9,7 +9,7 @@
           General Information
         </legend>
 
-        <% if @purchase_order.status.blank? %>
+        <% if @purchase_order.status == "New" %>
           <%= f.hidden_field :status, value: "Entered" %>
         <% else %>
           <%= f.label :status, t(:manually_override_status) %> 
