@@ -67,9 +67,12 @@ module Spree
 
       def edit_line_items
         @purchase_order = find_resource
-        @purchase_order.status = "New"
-        @purchase_order.save validate: false
 
+        if @purchase_order.status.blank?
+          @purchase_order.status = "New"
+          @purchase_order.save validate: false
+        end
+        
         total_line_items = @purchase_order.purchase_order_line_items ? @purchase_order.purchase_order_line_items.size : 0
 
         @line_item_limit = 10 - total_line_items
