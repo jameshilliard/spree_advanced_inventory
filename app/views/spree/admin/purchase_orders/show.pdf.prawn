@@ -20,11 +20,13 @@ move_down 2
 font "Helvetica",  size: 9,  style: :bold
 text "##{@purchase_order.number}", align: :right
 
-if @purchase_order.orders 
+if @purchase_order.orders and @purchase_order.orders.size > 0
   move_down 2
   font "Helvetica", size: 8
   text "Reference #: #{@purchase_order.orders.collect(&:number).join(", ")}", align: :right
 end
+
+font "Helvetica",  size: 9
 
 bounding_box [0,660], :width => 200 do
   move_down 1

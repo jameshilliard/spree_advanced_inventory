@@ -1,7 +1,7 @@
-bounding_box [0,660], :width => 200 do
-  move_down 1
+bounding_box [0,680], :width => 200 do
 
-  data = [[Prawn::Table::Cell.new(text: Spree::Config.advanced_inventory_office_address1)]]
+  data = [[text("REMIT TO", style: :bold)]]
+  data << [Prawn::Table::Cell.new(text: Spree::Config.advanced_inventory_office_address1)]
   data << [Spree::Config.advanced_inventory_office_address2]
   data << ["#{Spree::Config.advanced_inventory_office_city}, #{Spree::Config.advanced_inventory_office_state} #{Spree::Config.advanced_inventory_office_zip}"]
   data << [Spree::Config.advanced_inventory_office_country]
