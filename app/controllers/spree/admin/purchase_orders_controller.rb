@@ -11,7 +11,7 @@ module Spree
       before_filter :find_or_create_office_address
       before_filter :load_supplier, only: [:create, :update]
       before_filter :find_or_build_address, only: [:create, :update]
-      after_filter :update_orders, only: [:create, :update]
+      before_filter :update_orders, only: [:update]
 
       def index
         params[:q] ||= {}
@@ -164,10 +164,6 @@ module Spree
         if @purchase_order
           flash[:success] = "#{@purchase_order.po_type} removed"
 
-          if @purchase_order.order
-            flash[:success] += " - Review the associated order" 
-          end
-
           @purchase_order.destroy
         else
           flash[:error] = "Could not load #{params[:id]}"
@@ -181,8 +177,8 @@ module Spree
           @purchase_order = Spree::PurchaseOrder.new
           @purchase_order.dropship = (params[:type] == "DS" ? true : false)
           @purchase_order.user_id = spree_current_user.id
-          @purchase_order.generate_number
           @purchase_order.save validate: false
+          @purchase_order.generate_number
           @purchase_order.purchase_order_line_items.build
 
           return @purchase_order
@@ -260,22 +256,20 @@ module Spree
         end
 
         def update_orders
-          unless @purchase_order.errors
-            Spree::Order.where(purchase_order_id: @purchase_order.id).each do |o|
-              unless params[:order_ids] and params[:order_ids].include?(o.id)
-                o.purchase_order_id = nil
-                o.save
-              end
+          Spree::Order.where(purchase_order_id: @purchase_order.id).each do |o|
+            unless params[:order_ids] and params[:order_ids].include?(o.id)
+              o.purchase_order_id = nil
+              o.save validate: false
             end
+          end
 
-            if params[:order_ids]
-              params[:order_ids].each do |oid|
-                o = Spree::Order.find(oid)
+          if params[:order_ids]
+            params[:order_ids].each do |oid|
+              o = Spree::Order.find(oid)
 
-                if o and o.purchase_order_id != @purchase_order.id
-                  o.purchase_order_id = @purchase_order.id
-                  o.save
-                end
+              if o and o.purchase_order_id != @purchase_order.id
+                o.purchase_order_id = @purchase_order.id
+                o.save validate: false
               end
             end
           end
