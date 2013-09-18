@@ -13,7 +13,7 @@
   <ul>
   <% @po.orders.each do |o| %>
     <li>
-      <%= link_to o.number, edit_admin_order_path(o.number), target: "_BLANK" %> - 
+      <%= link_to o.number, edit_admin_order_url(o.number), target: "_BLANK" %> - 
       <%= o.ship_address.firstname + " " + o.ship_address.lastname %> -
       Created: <%= o.created_at.strftime("%m/%d @ %l:%M %P") %> - 
       $<%= o.total %>
