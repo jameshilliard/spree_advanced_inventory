@@ -5,6 +5,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   belongs_to :shipping_method
   belongs_to :user
   has_many :purchase_order_line_items, dependent: :destroy
+  has_many :received_purchase_order_line_items, through: :purchase_order_line_item
   has_many :variants, through: :purchase_order_line_items
   has_many :orders
 

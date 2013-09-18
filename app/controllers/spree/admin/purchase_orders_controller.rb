@@ -112,7 +112,7 @@ module Spree
                                                     purchase_order_id: @purchase_order.id,
                                                     quantity: line_item["quantity"].to_i,
                                                     comment: line_item["comment"],
-                                                   price: line_item["price"].to_f,
+                                                    price: line_item["price"].to_f,
                                                     user_id: spree_current_user.id)
               end
             end

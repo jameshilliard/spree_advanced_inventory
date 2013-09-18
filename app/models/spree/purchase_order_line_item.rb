@@ -3,6 +3,7 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
   belongs_to :variant
   belongs_to :line_item
   belongs_to :user
+  has_one :product, through: :variant
 
   has_many :received_purchase_order_line_items
 
