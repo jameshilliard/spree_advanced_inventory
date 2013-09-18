@@ -130,10 +130,11 @@ module Spree
 
         ::ActiveRecord::Base.clear_all_connections!
         fork do
-          sleep 30
+          sleep 10
           Spree::PurchaseOrderMailer.email_supplier(@purchase_order, false).deliver
           @purchase_order.status = "Submitted"
           @purchase_order.save validate: false
+          exit
         end
         ::ActiveRecord::Base.establish_connection
 
@@ -259,6 +260,10 @@ module Spree
         end
 
         def update_orders
+          if params[:sending_manually] and params[:purchase_order][:status] == "Entered"
+            params[:purchase_order][:status] = "Submitted"
+          end
+
           Spree::Order.where(purchase_order_id: @purchase_order.id).each do |o|
             unless params[:order_ids] and params[:order_ids].include?(o.id)
               o.purchase_order_id = nil

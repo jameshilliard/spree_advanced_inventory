@@ -136,6 +136,10 @@
           </table>
 
         </div>
+      <% if @purchase_order.status != "Submitted" and @purchase_order.status != "Completed" %>
+        <input type="checkbox" name="sending_manually" value="1" /> Check this box if you are submitting this PO by hand (or phone/fax)
+      <% end %>
+      <br/>        
       </fieldset>
     </div>
 
@@ -161,14 +165,14 @@
   <br/>
 
 
-    <div class="form-buttons filter-actions actions" data-hook="buttons">
+  <div class="form-buttons filter-actions actions" data-hook="buttons">
 
-      <%= button t(:save), 'icon-arrow-right' %>
-      <span class="or"><%= t(:or) %></span>
-      <%= button_link_to t(:cancel), collection_url, :icon => 'icon-remove' %>
-    </div>
+    <%= button t(:save), 'icon-arrow-right' %>
+    <span class="or"><%= t(:or) %></span>
+    <%= button_link_to t(:cancel), collection_url, :icon => 'icon-remove' %>
+  </div>
 
-    <% end %>
+  <% end %>
   </div>
 </div>
 
