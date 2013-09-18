@@ -1,0 +1,43 @@
+<h3>Hello <%= @po.user.email.split("@").first.titleize %>, </h3>
+
+<p>
+  At <%= @completed_at %> 
+  <%= link_to @po.number, edit_admin_purchase_order_url(@po) %> 
+  was received in full.
+</p>
+
+<p>
+<% if @po.orders and @po.orders.size > 0 %>
+  <strong>Associated orders:</strong>
+  <br/>
+  <ul>
+  <% @po.orders.each do |o| %>
+    <li>
+      <%= link_to o.number, edit_admin_order_path(o.number), target: "_BLANK" %> - 
+      <%= o.ship_address.firstname + " " + o.ship_address.lastname %> -
+      Created: <%= o.created_at.strftime("%m/%d @ %l:%M %P") %> - 
+      $<%= o.total %>
+      <br/>
+      Checkout: <%= o.state.upcase %>,
+      Payment: <%= o.payment_state.upcase %>,
+      Shipment: <%= o.shipment_state.upcase %>
+    </li>
+  <% end %>
+  </ul>
+<% else %>
+  This purchase order was not associated with any orders.
+<% end %>
+</p>
+
+<h3>Line items received</h3>
+<ol>
+<% @po.received_purchase_order_line_items.each do |r| %>
+  <li>
+    <%= r.purchase_order_line_item.product.name.split(": ").first %>
+    x <%= r.quantity %>
+    @ <%= r.received_at.strftime("%m/%d/%Y %l:%M %P") %>
+  </li>
+<% end %>
+</ol>
+
+

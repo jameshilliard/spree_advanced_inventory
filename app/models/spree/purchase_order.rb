@@ -5,7 +5,6 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   belongs_to :shipping_method
   belongs_to :user
   has_many :purchase_order_line_items, dependent: :destroy
-  has_many :received_purchase_order_line_items, through: :purchase_order_line_item
   has_many :variants, through: :purchase_order_line_items
   has_many :orders
 
@@ -19,6 +18,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
 
   before_validation :copy_supplier_id
+  before_save :send_completed_notice
 
   validates :address_id, :shipping_method_id, presence: true
 
@@ -33,6 +33,11 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     else 
       false
     end
+  end
+
+  def received_purchase_order_line_items
+    Spree::ReceivedPurchaseOrderLineItem.where("spree_purchase_order_line_items.purchase_order_id = ?", id).
+      joins(:purchase_order_line_item)
   end
 
   def generate_number
@@ -175,4 +180,9 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     end
   end
 
+  def send_completed_notice
+    if not dropship and status_changed? and status == "Completed" and status_was != "Completed"
+      Spree::PurchaseOrderMailer.completed_notice(self).deliver
+    end
+  end
 end

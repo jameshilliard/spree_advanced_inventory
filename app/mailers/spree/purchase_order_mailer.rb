@@ -1,6 +1,15 @@
 module Spree
   class PurchaseOrderMailer < BaseMailer
 
+    def completed_notice(po)
+      @po = po
+      @completed_at = po.updated_at.strftime("%m/%d/%Y %l:%M %P")
+
+      mail(to: "zach@800ceoread.com", 
+           from: "webserver@800ceoread.com", 
+           subject: "[#{po.number}] Purchase order received at #{@completed_at}") 
+    end
+
     def email_supplier(purchase_order, resend = false)
       @purchase_order = @po = purchase_order
 
