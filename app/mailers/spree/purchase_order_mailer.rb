@@ -5,8 +5,8 @@ module Spree
       @po = po
       @completed_at = po.updated_at.strftime("%m/%d/%Y %l:%M %P")
 
-      mail(to: (@po.user.email ? @po.user.email : "orders@800ceoread.com"), 
-           from: "webserver@800ceoread.com", 
+      mail(to: [(@po.user.email ? @po.user.email : from_address), "mel@800ceoread.com"], 
+           from: from_address, 
            subject: "[#{po.number}] Purchase order received at #{@completed_at}") 
     end
 
@@ -25,9 +25,9 @@ module Spree
       ext = @po.hardcopy_extension
       attachments["#{@po.number}.#{ext}"] = File.read(File.join(Rails.root,"tmp",@po.number + ".#{ext}"))
       mail(:to => @po.supplier.email.split(";"), 
-           :from => "webserver@800ceoread.com",
+           :from => from_address,
            :cc => @po.supplier_contact.email.split(";"), 
-           :bcc => [@po.user.email, "zach@800ceoread.com"], 
+           :bcc => [@po.user.email], 
            :reply_to => @po.user.email, 
            :subject => subject)
 
