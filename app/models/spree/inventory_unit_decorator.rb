@@ -24,7 +24,6 @@ Spree::InventoryUnit.class_eval do
     def self.determine_backorder(o, v, q)
 
       if o.is_dropship
-        v.receive_quantity(q)
         0
       else
         if v.on_hand == 0 
