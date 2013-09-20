@@ -12,7 +12,7 @@ Spree::InventoryUnit.class_eval do
 
     # Do not recreate stock levels for dropships
     if self.track_levels?(v) and not o.is_dropship
-      v.increment!(:count_on_hand, q)
+      v.receive_quantity(q)
     end
 
     if Spree::Config[:create_inventory_units]
@@ -24,7 +24,7 @@ Spree::InventoryUnit.class_eval do
     def self.determine_backorder(o, v, q)
 
       if o.is_dropship
-        v.increment!(:count_on_hand, q)
+        v.receive_quantity(q)
         0
       else
         if v.on_hand == 0 
