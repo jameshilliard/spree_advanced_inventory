@@ -30,8 +30,8 @@
               <br/>
                 &nbsp;&nbsp;&nbsp;
                 Checkout: <%= o.state.upcase %>,
-                Payment: <%= o.payment_state.upcase %>,
-                Shipment: <%= o.shipment_state.upcase %>
+                Payment: <%= o.payment_state ? o.payment_state.upcase : "NONE" %>,
+                Shipment: <%= o.shipment_state ? o.shipment_state.upcase : "NONE" %>
               </li>
             <% end %>
           </ul>
@@ -146,9 +146,9 @@
     <div class="seven columns omega">
       <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
         <legend align="center">
-          <%= @purchase_order.dropship ? t(:line_item) : t(:line_items) %>
+          <%= @purchase_order.dropship ? t(:line_items) : t(:line_items) %>
         </legend>
-
+        <br/>
         <div id="purchase-order-line-items">
           <%= render partial: "po_line_items", locals: { f: f } %>
         </div>
@@ -158,7 +158,27 @@
 
         </div>
       </fieldset>
-                 
+
+      <% unless not @purchase_order.received_purchase_order_line_items or @purchase_order.received_purchase_order_line_items.size == 0 %>
+        <div class="clear"></div>
+        <br/>
+        <br/>
+        
+        <fieldset data-hook="received-purchase-order-line-items" class="no-border-bottom">
+          <legend align="center">Received line items</legend>
+          <ol>
+          <% @purchase_order.received_purchase_order_line_items.each do |r| %>
+            <li>
+              <%= r.purchase_order_line_item.variant.sku %> &ndash;
+              <%= r.purchase_order_line_item.product.name.split(":").first %>
+              <br/>
+              Received <strong><%= r.quantity %></strong> at 
+              <%= r.received_at.strftime("%m/%d/%Y %l:%M %P") %>
+            </li>
+          <% end %>
+          </ol>          
+        </fieldset>
+      <% end %>
     </div>
 
   <div class="clear"></div>
