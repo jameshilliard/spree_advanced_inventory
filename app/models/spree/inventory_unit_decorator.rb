@@ -5,6 +5,9 @@ Spree::InventoryUnit.class_eval do
 
   def set_is_dropship
     self.is_dropship = order.is_dropship||false
+    if is_dropship
+      self.state = 'sold'
+    end
     return true
   end
   
