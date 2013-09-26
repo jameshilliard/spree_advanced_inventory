@@ -21,8 +21,11 @@
           <ul id="purchase-order-orders">
             <% if @purchase_order.status != "Completed" %>
               <%= render partial: "eligible_order", collection: @eligible_orders, as: :o %>
-              <% unless @eligible_orders.size == 0 %>
-                No unshipped orders for these line items
+              <% unless @eligible_orders.size > 0 %>
+                No unshipped orders for these line items. 
+                <% if @purchase_order.orders and @purchase_order.orders.size > 0 %>
+                  <em><%= @purchase_order.orders.size %> will be listed here when this PO is marked as complete.</em>
+                <% end %>
               <% end %>
             <% else %>
               <%= render partial: "eligible_order", collection: @purchase_order.orders, as: :o %>
