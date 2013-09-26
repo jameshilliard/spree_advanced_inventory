@@ -63,7 +63,7 @@ module Spree
                 redirect_to action: :update, variant_id: @variant.id, method: "get"
               end
             elsif params[:receive_type] == "independent"
-              @variant.increment!(:count_on_hand, params[:receive].to_i)
+              @variant.receive_quantity(params[:receive]) 
               flash[:success] = "Received #{params[:receive]} units of #{@variant.product.name}"
               redirect_to action: :update, variant_id: @variant.id
             end
