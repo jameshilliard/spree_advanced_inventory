@@ -5,12 +5,28 @@ Spree::InventoryUnit.class_eval do
 
   def set_is_dropship
     self.is_dropship = order.is_dropship||false
+
     if is_dropship
       self.state = 'sold'
     end
     return true
   end
-  
+
+  def self.increase(order, variant, quantity)
+    back_order = determine_backorder(order, variant, quantity)
+    sold = quantity - back_order
+
+    #set on_hand if configured
+    if self.track_levels?(variant) and not order.is_dropship
+      variant.decrement!(:count_on_hand, quantity)
+    end
+
+    #create units if configured
+    if Spree::Config[:create_inventory_units]
+      create_units(order, variant, sold, back_order)
+    end
+  end 
+
   def self.decrease(o, v, q)
 
     # Do not recreate stock levels for dropships
