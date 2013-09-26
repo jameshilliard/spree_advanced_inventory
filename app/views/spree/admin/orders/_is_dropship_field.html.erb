@@ -1,11 +1,10 @@
 <% unless @order.shipment_state and @order.shipment_state == "shipped" %>
-  <div class="field two columns">
     <%= label_tag :is_dropship, 'Dropship?' %>
     <br/>
     <%= select_tag 'order[is_dropship]', 
       options_for_select({'No' => false, 'Yes' => true  }, @order.is_dropship), 
       { size: 1, class: 'select2', id: "order_is_dropship" } 
     %>
-  </div>
-  <script>$('#order_is_dropship').select2();
+  <div class="clear"></div>
+  <script>$('#order_is_dropship').select2();</script>
 <% end %>
