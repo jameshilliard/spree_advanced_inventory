@@ -10,16 +10,21 @@ Spree::Order.class_eval do
     return value
   end
 
-  def dropship_conversion 
-    if not new_record? and is_dropship and is_dropship_changed? and not inventory_adjusted
-      # The first time an order is changed from non_dropship
-      # to a dropship, this adds the units back into inventory 
-      line_items.each do |l|
-        l.variant.increment!(:count_on_hand, l.quantity)
-      end
+  def dropship_conversion
+    if updated_at
+      if is_dropship and is_dropship_changed? and is_dropship_was == false and not inventory_adjusted and (Time.current - updated_at > 300)
+        line_items.each do |l|
+          l.variant.receive_quantity(l.quantity)
+        end
 
-      self.inventory_adjusted = true
-      
+        inventory_units.each do |i|
+          i.state = 'sold'
+          i.save
+        end
+
+        self.inventory_adjusted = true
+        
+      end
     end
     return true
   end
