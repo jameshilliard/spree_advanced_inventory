@@ -190,7 +190,9 @@ module Spree
 
         def find_resource
           param_id = params[:id] ? params[:id] : params[:purchase_order_id]
-          return Spree::PurchaseOrder.find_by_number(param_id)
+          po =  Spree::PurchaseOrder.find_by_number(param_id)
+          @eligible_orders = Spree::Order.eligible_for_po(po)
+          return po
         end
 
         def find_or_create_office_address

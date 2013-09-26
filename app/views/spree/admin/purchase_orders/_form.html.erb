@@ -20,7 +20,10 @@
           <%= f.label :order_id, t(:corresponding_orders) %> 
           <ul id="purchase-order-orders">
             <% if @purchase_order.status != "Completed" %>
-              <%= render partial: "eligible_order", collection: Spree::Order.eligible_for_po(@purchase_order), as: :o %>
+              <%= render partial: "eligible_order", collection: @eligible_orders, as: :o %>
+              <% unless @eligible_orders.size == 0 %>
+                No unshipped orders for these line items
+              <% end %>
             <% else %>
               <%= render partial: "eligible_order", collection: @purchase_order.orders, as: :o %>
             <% end %>
