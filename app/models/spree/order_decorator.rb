@@ -40,7 +40,7 @@ Spree::Order.class_eval do
                 from spree_orders o, spree_line_items l 
                 where o.completed_at is not null and #{dropship_check} 
                 o.state = 'complete' and
-                o.shipment_state != 'shipped' and
+                o.shipment_state != 'shipped' and  
                 l.order_id = o.id and 
                 l.variant_id in (select distinct(variant_id) from spree_purchase_order_line_items where purchase_order_id = ?) 
                 order by 
