@@ -13,7 +13,7 @@ Spree::Order.class_eval do
   def dropship_conversion
     if updated_at
       if is_dropship_changed? and 
-        if is_dropship and is_dropship_was == false and not inventory_adjusted and (Time.new - updated_at > 300)
+        if is_dropship and is_dropship_was == false and not inventory_adjusted and (Time.new - created_at < 300)
 
           line_items.each do |l|
             l.variant.receive_quantity(l.quantity)
