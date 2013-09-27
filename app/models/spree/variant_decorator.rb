@@ -7,16 +7,16 @@ Spree::Variant.class_eval do
     if on_hand < 0
       diff = num + on_hand
       
-      self.on_hand = diff
-      self.save
-
       if diff > 0
-        self.on_hand = num - diff
+        self.on_hand = diff
         self.save
 
+        self.on_hand = num - diff
+      elsif diff <= 0
+        self.on_hand = num
       end
     else
-      increment!(:count_on_hand, num)
+      self.on_hand += num 
     end    
     self.save
   end
