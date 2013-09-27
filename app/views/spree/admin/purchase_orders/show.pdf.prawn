@@ -81,6 +81,11 @@ bounding_box [0,560], :width => 170, :height => 150 do
 
 
 data = [["#{@purchase_order.supplier.firstname} #{@purchase_order.supplier.lastname}"]]
+
+if @purchase_order.supplier.attributes["company"] and @purchase_order.supplier.attributes["company"].size > 0
+  data << [@purchase_order.supplier.company]
+end
+
 data << [@purchase_order.supplier.address1]
 
 if @purchase_order.supplier.address2.size > 0
@@ -92,9 +97,6 @@ if @purchase_order.supplier.attributes["address3"] and @purchase_order.supplier.
 end
 
 
-if @purchase_order.supplier.attributes["company"] and @purchase_order.supplier.attributes["company"].size > 0
-  data << [@purchase_order.supplier.company]
-end
 
 data << ["#{@purchase_order.supplier.city}, #{@purchase_order.supplier.state} #{@purchase_order.supplier.zipcode}"]
 data << [@purchase_order.supplier.country]
