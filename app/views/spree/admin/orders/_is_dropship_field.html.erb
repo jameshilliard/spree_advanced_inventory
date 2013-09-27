@@ -7,7 +7,7 @@
       { size: 1, class: 'select2', id: "order_is_dropship" } 
       %>
   <% else %>
-    <%= label_tag :is_dropship, "No change until #{(@order.updated_at + 300).strftime("%l:%M %P")}" %>
+    <%= label_tag :is_dropship, "No change until #{(@order.updated_at + 300).strftime("%l:%M:%S")}" %>
     <br/>
     <%= select_tag 'order[is_dropship]', 
       options_for_select({'No' => false, 'Yes' => true  }, @order.is_dropship), 
