@@ -1,5 +1,5 @@
 <% unless @order.shipment_state and @order.shipment_state == "shipped" %>
-  <% if not @order.admin_user_id or @order.is_dropship or Time.current - @order.updated_at > 300 %>
+  <% if not @order.admin_user_id or @order.is_dropship or Time.new - @order.updated_at > 300 %>
     <%= label_tag :is_dropship, "Dropship?" %>
     <br/>
     <%= select_tag 'order[is_dropship]', 

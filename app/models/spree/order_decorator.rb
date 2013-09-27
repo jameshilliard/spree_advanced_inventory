@@ -13,7 +13,7 @@ Spree::Order.class_eval do
   def dropship_conversion
     if updated_at
       if is_dropship_changed? and 
-        if is_dropship and is_dropship_was == false and not inventory_adjusted and (Time.current - updated_at > 300)
+        if is_dropship and is_dropship_was == false and not inventory_adjusted and (Time.new - updated_at > 300)
 
           line_items.each do |l|
             l.variant.receive_quantity(l.quantity)
@@ -34,7 +34,7 @@ Spree::Order.class_eval do
 
           line_items.each do |l|
             current_on_hand = l.variant.on_hand
-            Rails.logger.info "\n\n*** #{l.variant_id} on hand #{current_on_hand} vs #{l.quantity}"
+            
             l.variant.decrement!(:count_on_hand, l.quantity)
 
             if current_on_hand >= l.quantity
@@ -50,10 +50,8 @@ Spree::Order.class_eval do
               inventory_units.where(variant_id: l.variant_id).each do |i|
 
                 if counter <= current_on_hand
-                  Rails.logger.info "\t#{l.variant_id} - #{counter} - SOLD"
                   i.state = 'sold'
                 else
-                  Rails.logger.info "\t#{l.variant_id} - #{counter} - BACKORDERED"
                   i.state = 'backordered'
                 end
 

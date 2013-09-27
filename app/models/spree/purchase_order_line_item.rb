@@ -28,7 +28,7 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
   end
 
   def received
-    received_purchase_order_line_items.collect(&:quantity).sum
+    received_purchase_order_line_items.collect(&:quantity).sum||0
   end
 
   def line_total

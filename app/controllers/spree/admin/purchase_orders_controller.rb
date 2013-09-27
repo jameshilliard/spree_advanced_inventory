@@ -31,7 +31,7 @@ module Spree
         end
 
         @search = Spree::PurchaseOrder.ransack(params[:q])
-        @purchase_orders = @search.result.includes([:purchase_order_line_items, :user, :address, :variants]).
+        @purchase_orders = @search.result(distinct: true).includes([:purchase_order_line_items, :user, :address, :variants]).
           page(params[:page]).
           per(params[:per_page] || Spree::Config[:orders_per_page])
 
