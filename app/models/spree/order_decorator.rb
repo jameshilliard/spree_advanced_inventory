@@ -12,18 +12,58 @@ Spree::Order.class_eval do
 
   def dropship_conversion
     if updated_at
-      if is_dropship and is_dropship_changed? and is_dropship_was == false and not inventory_adjusted and (Time.current - updated_at > 300)
-        line_items.each do |l|
-          l.variant.receive_quantity(l.quantity)
-        end
+      if is_dropship_changed? and 
+        if is_dropship and is_dropship_was == false and not inventory_adjusted and (Time.current - updated_at > 300)
 
-        inventory_units.each do |i|
-          i.state = 'sold'
-          i.save
-        end
+          line_items.each do |l|
+            l.variant.receive_quantity(l.quantity)
 
-        self.inventory_adjusted = true
-        
+            inventory_units.where(variant_id: l.variant_id).each do |i|
+              i.state = 'sold'
+              i.save validate: false
+
+            end
+          end
+
+          self.inventory_adjusted = true
+
+        elsif not is_dropship and is_dropship_was == true
+          # This resets the check for inventory adjustments in case the admin keeps changing the
+          # dropship state back and forth
+          self.inventory_adjusted = false
+
+          line_items.each do |l|
+            current_on_hand = l.variant.on_hand
+            Rails.logger.info "\n\n*** #{l.variant_id} on hand #{current_on_hand} vs #{l.quantity}"
+            l.variant.decrement!(:count_on_hand, l.quantity)
+
+            if current_on_hand >= l.quantity
+              # These units should already be sold but make sure!
+              inventory_units.where(variant_id: l.variant_id).each do |i|
+                i.state = 'sold'
+                i.is_dropship = false
+                i.save validate: false
+
+              end
+            else
+              counter = 1
+              inventory_units.where(variant_id: l.variant_id).each do |i|
+
+                if counter <= current_on_hand
+                  Rails.logger.info "\t#{l.variant_id} - #{counter} - SOLD"
+                  i.state = 'sold'
+                else
+                  Rails.logger.info "\t#{l.variant_id} - #{counter} - BACKORDERED"
+                  i.state = 'backordered'
+                end
+
+                i.is_dropship = false
+                i.save validate: false
+                counter += 1
+              end
+            end
+          end
+        end 
       end
     end
     return true

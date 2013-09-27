@@ -1,10 +1,20 @@
 <% unless @order.shipment_state and @order.shipment_state == "shipped" %>
-    <%= label_tag :is_dropship, 'Dropship?' %>
+  <% if not @order.admin_user_id or @order.is_dropship or Time.current - @order.updated_at > 300 %>
+    <%= label_tag :is_dropship, "Dropship?" %>
     <br/>
     <%= select_tag 'order[is_dropship]', 
       options_for_select({'No' => false, 'Yes' => true  }, @order.is_dropship), 
       { size: 1, class: 'select2', id: "order_is_dropship" } 
-    %>
+      %>
+  <% else %>
+    <%= label_tag :is_dropship, "No change until #{(@order.updated_at + 300).strftime("%l:%M %P")}" %>
+    <br/>
+    <%= select_tag 'order[is_dropship]', 
+      options_for_select({'No' => false, 'Yes' => true  }, @order.is_dropship), 
+      { size: 1, class: 'select2', id: "order_is_dropship", disabled: "true" } 
+      %>
+  <% end %>
+
   <div class="clear"></div>
   <script>$('#order_is_dropship').select2();</script>
 <% end %>
