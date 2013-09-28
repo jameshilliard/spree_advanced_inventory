@@ -19,7 +19,6 @@ Spree::Order.class_eval do
             l.variant.receive(l.quantity)
 
             inventory_units.where(variant_id: l.variant_id).each do |i|
-              logger.info "*** dropship conversion iu state to sold"
               i.state = 'sold'
               i.save validate: false
 
@@ -41,7 +40,6 @@ Spree::Order.class_eval do
             if current_on_hand >= l.quantity
               # These units should already be sold but make sure!
               inventory_units.where(variant_id: l.variant_id).each do |i|
-                logger.info "*** dropship conversion iu state to sold"
                 i.state = 'sold'
                 i.is_dropship = false
                 i.save validate: false
