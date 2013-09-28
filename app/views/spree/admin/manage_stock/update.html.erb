@@ -31,35 +31,15 @@
       </p>
       <br/>
 
-      <h4 align="center"><%= @variant.on_hand %> units in stock</h4>
+      <h4 align="center"><%= @variant.on_hand %> units in stock &ndash;
+      <%= link_to "Update stock levels manually", edit_admin_product_variant_url(@variant.product.permalink, @variant.id) %>
+      </h4>
       <br/>
       <br/>
-
-      <%= form_tag(admin_stock_update_path, method: "post", id: "manual-receive") do |f| %>
-      <table class="fullwidth index">
-        <colgroup>
-          <col style="width: 60%">
-          <col style="width: 20%">
-          <col style="width: 20%">
-        </colgroup>
-        <thead>
-          <tr>
-            <th><%= t(:receive_non_purchase_order_stock) %></th>
-            <th>
-              <%= number_field_tag "receive", 0, class: "fullwidth" %> 
-              <%= hidden_field_tag "variant_id", @variant.id %>
-              <%= hidden_field_tag "receive_type", "independent" %>
-            </th>
-            <th><%= button "Go", "icon-cogs" %></th>
-          </tr>
-        </thead>
-      
-      </table>
-      <% end %>
 
       <fieldset class="no-border-bottom">
         <legend align="center">
-          <%= t(:or_receive_from_purchase_order) %>
+          <%= t(:receive_from_purchase_order) %>
         </legend>
       </fieldset>
 
