@@ -24,7 +24,7 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
     qty_recv = qty_recv.to_i
     received_purchase_order_line_items.create(quantity: qty_recv, received_at: Time.now)
 
-    variant.receive_quantity(qty_recv)  
+    variant.receive(qty_recv)  
   end
 
   def received

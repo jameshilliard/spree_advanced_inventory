@@ -1,8 +1,27 @@
 <html>
   <head>
-    <title>Full Inventory Report</title>
+  <title><%= params[:first_letter] %> - <%= params[:stock_level] %>- Full Inventory Report</title>
   </head>
   <body>
+
+  <div style="font-size: 1.4em; margin: 0 auto; text-align: center; width: 100%;">
+    <strong><%= link_to "ALL", admin_full_inventory_report_url + "?stock_level=#{params[:stock_level]}" %></strong>
+    
+    <% ("a".."z").each do |l| %>
+      <%= link_to l.upcase, admin_full_inventory_report_url + "?first_letter=#{l}&stock_level=#{params[:stock_level]}" %>&nbsp;
+    <% end %>
+
+    <br/>
+    <br/>
+
+    <strong>STOCK LEVEL :</strong>
+    <%= link_to "POSITIVE", admin_full_inventory_report_url + "?first_letter=#{params[:first_letter]}&stock_level=in_stock" %> &ndash;
+    <%= link_to "ZERO", admin_full_inventory_report_url + "?first_letter=#{params[:first_letter]}&stock_level=zero" %> &ndash;
+    <%= link_to "BACKORDER", admin_full_inventory_report_url + "?first_letter=#{params[:first_letter]}&stock_level=backordered" %>
+  </div>
+
+
+  <br/>
     <table width="100%" border="0" cellspacing="1" cellpadding="5" bgcolor="#d8d8d8">
       <colgroup>
         <col style="width: 45%">
@@ -21,10 +40,14 @@
     <% @inventory.each do |i| %>
       <tr bgcolor="#ffffff" valign="top">
         <td><%= i.title.split(":").first %></td>
-        <td><%= i.sku %></td>
+        <td><%= i.sku[0..30] %></td>
         <td><%= i.publisher %></td>
         <td><%= i.options_text.split(": ").last %></td>
-        <td><%= i.count_on_hand %></td>
+        <td>
+          <a href="<%= edit_admin_product_variant_url(i.permalink, i.id) %>" target="_BLANK">
+            <div style="width: 100%; display: block"><%= i.count_on_hand %></div>
+          </a>
+        </td>
       </tr>
     <% end %>
   </table>

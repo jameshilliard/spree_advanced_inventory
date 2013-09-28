@@ -7,8 +7,23 @@ module Spree
       end
 
       def full_inventory_report
-        @inventory = Spree::Variant.where("spree_variants.count_on_hand > 0").select("spree_variants.*, spree_products.name as title").joins(:product).
-                                    order("spree_products.name asc, spree_variants.sku asc")
+
+        @inventory = Spree::Variant.select("spree_variants.*, spree_products.name as title, spree_products.permalink").joins(:product).
+                                    order("spree_products.name asc, spree_variants.sku asc").where(is_master: false, deleted_at: nil)
+
+        if params[:first_letter]
+          l = params[:first_letter].to_s
+          @inventory = @inventory.where{(product.name =~ "#{l}%")}
+        end
+
+        if params[:stock_level] == "backordered"
+          @inventory = @inventory.where{(count_on_hand < 0)}
+        elsif params[:stock_level] == "zero"
+          @inventory = @inventory.where{(count_on_hand == 0)}
+        elsif params[:stock_level] == "in_stock" or params[:stock_level].blank?
+          @inventory = @inventory.where{(count_on_hand > 0)}
+        end
+
         render layout: false
       end
 
@@ -22,6 +37,9 @@ module Spree
         end
 
         @po.items_received
+        @po.orders.each do |o|
+          o.update!
+        end
         flash[:success] = "PO #{@po.number} fully received"
         redirect_to admin_purchase_orders_path
       end
@@ -45,15 +63,21 @@ module Spree
           limit(20)
 
         if request.post?
-          if params[:receive].to_i > 0
+          quantity = params[:receive].to_i
+          if quantity > 0            
             if params[:receive_type] == "po"
               @line_item = Spree::PurchaseOrderLineItem.find(params[:received_id])
 
               if @line_item
 
-                @line_item.receive(params[:receive])
+                @line_item.receive(quantity)
 
                 @line_item.purchase_order.items_received
+                @line_item.purchase_order.orders.each do |o|
+                  unless o.inventory_units.where(variant_id: @variant_id, state: 'backordered').size > 0
+                    o.update!
+                  end
+                end
 
                 flash[:success] = flash_message_for(@variant, "received stock")
                 redirect_to action: :update, variant_id: @variant.id
@@ -62,12 +86,7 @@ module Spree
                 flash[:error] = flash_message_for(@variant, "Could not find that purchase order line item")
                 redirect_to action: :update, variant_id: @variant.id, method: "get"
               end
-            elsif params[:receive_type] == "independent"
-              @variant.receive_quantity(params[:receive]) 
-              flash[:success] = "Received #{params[:receive]} units of #{@variant.product.name}"
-              redirect_to action: :update, variant_id: @variant.id
             end
-
           else
             flash[:error] = flash_message_for(@variant, "Quantity received must be greater than 0")
             redirect_to action: :update, variant_id: @variant.id, method: "get"

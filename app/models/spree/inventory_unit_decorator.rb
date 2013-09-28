@@ -4,11 +4,13 @@ Spree::InventoryUnit.class_eval do
   before_validation :set_is_dropship
 
   def set_is_dropship
-    self.is_dropship = order.is_dropship||false
-
-    if is_dropship
+    if order.is_dropship == true
+      self.is_dropship = true
       self.state = 'sold'
-    end
+    else
+      self.is_dropship = false
+    end 
+
     return true
   end
 
@@ -31,7 +33,7 @@ Spree::InventoryUnit.class_eval do
 
     # Do not recreate stock levels for dropships
     if self.track_levels?(v) and not o.is_dropship
-      v.receive_quantity(q)
+      v.increment!(:count_on_hand, q)
     end
 
     if Spree::Config[:create_inventory_units]
@@ -40,6 +42,10 @@ Spree::InventoryUnit.class_eval do
   end
   
   private
+    def update_order
+      #order.update!
+    end  
+
     def self.determine_backorder(o, v, q)
 
       if o.is_dropship

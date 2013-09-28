@@ -4,8 +4,12 @@ module Spree
     def completed_notice(po)
       @po = po
       @completed_at = po.updated_at.strftime("%m/%d/%Y %l:%M %P")
-
-      mail(to: [(@po.user.email ? @po.user.email : from_address), "mel@800ceoread.com"], 
+      
+      unless Rails.env == "development"
+        cc_list = ["mel@800ceoread.com"]
+      end
+      mail(to: [(@po.user.email ? @po.user.email : from_address)], 
+           cc: cc_list,
            from: from_address, 
            subject: "[#{po.number}] Purchase order received at #{@completed_at}") 
     end
