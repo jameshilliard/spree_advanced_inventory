@@ -100,18 +100,24 @@
 <% else %>
   <table class="index">
     <colgroup>
-    	<col style="width: 15%">
-      <col style="width: 15%">
-      <col style="width: 35%">
-      <col style="width: 30%">
+      <col style="width: 5%">
+    	<col style="width: 10%">
       <col style="width: 10%">
+      <col style="width: 10%">
+      <col style="width: 10%">
+      <col style="width: 10%">
+      <col style="width: 10%">
+      <col style="width: 8%">
     </colgroup>
     <thead>
       <tr data-hook="rate_header">
-        <th><%= t(:order_number) %></th>
-        <th><%= t(:supplier) %></th>
-        <th><%= t(:details) %></th>
-        <th><%= t(:ship_to) %></th>
+        <th>OWNER</th>
+        <th>TYPE</th>
+        <th>NUMBER</th>
+        <th>SUPPLIER</th>
+        <th>ORDERS</th>
+        <th>STATUS</th>
+        <th>TOTAL</th>
         <th class="actions"></th>
       </tr>
     </thead>
@@ -119,63 +125,49 @@
       <% @purchase_orders.each do |purchase_order|%>
         <% unless purchase_order.status.blank? or purchase_order.status == "New" %>
           <tr id="<%= spree_dom_id purchase_order %>" data-hook="rate_row" class="<%= cycle('odd', 'even')%>">
-
-            <td>
-              <b><%= purchase_order.dropship ? "Dropship" : "Purchase Order" %></b><br/>
-              <%= purchase_order.number %>            
-              <br/>
-              
-              <% if purchase_order.orders %>
-                <span class="small">
-                <% purchase_order.orders.each do |o| %>
-                  <%= link_to o.number, admin_order_url(o), target: "_NEW" %><br/>
-                <% end %>
-                </span>
-              <% else %>
-                 No reference order
-              <% end %>
-              <br/>
-              
-              Status: <%= purchase_order.status %>
-              <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
-                <br/>
-                <%= link_to "Mark as complete?", admin_purchase_order_complete_path(purchase_order) %>
-              <% end %>
-              <br/>
-            </td>
-            <td>
-              <% if purchase_order.supplier and purchase_order.supplier.email %>
-                <%= link_to purchase_order.supplier, "mailto:#{purchase_order.supplier.email}", title: "E-mail this supplier" %>
+            <td class="align-center"><%= purchase_order.user.email.split("@").first.titleize %></td>
+            <td class="align-center"><%= purchase_order.po_type %></td>
+            <td class="align-center"><%= link_to purchase_order.number, edit_admin_purchase_order_path(purchase_order) %></td>
+            <td class="small">
+              <% if purchase_order.supplier %>
+                <%= link_to purchase_order.supplier, edit_admin_supplier_path(purchase_order.supplier), target: "_BLANK" %>
               <% else %>
                 <%= purchase_order.supplier %>
               <% end %>
 
-              <br/>
               <% if purchase_order.supplier and purchase_order.supplier.phone %>
+                <br/>
                 <%= purchase_order.supplier.phone %>
               <% end %>
-            </td>
-            <td>
-              
-              <%= line_item_details(purchase_order.purchase_order_line_items).html_safe %> 
-              <br/>
-
-              By: <%= purchase_order.user.email.split("@").first.capitalize %> - <%= purchase_order.created_at.strftime("%m/%d/%Y %H:%M") %>
 
             </td>
-            <td>
-              <%= purchase_order.address %><br/>
-              <% unless not purchase_order.shipping_method %>
-                Via: <%= purchase_order.shipping_method.name.upcase %>
+            <td class="align-center" class="small">
+              <% if purchase_order.orders and purchase_order.orders.size > 0 %>
+                <% purchase_order.orders.each do |o| %>
+                  <%= link_to o.number, admin_order_url(o), target: "_NEW" %><br/>
+                <% end %>
+              <% else %>
+                 None
               <% end %>
             </td>
+            <td class="align-center">
+              <%= purchase_order.status %>
+              <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
+                <br/>
+                <%= link_to "Mark as complete?", admin_purchase_order_complete_path(purchase_order) %>
+              <% elsif purchase_order.status == "Completed" %>
+                <span class="small"><%= purchase_order.completed_at ? purchase_order.completed_at.strftime("%m/%d/%Y %l:%M %P") : "" %></span>
+              <% end %>
+              
+            </td>
+            <td class="align-center"><%= number_to_currency(purchase_order.total) %></td>
+
             <td class="actions">
               <%= link_to_with_icon("icon-edit", 
                                     "Edit", 
                                     edit_admin_purchase_order_path(purchase_order), 
                                     style: "margin-bottom: 4px",
                                     no_text: true)  %>
-              <br/>
 
               <% if purchase_order.can_destroy? %>
                 <%= link_to_with_icon("icon-trash", 
@@ -187,7 +179,6 @@
                                       confirm: "Remove #{purchase_order.po_type} #{purchase_order.number}?" )  %>
                                     <br/>
               <% end %>
-              <br/>
 
               <% if purchase_order.status == "Entered" %>
                 <%= link_to_with_icon("icon-envelope", 
@@ -197,7 +188,6 @@
                                       style: "margin-bottom: 4px",
                                       target: "_NEW",
                                       confirm: "E-mail invoice to #{purchase_order.supplier.email} and then view #{purchase_order.hardcopy_extension.upcase}?")  %>
-                <br/>
               <% end %>
                           
               <%= link_to_with_icon("icon-file", 
@@ -205,11 +195,23 @@
                                     admin_purchase_order_path(id: purchase_order.number, format:  purchase_order.hardcopy_extension), 
                                     style: "margin-bottom: 4px",
                                     target: "_NEW",
-                                    no_text: true)  %>            
+                                    no_text: true)  %>
               <br/>
-
             </td>
-
+          </tr>
+          <tr data-hook="rate_row" class="<%= cycle('even','odd')%>">
+            <td colspan="7" style="border-bottom: 1px #333 dashed !important">
+              <span style="float: left">
+                <%= line_item_details(purchase_order.purchase_order_line_items).html_safe %>
+              </span>
+              <span style="width: 250px; display: block; float: right; text-align: right">
+                Ship to <%= purchase_order.address.firstname %> <%= purchase_order.address.lastname %>
+                <% unless not purchase_order.shipping_method %>
+                  <br/>
+                  <%= purchase_order.shipping_method.name.upcase %>
+                <% end %>
+              </span>
+            </td>
           </tr>
         <% end %>
       <% end %>

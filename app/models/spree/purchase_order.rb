@@ -77,6 +77,19 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     status == "Submitted" and not dropship
   end
 
+  def completed_at
+    if status == "Completed"
+      last_item = received_purchase_order_line_items.order("received_at desc").limit(1).first
+      if last_item and last_item.received_at
+        last_item.received_at
+      else
+        nil
+      end
+    else
+      nil
+    end
+  end
+
   def gross_amount
     sum = 0.0
 

@@ -18,7 +18,7 @@ Spree::Variant.class_eval do
     #if on_demand
     #  inventory_units.with_state('backordered').each(&:fill_backorder)
     #end
-  end  
+  end
 
   private
 
@@ -47,7 +47,8 @@ Spree::Variant.class_eval do
           if order_list.size > 0
             order_list.each do |oid|
               o = Spree::Order.find(oid)
-              o.shipments.each do |shipment| 
+              o.shipments.each do |shipment|
+
                 unless shipment.state == "shipped"
                   shipment.update!(o)
                 end
