@@ -47,7 +47,9 @@ Spree::Variant.class_eval do
           if order_list.size > 0
             order_list.each do |oid|
               o = Spree::Order.find(oid)
-              o.update!
+              o.shipments.each { |shipment| shipment.update!(o) }
+              o.update_shipment_state
+              o.update_attributes_without_callbacks({ :shipment_state => o.shipment_state })
             end
           end
           self.update_attribute_without_callbacks(:count_on_hand, new_level)
