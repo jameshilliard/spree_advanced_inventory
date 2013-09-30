@@ -38,7 +38,14 @@ module Spree
 
         @po.items_received
         @po.orders.each do |o|
-          o.update!
+          o.shipments.each do |shipment| 
+            unless shipment.state == "shipped"
+              shipment.update!(o)
+            end
+          end
+
+          o.update_shipment_state
+          o.update_attributes_without_callbacks({ :shipment_state => o.shipment_state })
         end
         flash[:success] = "PO #{@po.number} fully received"
         redirect_to admin_purchase_orders_path
@@ -74,8 +81,16 @@ module Spree
 
                 @line_item.purchase_order.items_received
                 @line_item.purchase_order.orders.each do |o|
+
                   unless o.inventory_units.where(variant_id: @variant_id, state: 'backordered').size > 0
-                    o.update!
+                    o.shipments.each do |shipment| 
+                      unless shipment.state == "shipped"
+                        shipment.update!(o)
+                      end
+                    end
+
+                    o.update_shipment_state
+                    o.update_attributes_without_callbacks({ :shipment_state => o.shipment_state })
                   end
                 end
 
