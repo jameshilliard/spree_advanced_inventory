@@ -15,7 +15,7 @@
     <br/>
 
     <%= form_tag admin_full_inventory_report_path, {method: "GET"} do %>
-      <%= text_field_tag :sku, params[:sku], size: 14, placeholder: "Search by SKU" %>
+      <%= text_field_tag :sku, params[:sku], size: 16, placeholder: "Search by SKU" %>
       <%= hidden_field_tag :first_letter, params[:first_letter] %>
       <%= hidden_field_tag :stock_level, params[:stock_level] %>
       <%= submit_tag "Go" %>
