@@ -24,6 +24,10 @@ module Spree
           @inventory = @inventory.where{(count_on_hand > 0)}
         end
 
+        if sku_search = params[:sku]
+          @inventory = @inventory.where{(sku =~ "%#{sku_search}%")}
+        end
+
         render layout: false
       end
 

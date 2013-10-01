@@ -1,5 +1,6 @@
 <html>
   <head>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
   <title><%= params[:first_letter] %> - <%= params[:stock_level] %>- Full Inventory Report</title>
   </head>
   <body>
@@ -12,9 +13,16 @@
     <% end %>
 
     <br/>
+
+    <%= form_tag admin_full_inventory_report_path, {method: "GET"} do %>
+      <%= text_field_tag :sku, params[:sku], size: 14, placeholder: "Search by SKU" %>
+      <%= hidden_field_tag :first_letter, params[:first_letter] %>
+      <%= hidden_field_tag :stock_level, params[:stock_level] %>
+      <%= submit_tag "Go" %>
+    <% end %>
     <br/>
 
-    <strong>STOCK LEVEL :</strong>
+    <strong>ON HAND LEVEL :</strong>
     <%= link_to "POSITIVE", admin_full_inventory_report_url + "?first_letter=#{params[:first_letter]}&stock_level=in_stock" %> &ndash;
     <%= link_to "ZERO", admin_full_inventory_report_url + "?first_letter=#{params[:first_letter]}&stock_level=zero" %> &ndash;
     <%= link_to "BACKORDER", admin_full_inventory_report_url + "?first_letter=#{params[:first_letter]}&stock_level=backordered" %>
@@ -24,32 +32,45 @@
   <br/>
     <table width="100%" border="0" cellspacing="1" cellpadding="5" bgcolor="#d8d8d8">
       <colgroup>
-        <col style="width: 45%">
+        <col style="width: 35%">
         <col style="width: 15%">
         <col style="width: 15%">
         <col style="width: 15%">
         <col style="width: 10%">
+        <col style="width: 5%">
+        <col style="width: 5%">
       </colgroup>
       <thead>
-        <th><%= t(:title) %></th>
-        <th><%= t(:sku) %></th>
-        <th><%= t(:publisher) %></th>
-        <th><%= t(:format) %></th>
-        <th><%= t(:on_hand) %></th>
+        <th>Title</th>
+        <th>SKU</th>
+        <th>Publisher</th>
+        <th>Format</th>
+        <th>Sold / BO</th>
+        <th>Unsold</th>
+        <th>Total</th>
       </thead>
     <% @inventory.each do |i| %>
       <tr bgcolor="#ffffff" valign="top">
         <td><%= i.title.split(":").first %></td>
-        <td><%= i.sku[0..30] %></td>
-        <td><%= i.publisher %></td>
-        <td><%= i.options_text.split(": ").last %></td>
-        <td>
+        <td align="center"><%= i.sku[0..30] %></td>
+        <td align="center"><%= i.publisher %></td>
+        <td align="center"><%= i.options_text.split(": ").last %></td>
+        <td align="center">
+            <a href="<%= admin_orders_url %>?q[variants_sku_cont]=<%= i.sku %>&q[shipment_state_not_eq]=shipped" target="_BLANK">
+              <%= i.inventory_units.with_state('sold').size %> / <%= i.on_backorder %>
+            </a>
+        </td>
+        <td align="center">
           <a href="<%= edit_admin_product_variant_url(i.permalink, i.id) %>" target="_BLANK">
             <div style="width: 100%; display: block"><%= i.count_on_hand %></div>
           </a>
         </td>
+        <td align="center"> <%= i.count_on_hand +  i.inventory_units.with_state('sold').size %> </a> </td>
+
       </tr>
     <% end %>
   </table>
+  <script>$("#sku").focus();</script>
+
   </body>
 </html>
