@@ -22,10 +22,12 @@
     <% end %>
     <br/>
 
-    <strong>ON HAND LEVEL :</strong>
-    <%= link_to "POSITIVE", admin_full_inventory_report_url + "?first_letter=#{params[:first_letter]}&stock_level=in_stock" %> &ndash;
-    <%= link_to "ZERO", admin_full_inventory_report_url + "?first_letter=#{params[:first_letter]}&stock_level=zero" %> &ndash;
-    <%= link_to "BACKORDER", admin_full_inventory_report_url + "?first_letter=#{params[:first_letter]}&stock_level=backordered" %>
+    <% if params[:sku].blank? %>
+      <strong>UNSOLD STOCK LEVEL :</strong>
+      <%= link_to "POSITIVE", admin_full_inventory_report_url + "?sku=#{params[:sku]}&first_letter=#{params[:first_letter]}&stock_level=in_stock" %> &ndash;
+      <%= link_to "ZERO", admin_full_inventory_report_url + "?sku=#{params[:sku]}&first_letter=#{params[:first_letter]}&stock_level=zero" %> &ndash;
+      <%= link_to "BACKORDER", admin_full_inventory_report_url + "?sku=#{params[:sku]}&first_letter=#{params[:first_letter]}&stock_level=backordered" %>
+    <% end %>
   </div>
 
 

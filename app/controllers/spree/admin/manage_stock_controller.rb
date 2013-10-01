@@ -11,22 +11,25 @@ module Spree
         @inventory = Spree::Variant.select("spree_variants.*, spree_products.name as title, spree_products.permalink").joins(:product).
                                     order("spree_products.name asc, spree_variants.sku asc").where(is_master: false, deleted_at: nil)
 
+        if sku_search = params[:sku]
+          @inventory = @inventory.where{(sku =~ "%#{sku_search}%")}
+        end
+
         if params[:first_letter]
           l = params[:first_letter].to_s
           @inventory = @inventory.where{(product.name =~ "#{l}%")}
         end
 
-        if params[:stock_level] == "backordered"
-          @inventory = @inventory.where{(count_on_hand < 0)}
-        elsif params[:stock_level] == "zero"
-          @inventory = @inventory.where{(count_on_hand == 0)}
-        elsif params[:stock_level] == "in_stock" or params[:stock_level].blank?
-          @inventory = @inventory.where{(count_on_hand > 0)}
+        if not params[:sku] or params[:sku].size == 0
+          if params[:stock_level] == "backordered"
+            @inventory = @inventory.where{(count_on_hand < 0)}
+          elsif params[:stock_level] == "zero"
+            @inventory = @inventory.where{(count_on_hand == 0)}
+          elsif params[:stock_level] == "in_stock" or params[:stock_level].blank?
+            @inventory = @inventory.where{(count_on_hand > 0)}
+          end
         end
 
-        if sku_search = params[:sku]
-          @inventory = @inventory.where{(sku =~ "%#{sku_search}%")}
-        end
 
         render layout: false
       end
