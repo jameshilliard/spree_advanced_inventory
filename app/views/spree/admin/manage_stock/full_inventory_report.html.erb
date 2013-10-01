@@ -48,12 +48,12 @@
       </colgroup>
       <thead>
         <th>Title</th>
-        <th>SKU</th>
-        <th>Publisher</th>
-        <th>Format</th>
         <th>Sold / BO</th>
         <th>Unsold</th>
         <th>Stock</th>
+        <th>SKU</th>
+        <th>Publisher</th>
+        <th>Format</th>
         <th>Cost</th>
         <th>Total</th>
       </thead>
@@ -64,9 +64,6 @@
         <% line_total = i.cost_price.to_f * i.count_on_hand %>
         <tr bgcolor="#ffffff" valign="top">
           <td><%= i.title.split(":").first %></td>
-          <td align="center"><%= i.sku[0..30] %></td>
-          <td align="center"><%= i.publisher %></td>
-          <td align="center"><%= i.options_text.split(": ").last %></td>
           <td align="center">
               <a href="<%= admin_orders_url %>?q[variants_sku_cont]=<%= i.sku %>&q[shipment_state_not_eq]=shipped" target="_BLANK">
                 <%= i.inventory_units.where(state: 'sold', is_dropship: false).size  %> / <%=  i.inventory_units.where(state: 'backordered', is_dropship: false).size %>
@@ -78,6 +75,9 @@
             </a>
           </td>
           <td align="center"> <%= i.count_on_hand + i.inventory_units.where(state: 'sold', is_dropship: false).size  %> </a> </td>
+          <td align="center"><%= i.sku[0..30] %></td>
+          <td align="center"><%= i.publisher %></td>
+          <td align="center"><%= i.options_text.split(": ").last %></td>
           <td align="center"><%= sprintf("$%0.2f", i.cost_price) %></td>
           <td align="center"><%= sprintf("$%0.2f", line_total) %><% total += (line_total) %></td>
         </tr>
