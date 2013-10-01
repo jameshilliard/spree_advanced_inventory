@@ -7,7 +7,6 @@ module Spree
       end
 
       def full_inventory_report
-
         @inventory = Spree::Variant.select("spree_variants.*, spree_products.name as title, spree_products.permalink").joins(:product).
                                     order("spree_products.name asc, spree_variants.sku asc").where(is_master: false, deleted_at: nil)
 

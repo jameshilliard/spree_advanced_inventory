@@ -18,6 +18,7 @@
       <%= text_field_tag :sku, params[:sku], size: 16, placeholder: "Search by SKU" %>
       <%= hidden_field_tag :first_letter, params[:first_letter] %>
       <%= hidden_field_tag :stock_level, params[:stock_level] %>
+      <%= hidden_field_tag :page, params[:page] %>
       <%= submit_tag "Go" %>
     <% end %>
     <br/>
@@ -34,13 +35,16 @@
   <br/>
     <table width="100%" border="0" cellspacing="1" cellpadding="5" bgcolor="#d8d8d8">
       <colgroup>
-        <col style="width: 35%">
-        <col style="width: 15%">
-        <col style="width: 15%">
-        <col style="width: 15%">
+        <col style="width: 30%">
+        <col style="width: 10%">
+        <col style="width: 10%">
+        <col style="width: 10%">
+        <col style="width: 10%">
         <col style="width: 10%">
         <col style="width: 5%">
         <col style="width: 5%">
+        <col style="width: 10%">
+
       </colgroup>
       <thead>
         <th>Title</th>
@@ -49,28 +53,36 @@
         <th>Format</th>
         <th>Sold / BO</th>
         <th>Unsold</th>
+        <th>Stock</th>
+        <th>Cost</th>
         <th>Total</th>
       </thead>
-    <% @inventory.each do |i| %>
-      <tr bgcolor="#ffffff" valign="top">
-        <td><%= i.title.split(":").first %></td>
-        <td align="center"><%= i.sku[0..30] %></td>
-        <td align="center"><%= i.publisher %></td>
-        <td align="center"><%= i.options_text.split(": ").last %></td>
-        <td align="center">
-            <a href="<%= admin_orders_url %>?q[variants_sku_cont]=<%= i.sku %>&q[shipment_state_not_eq]=shipped" target="_BLANK">
-              <%= i.inventory_units.with_state('sold').size %> / <%= i.on_backorder %>
+      <% total = 0.0 %>
+      <% @inventory.each do |i| %>
+        <% i.cost_price = i.cost_price ? i.cost_price : 0.0 %>
+        <% i.count_on_hand = i.count_on_hand ? i.count_on_hand : 0.0 %>
+        <% line_total = i.cost_price.to_f * i.count_on_hand %>
+        <tr bgcolor="#ffffff" valign="top">
+          <td><%= i.title.split(":").first %></td>
+          <td align="center"><%= i.sku[0..30] %></td>
+          <td align="center"><%= i.publisher %></td>
+          <td align="center"><%= i.options_text.split(": ").last %></td>
+          <td align="center">
+              <a href="<%= admin_orders_url %>?q[variants_sku_cont]=<%= i.sku %>&q[shipment_state_not_eq]=shipped" target="_BLANK">
+                <%= i.inventory_units.where(state: 'sold', is_dropship: false).size  %> / <%=  i.inventory_units.where(state: 'backordered', is_dropship: false).size %>
+              </a>
+          </td>
+          <td align="center">
+            <a href="<%= edit_admin_product_variant_url(i.permalink, i.id) %>" target="_BLANK">
+              <div style="width: 100%; display: block"><%= i.count_on_hand %></div>
             </a>
-        </td>
-        <td align="center">
-          <a href="<%= edit_admin_product_variant_url(i.permalink, i.id) %>" target="_BLANK">
-            <div style="width: 100%; display: block"><%= i.count_on_hand %></div>
-          </a>
-        </td>
-        <td align="center"> <%= i.count_on_hand +  i.inventory_units.with_state('sold').size %> </a> </td>
-
-      </tr>
-    <% end %>
+          </td>
+          <td align="center"> <%= i.count_on_hand + i.inventory_units.where(state: 'sold', is_dropship: false).size  %> </a> </td>
+          <td align="center"><%= sprintf("$%0.2f", i.cost_price) %></td>
+          <td align="center"><%= sprintf("$%0.2f", line_total) %><% total += (line_total) %></td>
+        </tr>
+      <% end %>
+    <tr><td colspan='8' align="right">Total:</td><td  align="center"><%= sprintf("$%0.2f", total) %></td></tr>
   </table>
   <script>$("#sku").focus().select();</script>
 
