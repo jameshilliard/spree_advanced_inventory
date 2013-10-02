@@ -11,7 +11,7 @@ bounding_box [0,680], :width => 200 do
     :border_width => 0.5,
     :vertical_padding   => 0,
     :horizontal_padding => 0,
-    :font_size => 8,
+    :font_size => 10,
     :border_style => :underline_header,
     :column_widths => { 0 => 200 }
 
@@ -32,7 +32,7 @@ bounding_box [370,660], :width => 170 do
     :border_width => 0.5,
     :vertical_padding   => 0,
     :horizontal_padding => 0,
-    :font_size => 8,
+    :font_size => 10,
     :border_style => :underline_header,
     :column_widths => { 0 => 170 })
 end
