@@ -20,6 +20,18 @@ Spree::Variant.class_eval do
     #end
   end
 
+  def recent_price
+    p = 0.0
+
+    if rp = purchase_order_line_items.where{(price != nil) & (price >= 0.0)}.order("updated_at desc").limit(1).first
+      p = rp.price
+    elsif cost_price and cost_price > 0.0
+      p = cost_price
+    end
+
+    return p
+  end
+
   private
 
     def process_backorders
