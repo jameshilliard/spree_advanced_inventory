@@ -59,9 +59,8 @@
       </thead>
       <% total = 0.0 %>
       <% @inventory.each do |i| %>
-        <% i.cost_price = i.cost_price ? i.cost_price : 0.0 %>
         <% i.count_on_hand = i.count_on_hand ? i.count_on_hand : 0.0 %>
-        <% line_total = i.cost_price.to_f * i.count_on_hand %>
+        <% line_total = i.recent_price.to_f * i.count_on_hand %>
         <tr bgcolor="#ffffff" valign="top">
           <td><%= i.title.split(":").first %></td>
           <td align="center">
@@ -78,7 +77,7 @@
           <td align="center"><%= i.sku[0..30] %></td>
           <td align="center"><%= i.publisher %></td>
           <td align="center"><%= i.options_text.split(": ").last %></td>
-          <td align="center"><%= sprintf("$%0.2f", i.cost_price) %></td>
+          <td align="center"><%= sprintf("$%0.2f", i.recent_price) %></td>
           <td align="center"><%= sprintf("$%0.2f", line_total) %><% total += (line_total) %></td>
         </tr>
       <% end %>
