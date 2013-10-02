@@ -114,8 +114,29 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     end
 
     if completed_line_items == purchase_order_line_items.size
+      
       self.status = "Completed"
       self.save
+
+      if orders and orders.size > 0
+        orders.each do |o|
+
+          unless o.inventory_units.where(variant_id: @variant_id, state: 'backordered').size > 0
+            o.shipments.each do |shipment| 
+              unless shipment.state == "shipped"
+                shipment.update!(o)
+              end
+            end
+
+            u = o.updater
+            if u
+              u.update_shipment_state
+              o.update_attributes_without_callbacks({ :shipment_state => o.shipment_state })
+            end
+          end
+
+        end
+      end
     end
   end
 

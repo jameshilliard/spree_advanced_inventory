@@ -43,16 +43,7 @@ module Spree
         end
 
         @po.items_received
-        @po.orders.each do |o|
-          o.shipments.each do |shipment| 
-            unless shipment.state == "shipped"
-              shipment.update!(o)
-            end
-          end
 
-          o.updater.update_shipment_state
-          o.update_attributes_without_callbacks({ :shipment_state => o.shipment_state })
-        end
         flash[:success] = "PO #{@po.number} fully received"
         redirect_to admin_purchase_orders_path
       end
@@ -86,19 +77,6 @@ module Spree
                 @line_item.receive(quantity)
 
                 @line_item.purchase_order.items_received
-                @line_item.purchase_order.orders.each do |o|
-
-                  unless o.inventory_units.where(variant_id: @variant_id, state: 'backordered').size > 0
-                    o.shipments.each do |shipment| 
-                      unless shipment.state == "shipped"
-                        shipment.update!(o)
-                      end
-                    end
-
-                    o.updater.update_shipment_state
-                    o.update_attributes_without_callbacks({ :shipment_state => o.shipment_state })
-                  end
-                end
 
                 flash[:success] = flash_message_for(@variant, "received stock")
                 redirect_to action: :update, variant_id: @variant.id
@@ -108,16 +86,9 @@ module Spree
                 redirect_to action: :update, variant_id: @variant.id, method: "get"
               end
             end
-          else
-            flash[:error] = flash_message_for(@variant, "Quantity received must be greater than 0")
-            redirect_to action: :update, variant_id: @variant.id, method: "get"
-
           end
-
-
         end
       end
-
     end
   end
 end
