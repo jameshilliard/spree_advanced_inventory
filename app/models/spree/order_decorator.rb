@@ -19,26 +19,25 @@ Spree::Order.class_eval do
 
             if ((Time.new - created_at) > 300)
               l.variant.receive(l.quantity)
+              self.inventory_adjusted = true
             end
 
             inventory_units.where(variant_id: l.variant_id).each do |i|
               i.state = 'sold'
+              i.is_dropship = true
               i.save validate: false
 
             end
           end
 
-          self.inventory_adjusted = true
 
-        elsif not is_dropship and is_dropship_was == true
-          # This resets the check for inventory adjustments in case the admin keeps changing the
-          # dropship state back and forth
-          self.inventory_adjusted = false
-
+        elsif not is_dropship and is_dropship_was == true 
           line_items.each do |l|
             current_on_hand = l.variant.on_hand
-            
-            l.variant.decrement!(:count_on_hand, l.quantity)
+
+            if inventory_adjusted
+              l.variant.decrement!(:count_on_hand, l.quantity)
+            end
 
             if current_on_hand >= l.quantity
               # These units should already be sold but make sure!
@@ -63,6 +62,10 @@ Spree::Order.class_eval do
                 counter += 1
               end
             end
+            
+            # This resets the check for inventory adjustments in case the admin keeps changing the
+            # dropship state back and forth
+            self.inventory_adjusted = false
           end
         end 
       end
