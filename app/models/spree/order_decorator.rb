@@ -11,6 +11,11 @@ Spree::Order.class_eval do
   end
 
   def dropship_conversion
+
+    if slug == nil
+      self.slug = ""
+    end
+
     if updated_at
       if is_dropship_changed? and 
         if is_dropship and is_dropship_was == false and not inventory_adjusted 
@@ -29,7 +34,6 @@ Spree::Order.class_eval do
 
             end
           end
-
 
         elsif not is_dropship and is_dropship_was == true 
           line_items.each do |l|

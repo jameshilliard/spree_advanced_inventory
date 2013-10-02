@@ -50,7 +50,7 @@ module Spree
             end
           end
 
-          o.update_shipment_state
+          o.updater.update_shipment_state
           o.update_attributes_without_callbacks({ :shipment_state => o.shipment_state })
         end
         flash[:success] = "PO #{@po.number} fully received"
