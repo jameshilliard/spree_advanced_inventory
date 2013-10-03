@@ -1,5 +1,5 @@
 <li class="small" style="border-bottom: 1px #efefef solid; margin-bottom: 4px; padding-bottom: 4px;">
-  <input type="checkbox" name="order_ids[]" value="<%= o.id %>" 
+<label><input type="checkbox" name="order_ids[]" value="<%= o.id %>" 
   <%= (o.purchase_order_id and o.purchase_order_id == @purchase_order.id) ? "CHECKED" : "" %> />
   <%= link_to o.number, edit_admin_order_path(o.number), target: "_BLANK" %> - 
   <%= o.ship_address.firstname + " " + o.ship_address.lastname %> -
@@ -10,5 +10,6 @@
   Checkout: <%= o.state.upcase %>,
   Payment: <%= o.payment_state ? o.payment_state.upcase : "NONE" %>,
   Shipment: <%= o.shipment_state ? o.shipment_state.upcase : "NONE" %>
+</label>
 </li>
 

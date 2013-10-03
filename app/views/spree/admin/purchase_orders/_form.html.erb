@@ -31,6 +31,11 @@
               <%= render partial: "eligible_order", collection: @purchase_order.orders, as: :o %>
             <% end %>
           </ul>
+          <br/>
+          <br/>
+          <% if @purchase_order.status != "Complete" and not @purchase_order.dropship %>
+            <label><%= f.check_box :auto_capture_orders, value: true %> Auto-capture unpaid orders when PO is received?</label>
+          <% end %>
         </div>          
 
           

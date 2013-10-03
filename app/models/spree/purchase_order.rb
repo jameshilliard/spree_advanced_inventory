@@ -11,7 +11,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   attr_accessible :dropship, :due_at, :status, :address_id, :supplier_id,
     :supplier_contact_id, :user_id, :comments, :terms, :order_id,
     :purchase_order_line_items_attributes, :discount, :shipping, :deposit,
-    :shipping_method_id, :address_attributes, :email_subject
+    :shipping_method_id, :address_attributes, :email_subject, :auto_capture_orders
 
   accepts_nested_attributes_for :purchase_order_line_items,
    :reject_if => Proc.new { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
@@ -121,7 +121,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
             qty_adjust += 1
           end
 
-          if o.inventory_units.where{(state == "backordered")}.size == 0
+          if o.inventory_units.where{(state == "backordered")}.size == 0 and auto_capture_orders
             cc_total = o.payments.where{(state == "pending") & (source_type == "Spree::CreditCard")}.pluck(:amount).sum||0.0
             non_cc_total = o.payments.where{(state == "checkout") & (source_type == nil)}.pluck(:amount).sum||0.0
 
