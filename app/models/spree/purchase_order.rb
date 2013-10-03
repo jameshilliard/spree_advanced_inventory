@@ -77,16 +77,13 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     status == "Submitted" and not dropship
   end
 
-  def completed_at
+  def set_completed_at
     if status == "Completed"
       last_item = received_purchase_order_line_items.order("received_at desc").limit(1).first
       if last_item and last_item.received_at
-        last_item.received_at
-      else
-        nil
+        self.completed_at = last_item.received_at
+        self.save validate: false
       end
-    else
-      nil
     end
   end
 
@@ -116,6 +113,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     if completed_line_items == purchase_order_line_items.size
       
       self.status = "Completed"
+      self.completed_at = Time.new
       self.save
 
       if orders and orders.size > 0
