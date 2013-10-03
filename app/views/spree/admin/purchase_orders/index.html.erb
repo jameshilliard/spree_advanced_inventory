@@ -152,12 +152,17 @@
             </td>
             <td class="align-center">
               <%= purchase_order.status %>
+              <br/>
+              <span class="small">
               <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
-                <br/>
+                <%= purchase_order.submitted_at ? purchase_order.submitted_at.strftime("%m/%d/%Y %l:%M %P<br/>").html_safe : "" %>                
                 <%= link_to "Mark as complete?", admin_purchase_order_complete_path(purchase_order) %>
               <% elsif purchase_order.status == "Completed" %>
-                <span class="small"><%= purchase_order.completed_at ? purchase_order.completed_at.strftime("%m/%d/%Y %l:%M %P") : "" %></span>
+                <%= purchase_order.completed_at ? purchase_order.completed_at.strftime("%m/%d/%Y %l:%M %P") : "" %>
+              <% else %>
+                <%= purchase_order.entered_at ? purchase_order.entered_at.strftime("%m/%d/%Y %l:%M %P") : "" %>
               <% end %>
+              </span>
               
             </td>
             <td class="align-center"><%= number_to_currency(purchase_order.total) %></td>

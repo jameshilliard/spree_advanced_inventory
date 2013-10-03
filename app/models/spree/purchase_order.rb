@@ -11,13 +11,15 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   attr_accessible :dropship, :due_at, :status, :address_id, :supplier_id,
     :supplier_contact_id, :user_id, :comments, :terms, :order_id,
     :purchase_order_line_items_attributes, :discount, :shipping, :deposit,
-    :shipping_method_id, :address_attributes, :email_subject, :auto_capture_orders
+    :shipping_method_id, :address_attributes, :email_subject, :auto_capture_orders,
+    :entered_at, :completed_at, :submitted_at
 
   accepts_nested_attributes_for :purchase_order_line_items,
    :reject_if => Proc.new { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
 
 
   before_validation :copy_supplier_id
+  before_validation :update_times
   before_save :send_completed_notice
 
   validates :address_id, :shipping_method_id, presence: true
@@ -32,6 +34,16 @@ class Spree::PurchaseOrder < ActiveRecord::Base
       true
     else 
       false
+    end
+  end
+
+  def update_times
+    if status_changed? and status == "Entered"
+      self.entered_at = Time.current
+    elsif status_changed? and status == "Submitted"
+      self.submitted_at = Time.current
+    elsif status_changed? and status == "Completed"
+      self.completed_at = Time.current
     end
   end
 
