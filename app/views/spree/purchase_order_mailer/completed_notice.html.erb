@@ -21,6 +21,9 @@
       Checkout: <%= o.state.upcase %>,
       Payment: <%= o.payment_state.upcase %>,
       Shipment: <%= o.shipment_state.upcase %>
+      <% if o.payment_state.upcase != "PAID" %>
+        <%= o.staff_comments.gsub(/\n/, " ") %>
+      <% end %>
     </li>
   <% end %>
   </ul>

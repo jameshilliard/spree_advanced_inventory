@@ -108,6 +108,61 @@ class Spree::PurchaseOrder < ActiveRecord::Base
       unless l.status == "Incomplete"
         completed_line_items += 1
       end
+      
+      qty_recv = l.received_purchase_order_line_items.pluck(:quantity).sum
+      qty_adjust = 0
+
+      if orders
+        orders.order("completed_at asc").each do |o|
+          o.inventory_units.where{(variant_id == l.variant_id) & (state == "backordered")}.each do |i|
+            i.state = 'sold'
+            i.save validate: false
+            qty_recv -= 1
+            qty_adjust += 1
+          end
+
+          if o.inventory_units.where{(state == "backordered")}.size == 0
+            cc_total = o.payments.where{(state == "pending") & (source_type == "Spree::CreditCard")}.pluck(:amount).sum||0.0
+            non_cc_total = o.payments.where{(state == "checkout") & (source_type == nil)}.pluck(:amount).sum||0.0
+
+            if cc_total + non_cc_total == o.total
+              o.payments.where{(state == "pending") | (state == "checkout")}.each do |p|
+                if (p.state == "pending" and p.source_type == "Spree::CreditCard") or (p.state == "checkout" and p.source_type != "Spree::CreditCard")
+                  begin
+                    p.send("capture!")
+                    o.update!
+                  rescue Spree::Core::GatewayError => ge
+                    o.update_attributes_without_callbacks({ 
+                      :staff_comments => 
+                      "#{o.staff_comments}\n*** AUTOMATIC PAYMENT CAPTURE FAILED #{Time.current.strftime("%m/%d %l:%M %P")} ***\n#{ge.message}\n"
+                    })
+                  end
+                else
+                  o.update_attributes_without_callbacks({ 
+                      :staff_comments => 
+                      "#{o.staff_comments}\n*** AUTOMATIC PAYMENT CAPTURE FAILED #{Time.current.strftime("%m/%d %l:%M %P")} ***\nCould not find a valid payment\n"
+                    })
+                end
+              end
+            else
+              o.update_attributes_without_callbacks({ 
+                :staff_comments => 
+                "#{o.staff_comments}\n*** AUTOMATIC PAYMENT CAPTURE FAILED #{Time.current.strftime("%m/%d %l:%M %P")} ***\nPayment total #{cc_total + non_cc_total} does not equal order total #{o.total}\n"
+              })
+            end
+          end
+        end
+      end
+
+      # This changes on hand to reflect the above inventory units being sold
+      if qty_adjust > 0
+        l.variant.update_attribute_without_callbacks(:count_on_hand, l.variant.count_on_hand + qty_adjust)
+      end
+
+      # Any remaining quantity should be received normally
+      if qty_recv > 0 
+        l.variant.receive(qty_recv)
+      end
     end
 
     if completed_line_items == purchase_order_line_items.size
