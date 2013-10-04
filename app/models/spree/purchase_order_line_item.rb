@@ -21,12 +21,11 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
   end
 
   def receive(qty_recv)
-    qty_recv = qty_recv.to_i
-    received_purchase_order_line_items.create(quantity: qty_recv, received_at: Time.now)
+    received_purchase_order_line_items.create(quantity: qty_recv.to_i, received_at: Time.now)
   end
 
   def received
-    received_purchase_order_line_items.collect(&:quantity).sum||0
+    received_purchase_order_line_items.pluck(:quantity).sum||0
   end
 
   def line_total

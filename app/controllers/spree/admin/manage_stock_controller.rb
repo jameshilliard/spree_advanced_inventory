@@ -35,14 +35,15 @@ module Spree
 
       def receive_entire_po
         @po = Spree::PurchaseOrder.find_by_number(params[:purchase_order_id])
-
+        r = {}
         @po.purchase_order_line_items.each do |p|
           if p.status != "Complete"
-            p.receive(p.quantity - p.received)
+            r[p.id] = p.quantity
+            p.receive(p.quantity)
           end
         end
 
-        @po.items_received
+        @po.items_received(r)
 
         flash[:success] = "PO #{@po.number} fully received"
         redirect_to admin_purchase_orders_path
@@ -76,7 +77,7 @@ module Spree
 
                 @line_item.receive(quantity)
 
-                @line_item.purchase_order.items_received
+                @line_item.purchase_order.items_received(@line_item.id => quantity)
 
                 flash[:success] = flash_message_for(@variant, "received stock")
                 redirect_to action: :update, variant_id: @variant.id

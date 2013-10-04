@@ -19,8 +19,8 @@ module Spree::Admin::PurchaseOrdersHelper
         end
       end
 
-      if po.can_be_received?
-        item_list += "#{link_to 'Receive Whole PO?', admin_receive_entire_po_path(po)}".html_safe
+      if po.can_be_fully_received? and 
+        item_list += "#{link_to 'Receive Whole PO?', admin_receive_entire_po_path(po), confirm: "Ok to confirm this entire purchase order?"}".html_safe
       end
     end
 

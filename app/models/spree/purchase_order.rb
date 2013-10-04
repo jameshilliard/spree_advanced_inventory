@@ -89,6 +89,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     status == "Submitted" and not dropship
   end
 
+  def can_be_fully_received?
+    can_be_received? and received_purchase_order_line_items.size == 0
+  end
+
   def set_completed_at
     if status == "Completed"
       last_item = received_purchase_order_line_items.order("received_at desc").limit(1).first
@@ -113,24 +117,27 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     gross_amount.to_f + shipping.to_f - discount.to_f - deposit.to_f
   end
 
-  def items_received
+  def items_received(line_item_ids)
     completed_line_items = 0
 
-    purchase_order_line_items.each do |l|
+    line_item_ids.each do |line_item_id,qty_recv|
+      l = Spree::PurchaseOrderLineItem.find(line_item_id)
+
+      qty_adjust = 0
+
       unless l.status == "Incomplete"
         completed_line_items += 1
       end
-      
-      qty_recv = l.received_purchase_order_line_items.pluck(:quantity).sum
-      qty_adjust = 0
 
       if orders
         orders.order("completed_at asc").each do |o|
           o.inventory_units.where{(variant_id == l.variant_id) & (state == "backordered")}.each do |i|
-            i.state = 'sold'
-            i.save validate: false
-            qty_recv -= 1
-            qty_adjust += 1
+            if qty_recv > 0
+              i.state = 'sold'
+              i.save validate: false
+              qty_recv -= 1
+              qty_adjust += 1
+            end
           end
 
           if o.inventory_units.where{(state == "backordered")}.size == 0 and auto_capture_orders
@@ -142,7 +149,8 @@ class Spree::PurchaseOrder < ActiveRecord::Base
                 if (p.state == "pending" and p.source_type == "Spree::CreditCard") or (p.state == "checkout" and p.source_type != "Spree::CreditCard")
                   begin
                     p.send("capture!")
-                    o.update!
+                    sleep 1.0
+
                   rescue Spree::Core::GatewayError => ge
                     o.update_attributes_without_callbacks({ 
                       :staff_comments => 
@@ -163,6 +171,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
               })
             end
           end
+          o.update!
         end
       end
 
