@@ -145,7 +145,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
             cc_total = o.payments.where{(state == "pending") & (source_type == "Spree::CreditCard")}.pluck(:amount).sum||0.0
             non_cc_total = o.payments.where{(state == "checkout") & (source_type == nil)}.pluck(:amount).sum||0.0
 
-            if (cc_total + non_cc_total).to_f == o.total.to_f
+            if (cc_total.to_f + non_cc_total.to_f) == o.total.to_f
 
               o.payments.where{(state == "pending") | (state == "checkout")}.each do |p|
                 if (p.state == "pending" and p.source_type == "Spree::CreditCard") or (p.state == "checkout" and p.source_type != "Spree::CreditCard")
