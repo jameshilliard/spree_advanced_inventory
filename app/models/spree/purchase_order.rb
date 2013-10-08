@@ -141,10 +141,12 @@ class Spree::PurchaseOrder < ActiveRecord::Base
           end
 
           if o.inventory_units.where{(state == "backordered")}.size == 0 and auto_capture_orders
+
             cc_total = o.payments.where{(state == "pending") & (source_type == "Spree::CreditCard")}.pluck(:amount).sum||0.0
             non_cc_total = o.payments.where{(state == "checkout") & (source_type == nil)}.pluck(:amount).sum||0.0
 
-            if cc_total + non_cc_total == o.total
+            if (cc_total + non_cc_total).to_f == o.total.to_f
+
               o.payments.where{(state == "pending") | (state == "checkout")}.each do |p|
                 if (p.state == "pending" and p.source_type == "Spree::CreditCard") or (p.state == "checkout" and p.source_type != "Spree::CreditCard")
                   begin
@@ -165,10 +167,12 @@ class Spree::PurchaseOrder < ActiveRecord::Base
                 end
               end
             else
-              o.update_attributes_without_callbacks({ 
-                :staff_comments => 
-                "#{o.staff_comments}\n*** AUTOMATIC PAYMENT CAPTURE FAILED #{Time.current.strftime("%m/%d %l:%M %P")} ***\nPayment total #{cc_total + non_cc_total} does not equal order total #{o.total}\n"
-              })
+              unless o.payment_state == "paid"
+                o.update_attributes_without_callbacks({ 
+                  :staff_comments => 
+                  "#{o.staff_comments}\n*** AUTOMATIC PAYMENT CAPTURE FAILED #{Time.current.strftime("%m/%d %l:%M %P")} ***\nPayment total #{cc_total + non_cc_total} does not equal order total #{o.total}\n"
+                })
+              end
             end
           end
           o.update!
