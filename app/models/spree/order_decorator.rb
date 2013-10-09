@@ -1,6 +1,6 @@
 Spree::Order.class_eval do
   belongs_to :purchase_order
-  attr_accessible :is_dropship, :inventory_adjusted
+  attr_accessible :is_dropship, :inventory_adjusted, :is_quote
 
   before_validation :dropship_conversion
 
@@ -10,8 +10,15 @@ Spree::Order.class_eval do
     return value
   end
 
-  def dropship_conversion
+  def use_stock
+    if is_dropship or is_quote
+      false
+    else
+      true
+    end
+  end
 
+  def dropship_conversion
     if slug == nil
       self.slug = ""
     end
@@ -90,6 +97,7 @@ Spree::Order.class_eval do
                 o.state = 'complete' and
                 o.shipment_state != 'shipped' and  
                 l.order_id = o.id and 
+                o.is_quote != true and
                 l.variant_id in (select distinct(variant_id) from spree_purchase_order_line_items where purchase_order_id = ?) 
                 order by 
                 o.completed_at desc limit 100", po.id])
