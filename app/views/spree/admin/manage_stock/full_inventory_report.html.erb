@@ -65,7 +65,7 @@
           <td><%= i.title.split(":").first %></td>
           <td align="center">
               <a href="<%= admin_orders_url %>?q[variants_sku_cont]=<%= i.sku %>&q[shipment_state_not_eq]=shipped" target="_BLANK">
-                <%= i.inventory_units.where(state: 'sold', is_dropship: false).size  %> / <%=  i.inventory_units.where(state: 'backordered', is_dropship: false).size %>
+                <%= i.inventory_units.where(state: 'sold', is_dropship: false, is_quote: false).size  %> / <%=  i.inventory_units.where(state: 'backordered', is_dropship: false, is_quote: false).size %>
               </a>
           </td>
           <td align="center">
@@ -73,7 +73,7 @@
               <div style="width: 100%; display: block"><%= i.count_on_hand %></div>
             </a>
           </td>
-          <td align="center"> <%= i.count_on_hand + i.inventory_units.where(state: 'sold', is_dropship: false).size  %> </a> </td>
+          <td align="center"> <%= i.count_on_hand + i.inventory_units.where(state: 'sold', is_dropship: false, is_quote: false).size  %> </a> </td>
           <td align="center"><%= i.sku[0..30] %></td>
           <td align="center"><%= i.publisher %></td>
           <td align="center"><%= i.options_text.split(": ").last %></td>
