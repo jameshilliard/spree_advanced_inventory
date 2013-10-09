@@ -1,0 +1,6 @@
+
+<% if @order.is_quote %>
+  Quote
+<% else %>
+  Order #<%= @order.number %>
+<% end %>
