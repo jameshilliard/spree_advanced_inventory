@@ -102,4 +102,15 @@ Spree::Order.class_eval do
                 order by 
                 o.completed_at desc limit 100", po.id])
   end
+
+  def after_cancel
+    unless is_quote
+      restock_items!
+
+      OrderMailer.cancel_email(self.id).deliver
+      unless %w(partial shipped).include?(shipment_state)
+        self.payment_state = 'credit_owed'
+      end
+    end
+  end  
 end
