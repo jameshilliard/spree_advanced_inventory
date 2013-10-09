@@ -1,14 +1,20 @@
 Spree::InventoryUnit.class_eval do
-  attr_accessible :is_dropship
+  attr_accessible :is_dropship, :is_quote
 
-  before_validation :set_is_dropship
+  before_validation :set_stock_type
 
-  def set_is_dropship
+  def set_stock_type
     if order.is_dropship == true
       self.is_dropship = true
       self.state = 'sold'
     else
       self.is_dropship = false
+    end 
+
+    if order.is_quote == true
+      self.is_quote = true
+    else
+      self.is_quote = false
     end 
 
     return true
@@ -19,7 +25,7 @@ Spree::InventoryUnit.class_eval do
     sold = quantity - back_order
 
     #set on_hand if configured
-    if self.track_levels?(variant) and not order.is_dropship
+    if self.track_levels?(variant) and order.use_stock
       variant.decrement!(:count_on_hand, quantity)
     end
 
@@ -32,7 +38,7 @@ Spree::InventoryUnit.class_eval do
   def self.decrease(o, v, q)
 
     # Do not recreate stock levels for dropships
-    if self.track_levels?(v) and not o.is_dropship
+    if self.track_levels?(v) and o.use_stock
       v.increment!(:count_on_hand, q)
     end
 
@@ -48,7 +54,7 @@ Spree::InventoryUnit.class_eval do
 
     def self.determine_backorder(o, v, q)
 
-      if o.is_dropship
+      if not o.use_stock
         0
       else
         if v.on_hand == 0 
