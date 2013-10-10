@@ -107,7 +107,7 @@ Spree::Order.class_eval do
     unless is_quote
       restock_items!
 
-      OrderMailer.cancel_email(self.id).deliver
+      Spree::OrderMailer.cancel_email(self.id).deliver
       unless %w(partial shipped).include?(shipment_state)
         self.payment_state = 'credit_owed'
       end
