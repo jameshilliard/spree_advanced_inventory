@@ -259,10 +259,12 @@ class Spree::PurchaseOrder < ActiveRecord::Base
       t.gsub!(/\|\|SHIP5\|\|/, "#{address.city}")
       t.gsub!(/\|\|SHIP6\|\|/, "#{address.state.abbr}")
       t.gsub!(/\|\|SHIP7\|\|/, "#{address.zipcode}")
+      t.gsub!(/\|\|SHIP8\|\|/, "#{address.phone}")
       t.gsub!(/\|\|ARRIVE\|\|/, "#{due_at}")
       t.gsub!(/\|\|SKU\|\|/, "#{line_item.variant.sku}")
       t.gsub!(/\|\|QTY\|\|/, "#{line_item.quantity}")
       t.gsub!(/\|\|TITLE\|\|/, "#{line_item.variant.product.name}")
+      t.gsub!(/\|\|REF\|\|/, "#{orders.collect(&:number).join(', ')}")
 
       r = File.new(File.join(Rails.root, "tmp", "#{number}.rtf"), "w")
       r.write(t)
