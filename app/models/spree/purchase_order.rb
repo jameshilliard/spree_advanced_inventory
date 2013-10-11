@@ -246,6 +246,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     if supplier and supplier.rtf_template and supplier.rtf_template.size > 0
       line_item = purchase_order_line_items.first
 
+      if File.exists?(File.join(Rails.root, "tmp", "#{number}.rtf"))
+        File.unlink(File.join(Rails.root, "tmp", "#{number}.rtf"))
+      end
+
       t = supplier.rtf_template
       t.gsub!(/\|\|PONUM\|\|/, "#{number}")
       t.gsub!(/\|\|DATE\|\|/, "#{created_at.strftime("%m-%d-%Y")}")
