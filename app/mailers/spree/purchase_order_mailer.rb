@@ -29,7 +29,11 @@ module Spree
         type = "New"
       end
 
-      subject = @po.email_subject || "[#{Spree::Config[:site_name]}] #{type} #{@po.po_type} ##{@po.number}"
+      subject = @po.email_subject
+      if subject.blank? 
+        subject = "[#{Spree::Config[:site_name]}] #{type} #{@po.po_type} ##{@po.number}"
+      end
+
       sleep 1
       ext = @po.hardcopy_extension
       attachments["#{@po.number}.#{ext}"] = File.read(File.join(Rails.root,"tmp",@po.number + ".#{ext}"))
