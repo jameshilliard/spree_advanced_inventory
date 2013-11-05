@@ -186,6 +186,11 @@ bounding_box [370,560], :width => 170, :height => 150 do
   move_down 4
 
 data = [["#{ @purchase_order.address.firstname} #{ @purchase_order.address.lastname}"]]
+
+if  @purchase_order.address.attributes["company"] and  @purchase_order.address.attributes["company"].size > 0
+  data << [ @purchase_order.address.company]
+end
+
 data << [ @purchase_order.address.address1]
 
 if  @purchase_order.address.address2.size > 0
@@ -194,11 +199,6 @@ end
 
 if  @purchase_order.address.attributes["address3"] and  @purchase_order.address.attributes["address3"].size > 0
   data << [ @purchase_order.address.address3]
-end
-
-
-if  @purchase_order.address.attributes["company"] and  @purchase_order.address.attributes["company"].size > 0
-  data << [ @purchase_order.address.company]
 end
 
 data << ["#{ @purchase_order.address.city}, #{ @purchase_order.address.state} #{ @purchase_order.address.zipcode}"]
