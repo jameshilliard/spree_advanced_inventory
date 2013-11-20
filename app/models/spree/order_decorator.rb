@@ -3,6 +3,7 @@ Spree::Order.class_eval do
   attr_accessible :is_dropship, :inventory_adjusted, :is_quote
 
   before_validation :dropship_conversion
+  before_validation :empty_nil_slug
 
   def to_select
     value = "#{number} - From: #{email} - $#{total}"
@@ -18,70 +19,84 @@ Spree::Order.class_eval do
     end
   end
 
-  def dropship_conversion
+  def empty_nil_slug
     if slug == nil
       self.slug = ""
     end
+    return true
+  end
 
-    if updated_at
-      if is_dropship_changed? and 
-        if is_dropship and is_dropship_was == false and not inventory_adjusted 
+  def dropship_conversion
+    if is_dropship 
+      make_dropship
 
-          line_items.each do |l|
+    elsif not is_dropship and is_dropship_was == true
+      make_regular
 
-            if ((Time.new - created_at) > 300)
-              l.variant.receive(l.quantity)
-              self.inventory_adjusted = true
-            end
+    end 
+    return true
+  end
 
-            inventory_units.where(variant_id: l.variant_id).each do |i|
-              i.state = 'sold'
-              i.is_dropship = true
-              i.save validate: false
+  def make_dropship
+    line_items.each do |l|
 
-            end
-          end
+      if inventory_adjusted == true
+        adjust_variant_stock(l.variant, l.quantity)
+        self.inventory_adjusted = false
+      end
 
-        elsif not is_dropship and is_dropship_was == true 
-          line_items.each do |l|
-            current_on_hand = l.variant.on_hand
-
-            if inventory_adjusted
-              l.variant.decrement!(:count_on_hand, l.quantity)
-            end
-
-            if current_on_hand >= l.quantity
-              # These units should already be sold but make sure!
-              inventory_units.where(variant_id: l.variant_id).each do |i|
-                i.state = 'sold'
-                i.is_dropship = false
-                i.save validate: false
-
-              end
-            else
-              counter = 1
-              inventory_units.where(variant_id: l.variant_id).each do |i|
-
-                if counter <= current_on_hand
-                  i.state = 'sold'
-                else
-                  i.state = 'backordered'
-                end
-
-                i.is_dropship = false
-                i.save validate: false
-                counter += 1
-              end
-            end
-            
-            # This resets the check for inventory adjustments in case the admin keeps changing the
-            # dropship state back and forth
-            self.inventory_adjusted = false
-          end
-        end 
+      variant_inventory_units(l.variant_id).each do |i|
+        update_inventory_unit(i, "sold")
       end
     end
-    return true
+  end
+
+  def make_regular
+    line_items.each do |l|
+      current_on_hand = l.variant.on_hand
+
+      if not inventory_adjusted
+        adjust_variant_stock(l.variant, l.quantity * -1)
+        self.inventory_adjusted = true
+      end
+
+      if current_on_hand >= l.quantity
+        variant_inventory_units(l.variant_id).each do |i|
+          update_inventory_unit(i, "sold")
+        end
+
+      else
+        counter = 1
+
+        variant_inventory_units(l.variant_id).each do |i|
+          if counter <= current_on_hand
+            update_inventory_unit(i, "sold")
+          else
+            update_inventory_unit(i, "backordered")
+          end
+
+          counter += 1
+        end
+      end
+    end
+  end
+
+  def variant_inventory_units(variant_id)
+    inventory_units.where(variant_id: variant_id)
+  end
+
+  def adjust_variant_stock(variant, quantity)
+    if quantity > 0
+      variant.receive(quantity)
+    else
+      variant.decrement!(:count_on_hand, quantity.abs)
+    end
+  end
+
+  def update_inventory_unit(i, new_state)
+    i.state = new_state
+    i.is_dropship = is_dropship
+    i.save validate: false
   end
 
   def self.eligible_for_po(po)
