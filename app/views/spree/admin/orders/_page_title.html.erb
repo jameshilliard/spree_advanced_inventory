@@ -2,5 +2,8 @@
 <% if @order.is_quote %>
   Quote
 <% else %>
+  <% if @order.is_dropship %>
+    Dropship
+  <% end %>
   Order #<%= @order.number %>
 <% end %>
