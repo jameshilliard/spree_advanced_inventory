@@ -20,9 +20,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   before_validation :copy_supplier_id
   before_validation :update_times
+  before_validation :check_email_subject
   before_save :send_completed_notice
 
-  validates :address_id, :shipping_method_id, :email_subject, :supplier_contact_id, presence: true
+  validates :address_id, :shipping_method_id, :supplier_contact_id, presence: true
   validates :discount, numericality: true, unless: Proc.new { |a| a.discount.blank? }
   validates :shipping, numericality: true, unless: Proc.new { |a| a.shipping.blank? }
   validates :deposit, numericality: true, unless: Proc.new { |a| a.deposit.blank? }
@@ -40,14 +41,30 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     end
   end
 
+  def copy_supplier_id
+    if supplier_contact
+      self.supplier_id = supplier_contact.supplier_id
+    end
+    return true
+  end
+
   def update_times
-    if status_changed? and status == "Entered"
+    if status == "Entered" and not entered_at
       self.entered_at = Time.current
-    elsif status_changed? and status == "Submitted"
+    elsif status == "Submitted" and not submitted_at
       self.submitted_at = Time.current
-    elsif status_changed? and status == "Completed"
+    elsif status == "Completed" and not completed_at
       self.completed_at = Time.current
     end
+
+    return true
+  end
+
+  def check_email_subject
+    if email_subject.blank?
+      self.email_subject = "[#{Spree::Config[:site_name]}] New #{po_type} ##{number}"
+    end
+    true
   end
 
   def received_purchase_order_line_items
@@ -222,8 +239,13 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   end
 
   def self.update_status
-	  where('status != ?', 'Completed').each do |po|
-      po.items_received
+	  where('status = ?', 'Submitted').each do |po|
+      puts "#{po.number} #{po.purchase_order_line_items.sum(:quantity)} vs #{po.received_purchase_order_line_items.sum(:quantity)}"
+      if po.purchase_order_line_items.sum(:quantity) == po.received_purchase_order_line_items.sum(:quantity)
+        po.status = "Completed"
+        po.completed_at = Time.new
+        po.save validate: false
+      end
     end
   end
 
@@ -284,13 +306,6 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   def self.states
     %w{Entered Submitted Completed}
-  end
-
-  def copy_supplier_id
-    if supplier_contact
-      self.supplier_id = supplier_contact.supplier_id
-    end
-    return true
   end
 
   def self.convert_order_association
