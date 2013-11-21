@@ -240,7 +240,6 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   def self.update_status
 	  where('status = ?', 'Submitted').each do |po|
-      puts "#{po.number} #{po.purchase_order_line_items.sum(:quantity)} vs #{po.received_purchase_order_line_items.sum(:quantity)}"
       if po.purchase_order_line_items.sum(:quantity) == po.received_purchase_order_line_items.sum(:quantity)
         po.status = "Completed"
         po.completed_at = Time.new
