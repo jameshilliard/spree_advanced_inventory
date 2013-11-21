@@ -1,6 +1,6 @@
 <li class="small" style="border-bottom: 1px #efefef solid; margin-bottom: 4px; padding-bottom: 4px;">
 <label><input type="checkbox" name="order_ids[]" value="<%= o.id %>" 
-  <%= (o.purchase_order_id and o.purchase_order_id == @purchase_order.id) ? "CHECKED" : "" %> />
+  <%= ((o.purchase_order_id and o.purchase_order_id == @purchase_order.id) or (params["order_ids[]"] and params["order_ids[]"].include?(o.id))) ? "CHECKED" : "" %> />
   <%= link_to o.number, edit_admin_order_path(o.number), target: "_BLANK" %> - 
   <%= o.ship_address.firstname + " " + o.ship_address.lastname %> -
   Created: <%= o.created_at.strftime("%m/%d @ %l:%M %P") %> - 
