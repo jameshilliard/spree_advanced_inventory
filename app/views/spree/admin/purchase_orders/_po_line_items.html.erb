@@ -9,6 +9,10 @@
     as: :line_item,
     locals: { f: f, po: @purchase_order }
   %>
+  <tr><td colspan="2" align="right">Discount</td><td>(<%= Spree::Money.new(@purchase_order.discount) %>)</td></tr>
+  <tr><td colspan="2" align="right">Deposit</td><td>(<%= Spree::Money.new(@purchase_order.deposit) %>)</td></tr>
+  <tr><td colspan="2" align="right">Shipping</td><td><%= Spree::Money.new(@purchase_order.shipping) %></td></tr>
+  <tr><td colspan="2" align="right"><strong>TOTAL</strong></td><td><%= Spree::Money.new(@purchase_order.total) %></td></tr>
 </table>
 <% unless @purchase_order.has_line_items? %>
   <div id="no-purchase-order-line-items">None added yet</div>
