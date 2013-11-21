@@ -22,7 +22,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   before_validation :update_times
   before_save :send_completed_notice
 
-  validates :address_id, :shipping_method_id, presence: true
+  validates :address_id, :shipping_method_id, :email_subject, :supplier_contact_id, presence: true
+  validates :discount, numericality: true, unless: Proc.new { |a| a.discount.blank? }
+  validates :shipping, numericality: true, unless: Proc.new { |a| a.shipping.blank? }
+  validates :deposit, numericality: true, unless: Proc.new { |a| a.deposit.blank? }
 
   default_scope order("spree_purchase_orders.created_at desc")
 
