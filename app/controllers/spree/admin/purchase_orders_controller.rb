@@ -68,10 +68,6 @@ module Spree
       def update
         @purchase_order = Spree::PurchaseOrder.find_by_number(params[:id])
         
-        if params[:purchase_order][:status] == "Completed" and not @purchase_order.completed_at 
-          params[:purchase_order][:completed_at] = Time.new
-        end
-
         if @purchase_order.update_attributes(params[:purchase_order])
           flash[:success] = "#{@purchase_order.po_type} updated"
           redirect_to edit_admin_purchase_order_path(@purchase_order.number) 
@@ -162,19 +158,43 @@ module Spree
 
       def complete
         @purchase_order = find_resource
-        next_url = admin_purchase_orders_path
+        next_url = request.env["HTTP_REFERER"]
 
         if @purchase_order.dropship and @purchase_order.status == "Submitted"
 
           @purchase_order.status = "Completed"
-          @purchase_order.save
-          flash[:success] = "#{@purchase_order.number} complete - You may capture payment on these orders now"
+          if @purchase_order.save
+            flash[:success] = "#{@purchase_order.number} complete - You may capture payment on these orders now"
+          else
+            next_url = edit_admin_purchase_order_url(@purchase_order)
+            flash[:error] = @purchase_order.errors.full_messages.join("; ")
+          end
         else
           flash[:error] = "#{@purchase_order.number} is not a dropship or has not yet been submitted"
         end
 
         redirect_to next_url
       end
+
+      def submitted
+        @purchase_order = find_resource
+        next_url = request.env["HTTP_REFERER"]
+
+        if @purchase_order.status == "Entered"
+
+          @purchase_order.status = "Submitted"
+          if @purchase_order.save
+            flash[:success] = "#{@purchase_order.number} marked as submitted"
+          else
+            next_url = edit_admin_purchase_order_url(@purchase_order)
+            flash[:error] = @purchase_order.errors.full_messages.join("; ")
+          end
+        else
+          flash[:error] = "#{@purchase_order.number} must have the status of Entered"
+        end
+
+        redirect_to next_url
+      end      
 
       def destroy
         @purchase_order = Spree::PurchaseOrder.find_by_number(params[:id])

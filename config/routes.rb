@@ -11,6 +11,7 @@ Spree::Core::Engine.routes.draw do
 
       match 'edit_line_items'
       match 'submit'
+      match 'submitted'
       match 'complete'
       match 'source'
       match 'item'
