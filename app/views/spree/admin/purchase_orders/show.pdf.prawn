@@ -5,7 +5,7 @@ im = "#{Rails.root.to_s}/public/assets/#{Spree::PrintInvoice::Config[:print_invo
 
 image im , at: [0,720] #, scale: 0.35
 
-fill_color "E99323"
+fill_color "D8D8D8"
 
 if @purchase_order.dropship
   text "Dropship", align: :right, style: :bold, size: 18
@@ -70,8 +70,6 @@ end
 move_down 50
 
 stroke_color "d8d8d8"
-
-
 
 bounding_box [0,560], :width => 170, :height => 150 do
   move_down 1
