@@ -76,7 +76,7 @@
         <div data-hook="purchase_order_shipping_method_id" class="field">
         <%= f.label :shipping_method_id, t(:shipping_method) %> 
         <%= f.select :shipping_method_id, 
-          @shipping_methods.map {|sm| ["#{sm.name} - #{sm.zone.name}", sm.id] }, 
+          @shipping_methods.map {|sm| ["#{sm.zone.name} - #{sm.name} - #{sm.display_on.size > 0 ? sm.display_on.titleize : "Both"}", sm.id] }, 
           {},  
           {class: 'fullwidth' } %>
         </div>
@@ -145,6 +145,19 @@
     </div>
 
     <div class="seven columns omega">
+
+      <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
+        <legend align="center">
+          Change Log
+        </legend>
+        <br/>
+        <table>
+          <tr><td>Started</td><td><%= @purchase_order.created_at.strftime("%m/%d/%Y %l:%M %P") %></td></tr>
+          <tr><td>Entered</td><td><%= @purchase_order.entered_at ? @purchase_order.entered_at.strftime("%m/%d/%Y %l:%M %P") : "N/A" %></td></tr>
+          <tr><td>Submitted</td><td><%= @purchase_order.submitted_at ? @purchase_order.submitted_at.strftime("%m/%d/%Y %l:%M %P") : "N/A" %></td></tr>
+          <tr><td>Completed</td><td><%= @purchase_order.completed_at ? @purchase_order.completed_at.strftime("%m/%d/%Y %l:%M %P") : "N/A" %></td></tr>
+        </table>
+      </fieldset>
       <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
         <legend align="center">
           <%= @purchase_order.dropship ? t(:line_items) : t(:line_items) %>
