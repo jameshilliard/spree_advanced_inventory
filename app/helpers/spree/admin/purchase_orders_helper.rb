@@ -13,7 +13,11 @@ module Spree::Admin::PurchaseOrdersHelper
           if po.can_be_received? and l.status != "Complete"
             sku = link_to("<em>Receive #{sku}</em>?".html_safe, admin_stock_update_path(variant_id: l.variant.id))
           else
-            sku = link_to(sku, edit_admin_product_variant_path(product_id: l.variant.product, id: l.variant), target: "_BLANK")
+            if admin_product_inventory_path(l.variant.product)
+              sku = link_to(sku, admin_product_inventory_path(l.variant.product) + "##{l.variant.sku}", target: "_BLANK")
+            else
+              sku = link_to(sku, edit_admin_product_variant_path(product_id: l.variant.product, id: l.variant), target: "_BLANK")
+            end
           end
           item_list += "(#{l.quantity}) &nbsp; #{l.variant.product.name.split(":").first} &mdash; #{sku}<br/>".html_safe
         end
