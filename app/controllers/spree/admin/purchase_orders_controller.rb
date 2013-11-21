@@ -65,6 +65,21 @@ module Spree
         redirect_to admin_purchase_order_edit_line_items_path(@purchase_order.number)
       end
 
+      def update
+        @purchase_order = Spree::PurchaseOrder.find_by_number(params[:id])
+        
+        if params[:purchase_order][:status] == "Completed" and not @purchase_order.completed_at 
+          params[:purchase_order][:completed_at] = Time.new
+        end
+
+        if @purchase_order.update_attributes(params[:purchase_order])
+          flash[:success] = "#{@purchase_order.po_type} updated"
+          redirect_to edit_admin_purchase_order_path(@purchase_order.number) 
+        else
+          render action: "edit"
+        end
+      end
+
       def edit_line_items
         @purchase_order = find_resource
 
@@ -196,7 +211,7 @@ module Spree
         end
 
         def find_or_create_office_address
-          @shipping_methods = ShippingMethod.where("display_on is null or display_on = '' or display_on = 'back_end'")
+          @shipping_methods = ShippingMethod.where("display_on is null or display_on = '' or display_on = 'back_end'").order("zone_id asc, updated_at desc")
 
           country = Spree::Country.where('name = ? or iso = ? or iso3 = ? or iso_name = ?',
                                          Spree::Config.advanced_inventory_office_country,
