@@ -14,6 +14,8 @@ module Spree
       before_filter :update_orders, only: [:update]
 
       def index
+        session[:return_to] = request.original_url
+
         params[:q] ||= {}
 
         # As date params are deleted if @show_only_completed, store
@@ -58,19 +60,26 @@ module Spree
 
       end
 
-
       def new
         set_type
-
         redirect_to admin_purchase_order_edit_line_items_path(@purchase_order.number)
       end
 
       def update
         @purchase_order = Spree::PurchaseOrder.find_by_number(params[:id])
-        
+
         if @purchase_order.update_attributes(params[:purchase_order])
           flash[:success] = "#{@purchase_order.po_type} updated"
-          redirect_to edit_admin_purchase_order_path(@purchase_order.number) 
+          
+          next_url = session[:return_to]||admin_purchase_orders_url()
+
+          if params[:submit] =~ /edit/i
+            next_url = edit_admin_purchase_order_path(@purchase_order.number)
+          else
+            session[:return_to] = nil
+          end
+
+          redirect_to next_url
         else
           render action: "edit"
         end
