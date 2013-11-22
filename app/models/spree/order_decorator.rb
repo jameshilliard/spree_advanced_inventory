@@ -81,6 +81,83 @@ Spree::Order.class_eval do
     end
   end
 
+  def pending_credit_card_payment_total
+    cc_total = 0.0
+    pending_payments.each do |p|
+      if p.source_type == "Spree::CreditCard"
+        cc_total += p.amount
+      end
+    end
+
+    return cc_total
+  end
+
+  def pending_check_payment_total
+    check_total = 0.0
+    pending_payments.each do |p|
+      if p.source_type == nil
+        check_total += p.amount
+      end
+    end
+
+    return check_total
+  end
+
+  def pending_payments
+    pending = Array.new
+
+    payments.each do |p|
+      if (p.state == "pending" and p.source_type == "Spree::CreditCard") or 
+        (p.state == "checkout" and p.source_type != "Spree::CreditCard")
+
+        pending.push(p)
+      end
+    end
+
+    return pending
+  end
+
+  def try_to_capture_payment
+    cc_total = pending_credit_card_payment_total
+    non_cc_total = pending_check_payment_total
+
+    if (cc_total.to_f + non_cc_total.to_f) == total.to_f
+      pending_payments.each do |p|
+        begin
+          p.capture!
+          p.save
+        rescue Spree::Core::GatewayError => ge
+          update_staff_comments(ge.message)
+        end
+      end
+    else
+      unless payment_state == "paid"
+        update_staff_comments("Payment totals did not match order total")
+      end
+    end
+  end
+
+  def update_staff_comments(comment)
+    if respond_to?(:staff_comments)
+      comment = "* Autopay problem: #{comment} on #{Time.new("%m/%d %l:%M %P")}"
+      update_attributes_without_callbacks({ :staff_comments => "#{staff_comments}\n#{comment}\n" })
+    end
+  end
+
+  def try_to_ship_shipments
+    shipments.each do |shipment| 
+      if can_ship?
+        shipment.ship!
+      end
+    end
+
+    u = updater
+    if u
+      u.update_shipment_state
+      update_attributes_without_callbacks({ :shipment_state => shipment_state })
+    end
+  end
+
   def variant_inventory_units(variant_id)
     inventory_units.where(variant_id: variant_id)
   end

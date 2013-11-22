@@ -149,93 +149,57 @@ class Spree::PurchaseOrder < ActiveRecord::Base
         completed_line_items += 1
       end
 
-      if orders
-        orders.order("completed_at asc").each do |o|
-          o.inventory_units.where{(variant_id == l.variant_id) & (state == "backordered")}.each do |i|
-            if qty_recv > 0
-              i.state = 'sold'
-              i.save validate: false
-              qty_recv -= 1
-              qty_adjust += 1
-            end
-          end
+      orders.order("completed_at asc").each do |o|
+        qty_adjust = fill_order_backorders(qty_recv)
 
-          if o.inventory_units.where{(state == "backordered")}.size == 0 and auto_capture_orders
-
-            cc_total = o.payments.where{(state == "pending") & (source_type == "Spree::CreditCard")}.pluck(:amount).sum||0.0
-            non_cc_total = o.payments.where{(state == "checkout") & (source_type == nil)}.pluck(:amount).sum||0.0
-
-            if (cc_total.to_f + non_cc_total.to_f) == o.total.to_f
-
-              o.payments.where{(state == "pending") | (state == "checkout")}.each do |p|
-                if (p.state == "pending" and p.source_type == "Spree::CreditCard") or (p.state == "checkout" and p.source_type != "Spree::CreditCard")
-                  begin
-                    p.send("capture!")
-                    sleep 1.0
-
-                  rescue Spree::Core::GatewayError => ge
-                    o.update_attributes_without_callbacks({ 
-                      :staff_comments => 
-                      "#{o.staff_comments}\n*** AUTOMATIC PAYMENT CAPTURE FAILED #{Time.current.strftime("%m/%d %l:%M %P")} ***\n#{ge.message}\n"
-                    })
-                  end
-                else
-                  o.update_attributes_without_callbacks({ 
-                      :staff_comments => 
-                      "#{o.staff_comments}\n*** AUTOMATIC PAYMENT CAPTURE FAILED #{Time.current.strftime("%m/%d %l:%M %P")} ***\nCould not find a valid payment\n"
-                    })
-                end
-              end
-            else
-              unless o.payment_state == "paid"
-                o.update_attributes_without_callbacks({ 
-                  :staff_comments => 
-                  "#{o.staff_comments}\n*** AUTOMATIC PAYMENT CAPTURE FAILED #{Time.current.strftime("%m/%d %l:%M %P")} ***\nPayment total #{cc_total + non_cc_total} does not equal order total #{o.total}\n"
-                })
-              end
-            end
-          end
-          o.update!
+        if o.inventory_units.with_state('backordered').size == 0 and auto_capture_orders
+          o.try_to_capture_payment
         end
+          
+        unless o.inventory_units.where(variant_id: l.variant_id, state: 'backordered').size > 0
+          o.try_to_ship_shipments
+        end
+
+        o.save
       end
 
-      # This changes on hand to reflect the above inventory units being sold
-      if qty_adjust > 0
-        l.variant.update_attribute_without_callbacks(:count_on_hand, l.variant.count_on_hand + qty_adjust)
-      end
-
-      # Any remaining quantity should be received normally
-      if qty_recv > 0 
-        l.variant.receive(qty_recv)
-      end
+      stock_remaining_units(qty_adjust, l.variant)
     end
 
     if completed_line_items == purchase_order_line_items.size
-      
       self.status = "Completed"
       self.completed_at = Time.new
       self.save
+    end
+  end
 
-      if orders and orders.size > 0
-        orders.each do |o|
+  def stock_remainin_units(qty, variant)
+    # This changes on hand to reflect the above inventory units being sold
+    if qty > 0
+      variant.update_attribute_without_callbacks(:count_on_hand, 
+                                                 variant.count_on_hand + qty)
+    end
 
-          unless o.inventory_units.where(variant_id: @variant_id, state: 'backordered').size > 0
-            o.shipments.each do |shipment| 
-              unless shipment.state == "shipped"
-                shipment.update!(o)
-              end
-            end
+    # Any remaining quantity should be received normally
+    if qty > 0 
+      variant.receive(qty)
+    end
+  end
 
-            u = o.updater
-            if u
-              u.update_shipment_state
-              o.update_attributes_without_callbacks({ :shipment_state => o.shipment_state })
-            end
-          end
+  def fill_order_backorders(qty_recv)
+    qty_adjust = 0
 
+    orders.order("completed_at asc").each do |o|
+      o.inventory_units.where(variant_id: l.variant_id, state: "backordered").each do |i|
+        if qty_recv > 0
+          i.fill_backorder
+          qty_recv -= 1
+          qty_adjust += 1
         end
       end
     end
+
+    return qty_adjust
   end
 
   def self.update_status
