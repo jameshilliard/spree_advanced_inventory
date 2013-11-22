@@ -11,7 +11,7 @@
 <% end %>
 
 <%= render :partial => 'spree/shared/error_messages', :locals => { :target => @purchase_order } %>
-<%= render :partial => 'spree/shared/error_messages', :locals => { :target => @purchase_order.supplier } %>
+<%= render :partial => 'spree/shared/error_messages', :locals => { :target => @purchase_order.address } %>
 <fieldset class="no-border-top">
   <%= render :partial => 'form' %>
   <div class="clear"></div>
