@@ -201,9 +201,11 @@
 
   <div class="form-buttons filter-actions actions" data-hook="buttons">
 
-    <%= button t(:save), 'icon-arrow-right' %>
+    <%= f.submit "Save", class: 'btn btn-success icon icon-arrow-right', name: "submit", id: "save-return" %>
     <span class="or"><%= t(:or) %></span>
-    <%= button_link_to t(:cancel), collection_url, :icon => 'icon-remove' %>
+    <%= f.submit "Save & Edit", class: 'btn btn-success icon icon-arrow-down', name: "submit", id: "save-edit" %>
+    <span class="or"><%= t(:or) %></span>
+    <%= button_link_to t(:cancel), (session[:return_to] ? session[:return_to] : collection_url), :icon => 'icon-remove' %>
   </div>
 
   <% end %>
