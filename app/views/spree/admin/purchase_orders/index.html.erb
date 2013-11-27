@@ -162,7 +162,7 @@
               <% elsif purchase_order.status == "Completed" %>
                 <%= purchase_order.completed_at ? purchase_order.completed_at.strftime("%m/%d/%Y %l:%M %P") : "" %>
 
-              <% else %>
+              <% elsif purchase_order.status == "Entered" %>
                 <%= purchase_order.entered_at ? purchase_order.entered_at.strftime("%m/%d/%Y %l:%M %P") : "" %>
                 <br/>
                 <%= link_to "Mark as submitted?", admin_purchase_order_submitted_path(purchase_order) %>

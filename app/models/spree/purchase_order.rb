@@ -138,68 +138,58 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   end
 
   def items_received(line_item_ids)
-    completed_line_items = 0
-
     line_item_ids.each do |line_item_id,qty_recv|
       l = Spree::PurchaseOrderLineItem.find(line_item_id)
-
-      qty_adjust = 0
-
-      unless l.status == "Incomplete"
-        completed_line_items += 1
-      end
+      q = qty_recv
 
       orders.order("completed_at asc").each do |o|
-        qty_adjust = fill_order_backorders(qty_recv)
+        q = q - fill_order_backorders(o, l.variant, q)
 
         if o.inventory_units.with_state('backordered').size == 0 and auto_capture_orders
           o.try_to_capture_payment
+          o.try_to_update_shipment_state
         end
           
-        unless o.inventory_units.where(variant_id: l.variant_id, state: 'backordered').size > 0
-          o.try_to_ship_shipments
-        end
-
         o.save
       end
 
-      stock_remaining_units(qty_adjust, l.variant)
+      stock_remaining_units(l.variant, q)
     end
 
-    if completed_line_items == purchase_order_line_items.size
+    if received_purchase_order_line_items.sum(:quantity) == purchase_order_line_items.sum(:quantity)
       self.status = "Completed"
       self.completed_at = Time.new
       self.save
     end
   end
 
-  def stock_remainin_units(qty, variant)
-    # This changes on hand to reflect the above inventory units being sold
-    if qty > 0
-      variant.update_attribute_without_callbacks(:count_on_hand, 
-                                                 variant.count_on_hand + qty)
+  def fill_order_backorders(o, v, qty_recv)
+    qty_adjust = 0
+
+    o.inventory_units.where(variant_id: v.id, state: "backordered").each do |i|
+      if qty_recv > 0
+        i.state = "sold"
+        i.save validate: false
+        qty_recv -= 1
+        qty_adjust += 1
+      end
     end
 
+    # This changes on hand to reflect the above inventory units being sold
+    if qty_adjust > 0
+      v.update_attribute_without_callbacks(:count_on_hand, 
+                                           v.count_on_hand + 
+                                           qty_adjust)
+    end
+
+    return qty_recv
+  end
+
+  def stock_remaining_units(variant, qty)
     # Any remaining quantity should be received normally
     if qty > 0 
       variant.receive(qty)
     end
-  end
-
-  def fill_order_backorders(qty_recv)
-    qty_adjust = 0
-
-    orders.order("completed_at asc").each do |o|
-      o.inventory_units.where(variant_id: l.variant_id, state: "backordered").each do |i|
-        if qty_recv > 0
-          i.fill_backorder
-          qty_recv -= 1
-          qty_adjust += 1
-        end
-      end
-    end
-
-    return qty_adjust
   end
 
   def self.update_status

@@ -105,11 +105,8 @@ Spree::Order.class_eval do
 
   def pending_payments
     pending = Array.new
-
     payments.each do |p|
-      if (p.state == "pending" and p.source_type == "Spree::CreditCard") or 
-        (p.state == "checkout" and p.source_type != "Spree::CreditCard")
-
+      if (p.state == "pending" or p.state == "checkout")
         pending.push(p)
       end
     end
@@ -144,16 +141,24 @@ Spree::Order.class_eval do
     end
   end
 
-  def try_to_ship_shipments
-    shipments.each do |shipment| 
-      if can_ship?
-        shipment.ship!
-      end
+  def try_to_update_shipment_state
+    shipments.each do |shipment|
+      shipment.update!(self)
+      shipment.save
     end
 
-    u = updater
-    if u
-      u.update_shipment_state
+    updater.update_shipment_state
+    update_attributes_without_callbacks({ :shipment_state => shipment_state })
+  end
+
+  def try_to_ship_shipments
+    if can_ship?
+      shipments.each do |shipment|
+        shipment.update!(self)
+        shipment.ship!
+        shipment.save
+      end
+      updater.update_shipment_state
       update_attributes_without_callbacks({ :shipment_state => shipment_state })
     end
   end
