@@ -6,7 +6,10 @@ Spree::InventoryUnit.class_eval do
   def set_stock_type
     if order.is_dropship == true
       self.is_dropship = true
-      self.state = 'sold'
+
+      unless shipment.shipped?
+        self.state = 'sold'
+      end
     else
       self.is_dropship = false
     end 
