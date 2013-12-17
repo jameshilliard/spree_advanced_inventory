@@ -7,7 +7,7 @@ Spree::Address.class_eval do
                  o.completed_at is not null and 
                  o.state = 'complete' and 
                  l.order_id = o.id and
-                 ((a.id = o.ship_address_id or a.id = o.bill_address_id) and 
+                 (a.id = o.ship_address_id and 
                  l.variant_id in (select distinct(variant_id) from spree_purchase_order_line_items where purchase_order_id = ?) or 
                  a.id = ?)
                  group by a.id 
