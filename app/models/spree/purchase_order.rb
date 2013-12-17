@@ -21,6 +21,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   before_validation :copy_supplier_id
   before_validation :update_times
   before_validation :check_email_subject
+  before_validation :receive_dropship_line_items
   before_save :send_completed_notice
 
   validates :address_id, :shipping_method_id, :supplier_contact_id, presence: true
@@ -32,6 +33,24 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   scope :complete, lambda { where{(status == "Completed")} }
   scope :incomplete, lambda { where{(status != "Completed")} }
+
+  def receive_dropship_line_items
+    if dropship
+      if status_changed? and status == "Completed" and status_was != "Completed"
+        purchase_order_line_items.each do |l|
+
+          diff = l.quantity - l.received_purchase_order_line_items.sum(:quantity).to_i
+
+          if diff > 0
+            Spree::ReceivedPurchaseOrderLineItem.create(purchase_order_line_item_id: l.id,
+                                                        quantity: diff,
+                                                        received_at: Time.current)
+          end
+        end
+      end
+    end
+    return true
+  end
 
   def valid_status
     if not status.blank? and status != "New"
@@ -55,6 +74,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
       self.submitted_at = Time.current
     elsif status == "Completed" and not completed_at
       self.completed_at = Time.current
+    end
+
+    if submitted_at and not entered_at
+      self.entered_at = submitted_at
     end
 
     return true
