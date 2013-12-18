@@ -173,6 +173,9 @@ module Spree
 
           @purchase_order.status = "Completed"
           if @purchase_order.save
+            if @purchase_orders.orders 
+              next_url = admin_order_payments_url(@purchase_order.orders.first)
+            end
             flash[:success] = "#{@purchase_order.number} complete - You may capture payment on these orders now"
           else
             next_url = edit_admin_purchase_order_url(@purchase_order)
