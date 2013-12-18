@@ -40,6 +40,10 @@ module Spree
           if p.status != "Complete"
             r[p.id] = p.quantity
             p.receive(p.quantity)
+
+            if p.variant.respond_to?(:admin_log_user_id)
+              p.variant.update_column(:admin_log_user_id, spree_current_user.id)
+            end
           end
         end
 
@@ -75,8 +79,11 @@ module Spree
 
               if @line_item
 
-                @line_item.receive(quantity)
+                if @line_item.variant.respond_to?(:admin_log_user_id)
+                  @line_item.variant.update_column(:admin_log_user_id, spree_current_user.id)
+                end
 
+                @line_item.receive(quantity)
                 @line_item.purchase_order.items_received(@line_item.id => quantity)
 
                 flash[:success] = flash_message_for(@variant, "received stock")
