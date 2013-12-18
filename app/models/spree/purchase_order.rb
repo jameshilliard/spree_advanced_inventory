@@ -166,7 +166,13 @@ class Spree::PurchaseOrder < ActiveRecord::Base
       q = qty_recv
 
       orders.order("completed_at asc").each do |o|
-        q = q - fill_order_backorders(o, l.variant, q)
+        remainder = fill_order_backorders(o, l.variant, q)
+
+        if remainder > 0 
+          q = q - remainder
+        else
+          q = remainder
+        end
 
         if o.inventory_units.with_state('backordered').size == 0 and auto_capture_orders
           o.try_to_capture_payment
@@ -200,9 +206,8 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
     # This changes on hand to reflect the above inventory units being sold
     if qty_adjust > 0
-      v.update_attribute_without_callbacks(:count_on_hand, 
-                                           v.count_on_hand + 
-                                           qty_adjust)
+      v.count_on_hand = v.count_on_hand + qty_adjust
+      v.save
     end
 
     return qty_recv
