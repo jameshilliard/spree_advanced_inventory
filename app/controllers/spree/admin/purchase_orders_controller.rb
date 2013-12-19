@@ -313,22 +313,10 @@ module Spree
             params[:purchase_order][:status] = "Submitted"
           end
 
-          Spree::Order.where(purchase_order_id: @purchase_order.id).each do |o|
-            unless params[:order_ids] and params[:order_ids].include?(o.id)
-              o.purchase_order_id = nil
-              o.save validate: false
-            end
-          end
+          @purchase_order.order_purchase_orders.destroy_all
 
-          if params[:order_ids]
-            params[:order_ids].each do |oid|
-              o = Spree::Order.find(oid)
-
-              if o and o.purchase_order_id != @purchase_order.id
-                o.purchase_order_id = @purchase_order.id
-                o.save validate: false
-              end
-            end
+          params[:order_ids].each do |oid|
+            Spree::OrderPurchaseOrder.create(order_id: oid, purchase_order_id: @purchase_order.id)
           end
         end
 
