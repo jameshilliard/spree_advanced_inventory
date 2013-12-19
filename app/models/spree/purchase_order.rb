@@ -6,7 +6,8 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   belongs_to :user
   has_many :purchase_order_line_items, dependent: :destroy
   has_many :variants, through: :purchase_order_line_items
-  has_many :orders
+  has_many :order_purchase_orders
+  has_many :orders, :through => :order_purchase_orders
 
   attr_accessible :dropship, :due_at, :status, :address_id, :supplier_id,
     :supplier_contact_id, :user_id, :comments, :terms, :order_id,
@@ -166,19 +167,14 @@ class Spree::PurchaseOrder < ActiveRecord::Base
       q = qty_recv
 
       orders.order("completed_at asc").each do |o|
-        remainder = fill_order_backorders(o, l.variant, q)
-
-        if remainder > 0 
-          q = q - remainder
-        else
-          q = remainder
-        end
+        q = fill_order_backorders(o, l.variant, q)
 
         if o.inventory_units.with_state('backordered').size == 0 and auto_capture_orders
           o.try_to_capture_payment
           o.try_to_update_shipment_state
         end
           
+        o.update!
         o.save
       end
 
@@ -198,7 +194,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     o.inventory_units.where(variant_id: v.id, state: "backordered").each do |i|
       if qty_recv > 0
         i.state = "sold"
-        i.save validate: false
+        i.save 
         qty_recv -= 1
         qty_adjust += 1
       end
