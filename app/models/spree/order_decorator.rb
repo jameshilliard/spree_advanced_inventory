@@ -1,5 +1,6 @@
 Spree::Order.class_eval do
-  belongs_to :purchase_order
+  has_many :order_purchase_orders
+  has_many :purchase_orders, through: :order_purchase_orders
   attr_accessible :is_dropship, :inventory_adjusted, :is_quote
 
   before_validation :dropship_conversion
@@ -9,6 +10,10 @@ Spree::Order.class_eval do
     value = "#{number} - From: #{email} - $#{total}"
 
     return value
+  end
+
+  def purchase_order
+    purchase_orders
   end
 
   def use_stock
@@ -168,7 +173,7 @@ Spree::Order.class_eval do
   end
 
   def adjust_variant_stock(variant, quantity)
-    if quantity > 0
+    if quantity >= 0
       variant.receive(quantity)
     else
       variant.decrement!(:count_on_hand, quantity.abs)
