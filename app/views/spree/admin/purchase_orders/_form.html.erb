@@ -138,7 +138,7 @@
 
         </div>
       <% if @purchase_order.status != "Submitted" and @purchase_order.status != "Completed" %>
-        <input type="checkbox" name="sending_manually" value="1" /> Check this box if you are submitting this PO by hand (or phone/fax)
+        <label><input type="checkbox" name="sending_manually" value="1" /> Check this box if you are submitting this PO by hand (or phone/fax)</label>
       <% end %>
       <br/>        
       </fieldset>
