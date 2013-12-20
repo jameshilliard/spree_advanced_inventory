@@ -173,7 +173,7 @@ module Spree
 
           @purchase_order.status = "Completed"
           if @purchase_order.save
-            if @purchase_orders.orders 
+            if @purchase_order.orders 
               next_url = admin_order_payments_url(@purchase_order.orders.first)
             end
             flash[:success] = "#{@purchase_order.number} complete - You may capture payment on these orders now"
@@ -313,10 +313,12 @@ module Spree
             params[:purchase_order][:status] = "Submitted"
           end
 
-          @purchase_order.order_purchase_orders.destroy_all
+          if params[:order_ids] and params[:order_ids].size > 0
+            @purchase_order.order_purchase_orders.destroy_all
 
-          params[:order_ids].each do |oid|
-            Spree::OrderPurchaseOrder.create(order_id: oid, purchase_order_id: @purchase_order.id)
+            params[:order_ids].each do |oid|
+              Spree::OrderPurchaseOrder.create(order_id: oid, purchase_order_id: @purchase_order.id)
+            end
           end
         end
 
