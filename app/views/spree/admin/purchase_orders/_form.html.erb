@@ -19,7 +19,7 @@
         <div data-hook="purchase_order_order" class="field">
           <%= f.label :order_id, t(:corresponding_orders) %> 
           <ul id="purchase-order-orders">
-            <%= render partial: "eligible_order", collection: @purchase_order.orders, as: :o %>
+            <%= render partial: "eligible_order", collection: Spree::Order.eligible_for_po(@purchase_order), as: :o %>
           </ul>
           <br/>
           <br/>
