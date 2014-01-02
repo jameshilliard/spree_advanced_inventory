@@ -196,7 +196,7 @@ Spree::Order.class_eval do
     find_by_sql(["select distinct o.* 
                 from spree_orders o, spree_line_items l 
                 where o.completed_at is not null and #{dropship_check} 
-                o.state = 'complete' and
+                (o.state = 'complete' or o.state = 'resumed') and
                 o.shipment_state != 'shipped' and  
                 l.order_id = o.id and 
                 o.is_quote != true and
