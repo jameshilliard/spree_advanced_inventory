@@ -7,8 +7,10 @@ Spree::InventoryUnit.class_eval do
     if order.is_dropship == true
       self.is_dropship = true
 
-      unless shipment.shipped?
-        self.state = 'sold'
+      if shipment.state != "shipped"
+        self.state = "sold"
+      elsif shipment.state == "shipped" and return_authorization_id == nil
+        self.state = "shipped"
       end
     else
       self.is_dropship = false
