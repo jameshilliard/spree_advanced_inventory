@@ -1,7 +1,14 @@
 Deface::Override.new(
   virtual_path: "spree/admin/orders/index",
-  insert_top: "#admin-new-order-button",
-  name: "add_quote_order_button",
+  replace: "li#admin-new-order-button",
+  name: "replace-admin-order-button",
+  partial: "spree/admin/orders/new_order_button"
+)
+
+Deface::Override.new(
+  virtual_path: "spree/admin/orders/index",
+  insert_before: "[data-hook='admin_orders_index_search']",
+  name: "add_order_button_menu",
   partial: "spree/admin/orders/quote_order_button")
 
 Deface::Override.new(
