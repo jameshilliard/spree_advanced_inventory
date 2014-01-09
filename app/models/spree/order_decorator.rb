@@ -174,7 +174,7 @@ Spree::Order.class_eval do
 
   def adjust_variant_stock(variant, quantity)
     if quantity >= 0
-      variant.receive(quantity)
+      variant.increment!(:count_on_hand, quantity)
     else
       variant.decrement!(:count_on_hand, quantity.abs)
     end
