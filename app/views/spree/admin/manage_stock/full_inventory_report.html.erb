@@ -64,9 +64,14 @@
         <tr bgcolor="#ffffff" valign="top">
           <td><%= i.title.split(":").first %></td>
           <td align="center">
-              <a href="<%= admin_orders_url %>?q[variants_sku_cont]=<%= i.sku %>&q[shipment_state_not_eq]=shipped" target="_BLANK">
-                <%= i.inventory_units.where(state: 'sold', is_dropship: false, is_quote: false).size  %> / <%=  i.inventory_units.where(state: 'backordered', is_dropship: false, is_quote: false).size %>
-              </a>
+            <% if admin_product_inventory_path(i.product) %>
+              <a href="<%= admin_product_inventory_path(i.product) %>#<%= i.sku %>" target="<%= i.id %>">
+            <% else %>
+              <a href="<%= admin_orders_url %>?q[variants_sku_cont]=<%= i.sku %>&q[shipment_state_not_eq]=shipped" target="<%= i.id %>">
+            <% end %>
+              <%= i.inventory_units.where(state: 'sold', is_dropship: false, is_quote: false).size  %> / <%=  i.inventory_units.where(state: 'backordered', is_dropship: false, is_quote: false).size %>
+            </a>
+
           </td>
           <td align="center">
             <a href="<%= edit_admin_product_variant_url(i.permalink, i.id) %>" target="_BLANK">
