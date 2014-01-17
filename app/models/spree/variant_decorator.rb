@@ -61,7 +61,7 @@ Spree::Variant.class_eval do
           if new_level > 0
 
             # fill backordered orders before creating new units
-            backordered_units = inventory_units.with_state('backordered')
+            backordered_units = inventory_units.order("created_at asc").with_state('backordered')
             backordered_units.slice(0, new_level).each do |i|
               unless order_list.include?(i.order_id)
                 order_list.push(i.order_id)
