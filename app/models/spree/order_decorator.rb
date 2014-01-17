@@ -32,13 +32,16 @@ Spree::Order.class_eval do
   end
 
   def dropship_conversion
-    if is_dropship 
-      make_dropship
+    unless completed_at == nil
+      if is_dropship 
+        make_dropship
 
-    elsif not is_dropship and is_dropship_was == true
-      make_regular
+      elsif not is_dropship and is_dropship_was == true
+        make_regular
 
-    end 
+      end 
+    end
+
     return true
   end
 
