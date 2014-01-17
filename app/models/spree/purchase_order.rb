@@ -167,15 +167,17 @@ class Spree::PurchaseOrder < ActiveRecord::Base
       q = qty_recv
 
       orders.order("completed_at asc").each do |o|
-        q = fill_order_backorders(o, l.variant, q)
+        if q > 0
+          q = fill_order_backorders(o, l.variant, q)
 
-        if o.inventory_units.with_state('backordered').size == 0 and auto_capture_orders
-          o.try_to_capture_payment
-          o.try_to_update_shipment_state
+          if o.inventory_units.with_state('backordered').size == 0 and auto_capture_orders
+            o.try_to_capture_payment
+            o.try_to_update_shipment_state
+          end
+            
+          o.update!
+          o.save
         end
-          
-        o.update!
-        o.save
       end
 
       stock_remaining_units(l.variant, q)
