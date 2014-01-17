@@ -249,7 +249,7 @@ end
 
 move_down 10
 font "Helvetica", size: 18
-text "#{@purchase_order.created_at.strftime("%m/%d/%Y")} - #{@purchase_order.id}"
+text "#{@purchase_order.created_at.strftime("%m/%d/%Y")} - #{@purchase_order.id} - #{@purchase_order.user.email.split("@").first.titleize}"
 
 bounding_box [0,370], :width => 540, :height => 300 do
   #move_down 2
