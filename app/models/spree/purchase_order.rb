@@ -229,17 +229,21 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   end
 
   def can_destroy?
-    if orders 
-      destroy_ok = true
-      orders.collect(&:shipment_state).each do |s|
-        if destroy_ok and s == "shipped"
-          destroy_ok = false
+    destroy_ok = true
+
+    if status == "Entered"
+      if orders 
+        orders.collect(&:shipment_state).each do |s|
+          if destroy_ok and s == "shipped"
+            destroy_ok = false
+          end
         end
       end
-      destroy_ok
     else
-      true
+      destroy_ok = false
     end
+
+    destroy_ok
   end
 
   def po_type
