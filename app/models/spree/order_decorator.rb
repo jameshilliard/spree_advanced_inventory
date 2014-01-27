@@ -3,7 +3,7 @@ Spree::Order.class_eval do
   has_many :purchase_orders, through: :order_purchase_orders
   attr_accessible :is_dropship, :inventory_adjusted, :is_quote
 
-  before_validation :dropship_conversion
+  before_save :dropship_conversion
   before_validation :empty_nil_slug
 
   def to_select
@@ -46,26 +46,34 @@ Spree::Order.class_eval do
   end
 
   def make_dropship
+    toggle_ia = false
+
     line_items.each do |l|
 
       if inventory_adjusted == true
         adjust_variant_stock(l.variant, l.quantity)
-        self.inventory_adjusted = false
+        toggle_ia = true
       end
 
       variant_inventory_units(l.variant_id).each do |i|
         update_inventory_unit(i, "sold")
       end
     end
+
+    if toggle_ia
+      self.inventory_adjusted = false
+    end
   end
 
   def make_regular
+    toggle_ia = false
+
     line_items.each do |l|
       current_on_hand = l.variant.on_hand
 
       if not inventory_adjusted
         adjust_variant_stock(l.variant, l.quantity * -1)
-        self.inventory_adjusted = true
+        toggle_ia = true
       end
 
       if current_on_hand >= l.quantity
@@ -86,6 +94,10 @@ Spree::Order.class_eval do
           counter += 1
         end
       end
+    end
+    
+    if toggle_ia 
+      self.inventory_adjusted = true
     end
   end
 
