@@ -39,6 +39,12 @@
     <%= r.purchase_order_line_item.product.name.split(": ").first %>
     x <%= r.quantity %>
     @ <%= r.received_at.strftime("%m/%d/%Y %l:%M %P") %>
+    <br/>
+    <% if r.purchase_order_line_item.price.to_f == 0.0 %>
+      <div style="color: #f00; font-weight: bold;">
+        <%= link_to "$0.00 LINE ITEM", admin_purchase_order_edit_line_items_url(@po.number), target: @po.id %>
+      </div>  
+    <% end %>
   </li>
 <% end %>
 </ol>
