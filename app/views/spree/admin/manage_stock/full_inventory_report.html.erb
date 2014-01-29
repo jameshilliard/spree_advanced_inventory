@@ -82,8 +82,16 @@
           <td align="center"><%= i.sku[0..30] %></td>
           <td align="center"><%= i.publisher %></td>
           <td align="center"><%= i.options_text.split(": ").last %></td>
-          <td align="center"><%= sprintf("$%0.2f", i.recent_price) %></td>
-          <td align="center"><%= sprintf("$%0.2f", line_total) %><% total += (line_total) %></td>
+          <td align="center">
+            <% recent_price_url = edit_admin_product_variant_url(i.product, i) %>
+
+            <% if rp = i.last_purchase_order_line_item %>
+              <% recent_price_url = admin_purchase_order_edit_line_items_url(rp.purchase_order) %>
+            <% end %>
+
+            <%= link_to Spree::Money.new(i.recent_price), recent_price_url, target: i.id %>
+          </td>
+          <td align="center"><%= Spree::Money.new(line_total) %><% total += (line_total) %></td>
         </tr>
       <% end %>
     <tr><td colspan='8' align="right">Total:</td><td  align="center"><%= sprintf("$%0.2f", total) %></td></tr>
