@@ -24,7 +24,7 @@
     <br/>
 
     <% if params[:sku].blank? %>
-      <strong>UNSOLD STOCK LEVEL :</strong>
+      <strong>TOTAL STOCK LEVEL :</strong>
       <%= link_to "POSITIVE", admin_full_inventory_report_url + "?sku=#{params[:sku]}&first_letter=#{params[:first_letter]}&stock_level=in_stock" %> &ndash;
       <%= link_to "ZERO", admin_full_inventory_report_url + "?sku=#{params[:sku]}&first_letter=#{params[:first_letter]}&stock_level=zero" %> &ndash;
       <%= link_to "BACKORDER", admin_full_inventory_report_url + "?sku=#{params[:sku]}&first_letter=#{params[:first_letter]}&stock_level=backordered" %>
@@ -48,9 +48,9 @@
       </colgroup>
       <thead>
         <th>Title</th>
-        <th>Sold / BO</th>
-        <th>Unsold</th>
-        <th>Stock</th>
+        <th>In Queue</th>
+        <th>Available</th>
+        <th>Total</th>
         <th>SKU</th>
         <th>Publisher</th>
         <th>Format</th>
