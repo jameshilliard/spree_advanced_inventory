@@ -21,10 +21,14 @@ Spree::Variant.class_eval do
     #end
   end
 
+  def last_purchase_order_line_item
+    purchase_order_line_items.where{(price != nil) & (price > 0.0)}.order("updated_at desc").limit(1).first
+  end
+
   def recent_price
     p = 0.0
 
-    if rp = purchase_order_line_items.where{(price != nil) & (price >= 0.0)}.order("updated_at desc").limit(1).first
+    if rp = last_purchase_order_line_item 
       p = rp.price
     elsif cost_price and cost_price > 0.0
       p = cost_price
