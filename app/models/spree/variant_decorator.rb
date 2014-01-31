@@ -12,14 +12,33 @@ Spree::Variant.class_eval do
   has_many :purchase_orders, through: :purchase_order_line_items
   has_many :orders, through: :line_items
 
-  def set_stock_type
+  def ensure_sku_stock_type
+    success_state = true
     self.stock_type = stock_type[0].upcase
 
-    if stock_type != "R" and sku =~ /(.+)#{stock_type}$/
-      self.sku += stock_type
+    if sku =~ /^978/ 
+      # Size starts at 1
+      # Arrays start at 0 
+      # Last character is size - 1.
+      prev = sku[sku.size - 1]
+
+      if prev != stock_type 
+        if ["C","B"].include?(prev)
+          self.sku = sku[0..(sku.size - 2)]
+        end
+
+        unless stock_type == "R"
+          self.sku += stock_type
+        end
+      end
     end
 
-    return true
+    if exists = Spree::Variant.where("sku = ? and id != ?", sku, id).first
+      errors.add(:sku, "is already in use by: #{exists.product.name.split(":").first}")
+      success_state = false
+    end
+
+    return success_state
   end
 
   def receive(qty)
