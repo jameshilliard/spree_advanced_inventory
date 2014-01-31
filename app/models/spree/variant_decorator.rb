@@ -12,6 +12,24 @@ Spree::Variant.class_eval do
   has_many :purchase_orders, through: :purchase_order_line_items
   has_many :orders, through: :line_items
 
+  def short_name
+    product.name.split(":").first
+  end
+
+  def self.regular_stock
+    where(stock_type: "R")
+  end
+
+  def stock_type_label
+    if stock_type == "R"
+      ""
+    elsif stock_type == "C"
+      "Consignment"
+    elsif stock_type == "B"
+      "Buyback"
+    end
+  end
+
   def ensure_sku_stock_type
     success_state = true
     self.stock_type = stock_type[0].upcase
@@ -33,7 +51,7 @@ Spree::Variant.class_eval do
       end
     end
 
-    if exists = Spree::Variant.where("sku = ? and id != ?", sku, id).first
+    if exists = Spree::Variant.where("sku = ? and id != ? and deleted_at is null", sku, id).first
       errors.add(:sku, "is already in use by: #{exists.product.name.split(":").first}")
       success_state = false
     end
