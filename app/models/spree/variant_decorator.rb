@@ -51,7 +51,7 @@ Spree::Variant.class_eval do
       end
     end
 
-    if exists = Spree::Variant.where("sku = ? and id != ? and deleted_at is null", sku, id).first
+    if exists = Spree::Variant.where("deleted_at is null and is_master = false and sku = ? and id != ?", sku, id).first
       errors.add(:sku, "is already in use by: #{exists.product.name.split(":").first}")
       success_state = false
     end
