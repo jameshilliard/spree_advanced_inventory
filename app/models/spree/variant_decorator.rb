@@ -1,7 +1,26 @@
 Spree::Variant.class_eval do
+  # Stock types:
+  # R => Regular
+  # C => Consignment
+  # B => Buyback
+
+  attr_accessible :stock_type
+
+  before_validation :ensure_sku_stock_type
+
   has_many :purchase_order_line_items
   has_many :purchase_orders, through: :purchase_order_line_items
   has_many :orders, through: :line_items
+
+  def set_stock_type
+    self.stock_type = stock_type[0].upcase
+
+    if stock_type != "R" and sku =~ /(.+)#{stock_type}$/
+      self.sku += stock_type
+    end
+
+    return true
+  end
 
   def receive(qty)
     if on_hand > 0
