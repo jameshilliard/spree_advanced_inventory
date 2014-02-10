@@ -13,7 +13,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     :supplier_contact_id, :user_id, :comments, :terms, :order_id,
     :purchase_order_line_items_attributes, :discount, :shipping, :deposit,
     :shipping_method_id, :address_attributes, :email_subject, :auto_capture_orders,
-    :entered_at, :completed_at, :submitted_at
+    :entered_at, :completed_at, :submitted_at, :tax
 
   accepts_nested_attributes_for :purchase_order_line_items,
    :reject_if => Proc.new { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
@@ -29,6 +29,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   validates :discount, numericality: true, unless: Proc.new { |a| a.discount.blank? }
   validates :shipping, numericality: true, unless: Proc.new { |a| a.shipping.blank? }
   validates :deposit, numericality: true, unless: Proc.new { |a| a.deposit.blank? }
+  validates :tax, numericality: true, unless: Proc.new { |a| a.tax.blank? }
 
   default_scope order("spree_purchase_orders.created_at desc")
 
@@ -158,7 +159,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   end
 
   def total
-    gross_amount.to_f + shipping.to_f - discount.to_f - deposit.to_f
+    gross_amount.to_f + shipping.to_f + tax.to_f - discount.to_f - deposit.to_f
   end
 
   def items_received(line_item_ids)
