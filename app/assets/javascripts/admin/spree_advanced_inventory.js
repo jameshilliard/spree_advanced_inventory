@@ -21,6 +21,10 @@ $(document).ready(function () {
       unsaved = false;
   });
 
+  $('.icon-refresh').click(function() {
+      unsaved = false;
+  });
+
   $('.pagination a').click(function() {
       unsaved = false;
   });
