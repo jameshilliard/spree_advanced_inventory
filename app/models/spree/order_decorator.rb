@@ -204,7 +204,7 @@ Spree::Order.class_eval do
   def self.eligible_for_po(po)
     dropship_check = ""
 
-    if po.dropship
+    if po and po.dropship
       dropship_check = "o.is_dropship = true and"
     end
   

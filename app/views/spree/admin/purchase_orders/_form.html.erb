@@ -100,29 +100,22 @@
           <%= f.label :balance_adjustments, t(:balance_adjustments) %>
           <table width="100%" cellspacing="3" cellpadding="0">
           <thead>
-            <th>Discount</th>              
+            <th>Tax</th>              
             <th>Shipping</th>
-            <th>Deposit</th>
           </thead>
 
           <tr valign="top">
-            <td width="33%">
-              <%= f.text_field :discount, 
+            <td width="50%">
+              <%= f.text_field :tax, 
                 class: 'fullwidth', 
-                  placeholder: "Discount" %>
+                  placeholder: "tax" %>
             </td>
-            <td width="33%">
+            <td width="50%">
 
               <%= f.text_field :shipping, 
                 class: 'fullwidth', 
                   placeholder: "Shipping" %>
             </td>
-            <td width="33%">
-
-              <%= f.text_field :deposit,
-                class: 'fullwidth', 
-                  placeholder: "Deposit" %>
-             </td>
            </tr>
           </table>
 
