@@ -299,8 +299,11 @@ module Spree
         end
 
         def remove_unused
-          Spree::PurchaseOrder.destroy_all(status: nil,
-                                           user_id: spree_current_user.id)
+          Spree::PurchaseOrder.where(status: nil, user_id: spree_current_user.id).each do |p|
+            if p.purchase_order_line_items.size == 0
+              p.destroy
+            end
+          end
         end
 
         def load_supplier
