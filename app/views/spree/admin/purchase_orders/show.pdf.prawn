@@ -145,19 +145,20 @@ bounding_box [180,560], :width => 170, :height => 150 do
 
   data = [["Number: #{@purchase_order.supplier.account_number}"]]
 
-  if @purchase_order.supplier.nr_account_number  
+  unless @purchase_order.supplier.nr_account_number.blank?
     data << ["NR account: #{@purchase_order.supplier.nr_account_number}"]
   end
 
   data << ["Contact: #{@purchase_order.supplier_contact.name}"]
   
-  if @purchase_order.supplier_contact.phone
+  unless @purchase_order.supplier_contact.phone.blank?
     data << ["Phone: #{@purchase_order.supplier_contact.phone}"]
   end
 
-  if @purchase_order.supplier_contact.email
+  unless @purchase_order.supplier_contact.email.blank?
     data << ["E-mail: #{@purchase_order.supplier_contact.email}"]
   end
+
 
   table data,
     :position => :center,
@@ -234,7 +235,12 @@ table data,
   move_down 4
 
   text "Method: #{@purchase_order.shipping_method.name}", align: :left, style: :bold, size: 9
- 
+
+  unless @purchase_order.due_at.blank?
+    move_down 4
+    text("DUE DATE: #{@purchase_order.due_at.strftime("%m/%d/%Y")}", style: :bold)
+  end 
+
 
   stroke do
     line_width 0.5
@@ -304,11 +310,9 @@ bounding_box [0,370], :width => 540, :height => 300 do
   totals = []
 
   totals << [Prawn::Table::Cell.new( :text => "Sub-total", :font_style => :bold), number_to_currency(@purchase_order.gross_amount)]
+  totals << [Prawn::Table::Cell.new( :text => "Tax", :font_style => :bold), number_to_currency(@purchase_order.tax.to_f)]
   totals << [Prawn::Table::Cell.new( :text => "Shipping", :font_style => :bold), number_to_currency(@purchase_order.shipping.to_f)]
-  totals << [Prawn::Table::Cell.new( :text => "Discount", :font_style => :bold), "(#{number_to_currency(@purchase_order.discount.to_f)})"]
-  totals << [Prawn::Table::Cell.new( :text => "Deposit", :font_style => :bold), "(#{number_to_currency(@purchase_order.deposit.to_f)})"]
-
-  totals << [Prawn::Table::Cell.new( :text => t(:total), :font_style => :bold), number_to_currency(@purchase_order.total)]
+  totals << [Prawn::Table::Cell.new( :text => "Total", :font_style => :bold), number_to_currency(@purchase_order.total)]
 
   bounding_box [bounds.right - 310, bounds.bottom + (totals.length * 18)], :width => 300 do
     table totals,
@@ -316,7 +320,7 @@ bounding_box [0,370], :width => 540, :height => 300 do
       :border_width => 0,
       :vertical_padding   => 2,
       :horizontal_padding => 6,
-      :font_size => 9,
+      :font_size => 10,
       :column_widths => { 0 => 225, 1 => 75 } ,
       :align => { 0 => :right, 1 => :right }
 
@@ -326,7 +330,7 @@ bounding_box [0,370], :width => 540, :height => 300 do
     unless @purchase_order.comments.blank?
       font "Helvetica", size: 12
       text "COMMENTS:"
-      font "Helvetica", size: 9
+      font "Helvetica", size: 10
       text @purchase_order.comments
     end
   end
