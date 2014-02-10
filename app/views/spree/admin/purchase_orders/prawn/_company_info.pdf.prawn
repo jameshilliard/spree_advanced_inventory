@@ -38,4 +38,4 @@ bounding_box [370,660], :width => 170 do
     :column_widths => { 0 => 170 })
 end
 
-move_down 50
+move_down 20
