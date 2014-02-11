@@ -312,6 +312,8 @@ module Spree
         end
 
         def update_orders
+          eligible_orders = Spree::Order.eligible_for_po(@purchase_order)
+
           if params[:sending_manually] and params[:purchase_order][:status] == "Entered"
             params[:purchase_order][:status] = "Submitted"
           end
@@ -322,6 +324,9 @@ module Spree
             params[:order_ids].each do |oid|
               Spree::OrderPurchaseOrder.create(order_id: oid, purchase_order_id: @purchase_order.id)
             end
+
+          elsif @purchase_order.status != "Completed" and not params[:order_ids] and eligible_orders.size > 0 
+            @purchase_order.order_purchase_orders.destroy_all
           end
         end
 
