@@ -1,5 +1,6 @@
 $(document).ready(function () {
   var unsaved = false;
+  var check_for_unsaved_changes = false;
 
   $(":input").change(function(){ 
     unsaved = true;
@@ -7,14 +8,16 @@ $(document).ready(function () {
 
   // Another way to bind the event
   $(window).bind('beforeunload', function() {
-      if(unsaved){
-          return "You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?";
-      }
+    if(unsaved) {
+      return "You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?";
+    }
   });
 
   // Monitor dynamic inputs
-  $(document).on('change', ':input', function(){ 
+  $(document).on('change', ':input', function(){
+    if(check_for_unsaved_changes) {
       unsaved = true;
+    }
   });
 
   $('.btn-success').click(function() {
