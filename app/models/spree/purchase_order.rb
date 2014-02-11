@@ -37,7 +37,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   scope :incomplete, lambda { where{(status != "Completed")} }
 
   def self.override_sort
-    Event.with_exclusive_scope { yield }
+    Spree::PurchaseOrder.with_exclusive_scope { yield }
   end
 
   def receive_dropship_line_items
