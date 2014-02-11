@@ -36,6 +36,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   scope :complete, lambda { where{(status == "Completed")} }
   scope :incomplete, lambda { where{(status != "Completed")} }
 
+  def self.override_sort
+    Event.with_exclusive_scope { yield }
+  end
+
   def receive_dropship_line_items
     if dropship
       if status_changed? and status == "Completed" and status_was != "Completed"
