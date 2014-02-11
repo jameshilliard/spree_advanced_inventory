@@ -14,9 +14,12 @@ $(document).ready(function () {
   });
 
   // Monitor dynamic inputs
-  $(document).on('change', ':input', function(){
+  $(document).on('change', ':input', function() {
     if(check_for_unsaved_changes) {
       unsaved = true;
+    }
+    else {
+      unsaved = false;
     }
   });
 
