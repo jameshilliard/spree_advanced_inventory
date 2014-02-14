@@ -119,6 +119,11 @@ if @purchase_order.supplier.attributes["fax"] and @purchase_order.supplier.attri
   data << ["Fax: #{fax_number}"]
 end
 
+if @purchase_order.supplier.attributes["po_comments"] and @purchase_order.supplier.attributes["po_comments"].size > 0
+  data << ["#{@purchase_order.supplier.po_comments}"]
+end 
+
+
 table data,
   :position => :center,
   :border_width => 0.5,

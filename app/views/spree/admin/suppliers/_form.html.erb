@@ -43,6 +43,11 @@
           <%= f.text_field :phone, :class => 'fullwidth' %>
         </div>
 
+        <div data-hook="po-comments" class="field">
+          <%= f.label :po_comments, "PO comments (shows up on PDF)" %>
+          <%= f.text_area :po_comments, :class => 'fullwidth', :rows => 5, :cols => 20 %>
+        </div>
+
         <div data-hook="comments" class="field">
           <%= f.label :comments, t(:comments) %>
           <%= f.text_area :comments, :class => 'fullwidth', :rows => 5, :cols => 20 %>
