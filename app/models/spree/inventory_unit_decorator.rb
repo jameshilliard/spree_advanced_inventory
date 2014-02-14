@@ -3,6 +3,14 @@ Spree::InventoryUnit.class_eval do
 
   before_validation :set_stock_type
 
+  def self.queued
+    joins(:order).where("spree_orders.payment_state = ? and spree_inventory_units.is_dropship = false and spree_inventory_units.is_quote = false and spree_inventory_units.state = ?", "paid", "sold")
+  end
+
+  def self.reserved
+    joins(:order).where("spree_orders.payment_state = ? and spree_inventory_units.is_dropship = false and spree_inventory_units.is_quote = false and spree_inventory_units.state = ?", "balance_due", "sold")
+  end
+
   def set_stock_type
     if order.is_dropship == true
       self.is_dropship = true
