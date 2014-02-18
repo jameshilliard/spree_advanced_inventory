@@ -32,6 +32,19 @@ module Spree
           params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
         end
 
+        if params[:q][:status_cont] == "Submitted"
+          params[:q][:submitted_at_lt] = params[:q][:created_at_lt]
+          params[:q][:submitted_at_gt] = params[:q][:created_at_gt]
+          params[:q].delete(:created_at_gt)
+          params[:q].delete(:created_at_lt)
+
+        elsif params[:q][:status_cont] == "Completed"
+          params[:q][:completed_at_lt] = params[:q][:created_at_lt]
+          params[:q][:completed_at_gt] = params[:q][:created_at_gt]
+          params[:q].delete(:created_at_gt)
+          params[:q].delete(:created_at_lt)
+        end
+
         @search = Spree::PurchaseOrder.ransack(params[:q])
         @purchase_orders = @search.result(distinct: true).includes([:purchase_order_line_items, :user, :address, :variants]).
           page(params[:page]).
