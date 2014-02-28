@@ -21,7 +21,8 @@ end
 bounding_box [370,660], :width => 170 do
   move_down 1
 
-  data = [["Phone: #{Spree::Config.advanced_inventory_office_phone}"]]
+  data = [[""]]
+  data << ["Phone: #{Spree::Config.advanced_inventory_office_phone}"]
   data << ["E-mail: #{Spree::Config.advanced_inventory_office_email}"]
   data << ["Federal Tax ID: #{Spree::Config.advanced_inventory_tax_id}"]
   data << [""]
