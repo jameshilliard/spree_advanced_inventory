@@ -51,7 +51,7 @@
       <% available_total = 0.0 %>
 
       <% @inventory.each do |i| %>
-        <% i.count_on_hand = i.count_on_hand ? i.count_on_hand : 0.0 %>
+        <% i.count_on_hand = i.count_on_hand ? i.count_on_hand : 0.0; i.reserved_units = i.reserved_units.to_i %>
         <tr bgcolor="#ffffff" valign="top">
           <td><%= i.title.split(":").first %></td>
           <td align="center">
