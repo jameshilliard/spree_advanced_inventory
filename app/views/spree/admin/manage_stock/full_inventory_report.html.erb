@@ -51,7 +51,7 @@
       <% available_total = 0.0 %>
 
       <% @inventory.each do |i| %>
-        <% i.count_on_hand = i.count_on_hand ? i.count_on_hand : 0.0; i.reserved_units = i.reserved_units.to_i %>
+        <% i.count_on_hand = i.count_on_hand ? i.count_on_hand : 0.0; i.reserved_units = i.reserved_units.to_i; line_cost = 0.0; line_inventory = 0; line_count = 0; line_total = 0.0 %>
         <tr bgcolor="#ffffff" valign="top">
           <td><%= i.title.split(":").first %></td>
           <td align="center">
@@ -64,17 +64,27 @@
             <% queue_total += i_total * i.recent_price %>
             <%= link_to i_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(i_total * i.recent_price)}" %>
           </td>
+
           <td align="center">
             <% r_total = i.reserved_units; reserve_total += i.reserved_units * i.recent_price %>
+            <% line_total += r_total * i.recent_price %> 
             <%= link_to r_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(r_total * i.recent_price)}" %>
           </td>
+
           <td align="center">
             <%= link_to i.count_on_hand, edit_admin_product_variant_path(i.permalink, i.id), target: i.id, title: Spree::Money.new(i.count_on_hand * i.recent_price) %>
-            <% available_total += i.count_on_hand * i.recent_price %>
+
+            <% if i.count_on_hand > 0 %>
+              <% line_cost = i.count_on_hand * i.recent_price %>
+              <% line_total += line_cost; available_total += line_cost %>
+              <% line_inventory += i.count_on_hand %>
+            <% end %>
           </td>
+
           <td align="center">
-            <%= i.count_on_hand + i.inventory_units.queued.size + r_total  %></a>
-          </td>
+            <%= r_total + line_inventory %></a>
+        </td>
+
           <td align="center">
             <% recent_price_url = edit_admin_product_variant_url(i.product, i) %>
 
@@ -84,7 +94,6 @@
 
             <%= link_to Spree::Money.new(i.recent_price), recent_price_url, target: i.id, title: recent_price_history(i) %>
           </td>
-          <% line_total = i.recent_price.to_f * (i.count_on_hand + i_total + r_total) %>
           <td align="center"><%= Spree::Money.new(line_total) %></td>
         </tr>
         <tr bgcolor="#ffffff" valign="top">
