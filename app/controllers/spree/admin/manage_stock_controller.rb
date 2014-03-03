@@ -25,7 +25,7 @@ module Spree
           elsif params[:stock_level] == "zero"
             @inventory = @inventory.where{(count_on_hand == 0)}
           elsif params[:stock_level] == "in_stock" or params[:stock_level].blank?
-            @inventory = @inventory.where{(count_on_hand > 0)}
+            @inventory = @inventory.where{((cost_price > 0.0) & (count_on_hand == 0)) | (count_on_hand > 0)}
           end
         end
 
