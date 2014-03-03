@@ -10,13 +10,7 @@ module Spree
       end
 
       def full_inventory_report
-        @inventory = Spree::FullInventory.where{
-          ((count_on_hand + reserved_units) != 0) &
-          ((state == nil) | (state == 'sold')) &
-          ((is_dropship == nil) | (is_dropship == false)) &
-          ((is_quote == nil) | (is_quote == false))
-        }.
-        order("title asc, sku asc")
+        @inventory = Spree::FullInventory.where{ ((count_on_hand + reserved_units) != 0) }.  order("title asc, sku asc")
 
         if params[:sku] and params[:sku].size > 0
           @inventory = @inventory.where(sku: params[:sku].strip)

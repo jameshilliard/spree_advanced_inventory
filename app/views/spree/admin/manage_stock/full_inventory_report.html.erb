@@ -12,10 +12,10 @@
   <body>
 
   <div style="font-size: 1.4em; margin: 0 auto; text-align: center; width: 100%;">
-    <strong><%= link_to "ALL", admin_full_inventory_report_url + "?stock_level=#{params[:stock_level]}" %></strong>
+    <strong><%= link_to "ALL", admin_full_inventory_report_url  %></strong>
     
     <% ("a".."z").each do |l| %>
-      <%= link_to l.upcase, admin_full_inventory_report_url + "?first_letter=#{l}&stock_level=#{params[:stock_level]}" %>&nbsp;
+      <%= link_to l.upcase, admin_full_inventory_report_url + "?first_letter=#{l}" %>&nbsp;
     <% end %>
 
     <br/>
