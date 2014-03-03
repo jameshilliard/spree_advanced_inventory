@@ -85,10 +85,12 @@ Spree::Variant.class_eval do
     p = 0.0
 
     if rp = last_purchase_order_line_item 
-      p = rp.price
+      p = rp.price.to_f
     elsif cost_price and cost_price > 0.0
-      p = cost_price
+      p = cost_price.to_f
     end
+
+    p = sprintf("%0.2f", p).to_f
 
     return p
   end
