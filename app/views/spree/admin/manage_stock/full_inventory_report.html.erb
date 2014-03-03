@@ -66,7 +66,8 @@
           </td>
 
           <td align="center">
-            <% r_total = i.reserved_units; reserve_total += i.reserved_units * i.recent_price %>
+            <% r_total = i.inventory_units.reserved.size %>
+            <% reserve_total += r_total * i.recent_price %>
             <% line_total += r_total * i.recent_price %> 
             <%= link_to r_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(r_total * i.recent_price)}" %>
           </td>
@@ -76,14 +77,15 @@
 
             <% if i.count_on_hand > 0 %>
               <% line_cost = i.count_on_hand * i.recent_price %>
-              <% line_total += line_cost; available_total += line_cost %>
+              <% line_total += line_cost %>
+              <% available_total += line_cost %>
               <% line_inventory += i.count_on_hand %>
             <% end %>
           </td>
 
           <td align="center">
-            <%= r_total + line_inventory %></a>
-        </td>
+            <%= r_total + line_inventory %>
+          </td>
 
           <td align="center">
             <% recent_price_url = edit_admin_product_variant_url(i.product, i) %>
@@ -117,7 +119,7 @@
         <td colspan='2' align='right'><%= Spree::Money.new(queue_total) %></td>
         <td align='center' style='border-left: 1px #fff solid;'><%= Spree::Money.new(reserve_total) %></td>
         <td colspan='2' align='center' style='border-left: 1px #fff solid;'><%= Spree::Money.new(available_total) %></td>
-        <td colspan='2' align="right"><%= Spree::Money.new(queue_total + reserve_total + available_total) %></td>
+        <td colspan='2' align="right"><strong><%= Spree::Money.new(reserve_total + available_total) %></strong></td>
       </tr>
   </table>
   <script>$("#sku").focus().select();</script>
