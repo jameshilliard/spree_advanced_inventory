@@ -1,7 +1,7 @@
 <html>
   <head>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
-  <title><%= params[:first_letter] %> - <%= params[:stock_level] %>- Full Inventory Report</title>
+  <title><%= params[:first_letter] %> - Full Inventory Report</title>
   <style>
     table.barby-barcode { border-spacing: 0; width: 230px; height: 40px; }
     tr.barby-row {}
@@ -29,12 +29,6 @@
     <% end %>
     <br/>
 
-    <% if params[:sku].blank? %>
-      <strong>TOTAL STOCK LEVEL :</strong>
-      <%= link_to "POSITIVE", admin_full_inventory_report_url + "?sku=#{params[:sku]}&first_letter=#{params[:first_letter]}&stock_level=in_stock" %> &ndash;
-      <%= link_to "ZERO", admin_full_inventory_report_url + "?sku=#{params[:sku]}&first_letter=#{params[:first_letter]}&stock_level=zero" %> &ndash;
-      <%= link_to "BACKORDER", admin_full_inventory_report_url + "?sku=#{params[:sku]}&first_letter=#{params[:first_letter]}&stock_level=backordered" %>
-    <% end %>
   </div>
 
   <br/>
@@ -71,7 +65,7 @@
             <%= link_to i_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(i_total * i.recent_price)}" %>
           </td>
           <td align="center">
-            <% r_total = i.inventory_units.reserved.size; reserve_total += r_total * i.recent_price %>
+            <% r_total = i.reserved_units; reserve_total += i.reserved_units * i.recent_price %>
             <%= link_to r_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(r_total * i.recent_price)}" %>
           </td>
           <td align="center">
