@@ -2,6 +2,12 @@
   <head>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
   <title><%= params[:first_letter] %> - <%= params[:stock_level] %>- Full Inventory Report</title>
+  <style>
+    table.barby-barcode { border-spacing: 0; width: 230px; height: 40px; }
+    tr.barby-row {}
+    td.barby-cell { width: 3px; height: 3px; }
+    td.barby-cell.on { background: #000; }
+  </style>
   </head>
   <body>
 
@@ -54,7 +60,9 @@
         <% i.count_on_hand = i.count_on_hand ? i.count_on_hand : 0.0 %>
         <tr bgcolor="#ffffff" valign="top">
           <td><%= i.title.split(":").first %></td>
-          <td align="center"><%= i.sku[0..30] %></td>
+          <td align="center">
+            <%= i.sku[0..30] %>
+          </td>
           <td align="center"><%= i.publisher %></td>
           <td align="center"><%= i.options_text.split(": ").last %></td>
           <td align="center">              
@@ -85,6 +93,21 @@
           <% line_total = i.recent_price.to_f * (i.count_on_hand + i_total + r_total) %>
           <td align="center"><%= Spree::Money.new(line_total) %></td>
         </tr>
+        <tr bgcolor="#ffffff" valign="top">
+          <td colspan='2'>
+
+            <% begin %>
+              <% barcode = Barby::Code39.new(i.sku) %>
+              <%= barcode.to_html.html_safe %>
+            <% rescue %>
+              <!-- No barcode available -->
+            <% end %>
+          </td>
+          <td colspan='8'>
+            &nbsp;
+          </td>
+        </tr>
+
       <% end %>
       <tr>
         <td colspan='3'>&nbsp;</td>

@@ -1,32 +1,40 @@
 module Spree
   module Admin
     class ManageStockController < BaseController
+      require 'barby'
+      require 'barby/barcode/bookland'
+      require 'barby/outputter/html_outputter'
 
       def index
 
       end
 
       def full_inventory_report
-        @inventory = Spree::Variant.select("spree_variants.*, spree_products.name as title, spree_products.permalink").joins(:product).
-                                    order("spree_products.name asc, spree_variants.sku asc").where(is_master: false, deleted_at: nil)
+        @inventory = Spree::Variant.select("spree_variants.*, spree_products.name as title, spree_products.permalink").
+          joins(:product).
+          order("spree_products.name asc, spree_variants.sku asc").
+          where(is_master: false, deleted_at: nil)
 
-        if sku_search = params[:sku]
-          @inventory = @inventory.where{(sku =~ "%#{sku_search}%")}
-        end
 
-        if params[:first_letter]
-          l = params[:first_letter].to_s
-          @inventory = @inventory.where{(product.name =~ "#{l}%")}
-        end
-
+        if params[:sku] and params[:sku].size > 0
+          @inventory = @inventory.where(sku: params[:sku].strip)
+        else
+          if params[:first_letter]
+            l = params[:first_letter].to_s
+            @inventory = @inventory.where{(product.name =~ "#{l}%")}
+          end
         if not params[:sku] or params[:sku].size == 0
           if params[:stock_level] == "backordered"
             @inventory = @inventory.where{(count_on_hand < 0)}
           elsif params[:stock_level] == "zero"
             @inventory = @inventory.where{(count_on_hand == 0)}
           elsif params[:stock_level] == "in_stock" or params[:stock_level].blank?
-            @inventory = @inventory.where{((cost_price > 0.0) & (count_on_hand == 0)) | (count_on_hand > 0)}
+            @inventory = @inventory.where{(count_on_hand > 0)}
           end
+        end
+
+
+
         end
 
 
