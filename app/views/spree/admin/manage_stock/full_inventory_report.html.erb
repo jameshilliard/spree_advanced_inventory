@@ -88,10 +88,10 @@
           </td>
 
           <td align="center">
-            <% recent_price_url = edit_admin_product_variant_url(i.product, i) %>
-
-            <% if rp = i.last_purchase_order_line_item and rp.purchase_order %>
-              <% recent_price_url = admin_purchase_order_edit_line_items_url(rp.purchase_order) %>
+            <% recent_price_url = edit_admin_product_variant_url(i.product, i); rp = i.last_n_purchase_order_line_items(30) %>
+            
+            <% if rp and rp.size > 0 %>
+              <% recent_price_url = admin_purchase_orders_url() + "?q[status_cont]=Completed&q[dropship_eq]=false&q[variants_sku_cont]=#{i.sku}" %>
             <% end %>
 
             <%= link_to Spree::Money.new(i.recent_price), recent_price_url, target: i.id, title: recent_price_history(i) %>

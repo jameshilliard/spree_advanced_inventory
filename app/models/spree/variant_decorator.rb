@@ -77,17 +77,30 @@ Spree::Variant.class_eval do
     #end
   end
 
+  def last_n_purchase_order_line_items(n = 1)
+    purchase_order_line_items.where{(price != nil) & (price > 0.0)}.order("updated_at desc").limit(n)
+  end
+
   def last_purchase_order_line_item
-    purchase_order_line_items.where{(price != nil) & (price > 0.0)}.order("updated_at desc").limit(1).first
+    l = last_n_purchase_order_line_items(1)
+
+    return l.first
   end
 
   def recent_price
     p = 0.0
 
-    if rp = last_purchase_order_line_item 
-      p = rp.price.to_f
+    rp = last_n_purchase_order_line_items(30)
+
+    if rp and rp.size == 1
+      p = rp.first.price.to_f
+
+    elsif rp and rp.size > 0
+      p = rp.sum(:price).to_f / rp.size
+
     elsif cost_price and cost_price > 0.0
       p = cost_price.to_f
+
     end
 
     p = sprintf("%0.2f", p).to_f
