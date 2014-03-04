@@ -34,13 +34,12 @@
       <thead>
         <th>Title</th>
         <th>SKU</th>
-        <th>Publisher</th>
         <th>Format</th>
         <th>In Queue<br/>(Captured)</th>
         <th>Reserved<br/>(Authorized)</th>
         <th>Available</th>
         <th>Total</th>
-        <th>Cost / Unit</th>
+        <th>Avg Cost / Unit</th>
         <th>Unsold cost</th>
       </thead>
       <% total = 0.0 %>
@@ -53,11 +52,10 @@
         <% unless params[:hide_backorders].to_s == "true" and i.count_on_hand < 0 and i.reserved_units == 0 %>
           <tr bgcolor="#ffffff" valign="top">
             <td><%= i.title.split(":").first %></td>
-            <td align="center">
+            <td align="center" width='150' style="word-wrap: break-word;"word>
               <%= i.sku[0..30] %>
             </td>
-            <td align="center"><%= i.publisher %></td>
-            <td align="center"><%= i.options_text.split(": ").last %></td>
+            <td align="center" width='100'><%= i.options_text.split(": ").last %></td>
             <td align="center">              
               <% i_total = i.inventory_units.queued.size %>
               <% queue_total += i_total * i.recent_price %>
