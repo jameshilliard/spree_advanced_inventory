@@ -22,16 +22,14 @@
 
     <%= form_tag admin_full_inventory_report_path, {method: "GET"} do %>
       <%= text_field_tag :sku, params[:sku], size: 16, placeholder: "Search by SKU" %>
+      <label><%= check_box_tag :hide_backorders, true, params[:hide_backorders] %> Hide backorders?</label>
       <%= hidden_field_tag :first_letter, params[:first_letter] %>
-      <%= hidden_field_tag :stock_level, params[:stock_level] %>
       <%= hidden_field_tag :page, params[:page] %>
       <%= submit_tag "Go" %>
     <% end %>
-    <br/>
 
   </div>
 
-  <br/>
     <table width="95%" border="0" cellspacing="1" cellpadding="5" bgcolor="#d8d8d8">
       <thead>
         <th>Title</th>
@@ -52,67 +50,68 @@
 
       <% @inventory.each do |i| %>
         <% i.count_on_hand = i.count_on_hand ? i.count_on_hand : 0.0; i.reserved_units = i.reserved_units.to_i; line_cost = 0.0; line_inventory = 0; line_count = 0; line_total = 0.0 %>
-        <tr bgcolor="#ffffff" valign="top">
-          <td><%= i.title.split(":").first %></td>
-          <td align="center">
-            <%= i.sku[0..30] %>
-          </td>
-          <td align="center"><%= i.publisher %></td>
-          <td align="center"><%= i.options_text.split(": ").last %></td>
-          <td align="center">              
-            <% i_total = i.inventory_units.queued.size %>
-            <% queue_total += i_total * i.recent_price %>
-            <%= link_to i_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(i_total * i.recent_price)}" %>
-          </td>
+        <% unless params[:hide_backorders].to_s == "true" and i.count_on_hand < 0 and i.reserved_units == 0 %>
+          <tr bgcolor="#ffffff" valign="top">
+            <td><%= i.title.split(":").first %></td>
+            <td align="center">
+              <%= i.sku[0..30] %>
+            </td>
+            <td align="center"><%= i.publisher %></td>
+            <td align="center"><%= i.options_text.split(": ").last %></td>
+            <td align="center">              
+              <% i_total = i.inventory_units.queued.size %>
+              <% queue_total += i_total * i.recent_price %>
+              <%= link_to i_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(i_total * i.recent_price)}" %>
+            </td>
 
-          <td align="center">
-            <% r_total = i.inventory_units.reserved.size %>
-            <% reserve_total += r_total * i.recent_price %>
-            <% line_total += r_total * i.recent_price %> 
-            <%= link_to r_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(r_total * i.recent_price)}" %>
-          </td>
+            <td align="center">
+              <% r_total = i.inventory_units.reserved.size %>
+              <% reserve_total += r_total * i.recent_price %>
+              <% line_total += r_total * i.recent_price %> 
+              <%= link_to r_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(r_total * i.recent_price)}" %>
+            </td>
 
-          <td align="center">
-            <%= link_to i.count_on_hand, edit_admin_product_variant_path(i.permalink, i.id), target: i.id, title: Spree::Money.new(i.count_on_hand * i.recent_price) %>
+            <td align="center">
+              <%= link_to i.count_on_hand, edit_admin_product_variant_path(i.permalink, i.id), target: i.id, title: Spree::Money.new(i.count_on_hand * i.recent_price) %>
 
-            <% if i.count_on_hand > 0 %>
-              <% line_cost = i.count_on_hand * i.recent_price %>
-              <% line_total += line_cost %>
-              <% available_total += line_cost %>
-              <% line_inventory += i.count_on_hand %>
-            <% end %>
-          </td>
+              <% if i.count_on_hand > 0 %>
+                <% line_cost = i.count_on_hand * i.recent_price %>
+                <% line_total += line_cost %>
+                <% available_total += line_cost %>
+                <% line_inventory += i.count_on_hand %>
+              <% end %>
+            </td>
 
-          <td align="center">
-            <%= r_total + line_inventory %>
-          </td>
+            <td align="center">
+              <%= r_total + line_inventory %>
+            </td>
 
-          <td align="center">
-            <% recent_price_url = edit_admin_product_variant_url(i.product, i); rp = i.last_n_purchase_order_line_items(30) %>
-            
-            <% if rp and rp.size > 0 %>
-              <% recent_price_url = admin_purchase_orders_url() + "?q[status_cont]=Completed&q[dropship_eq]=false&q[variants_sku_cont]=#{i.sku}" %>
-            <% end %>
+            <td align="center">
+              <% recent_price_url = edit_admin_product_variant_url(i.product, i); rp = i.last_n_purchase_order_line_items(30) %>
+              
+              <% if rp and rp.size > 0 %>
+                <% recent_price_url = admin_purchase_orders_url() + "?q[status_cont]=Completed&q[dropship_eq]=false&q[variants_sku_cont]=#{i.sku}" %>
+              <% end %>
 
-            <%= link_to Spree::Money.new(i.recent_price), recent_price_url, target: i.id, title: recent_price_history(i) %>
-          </td>
-          <td align="center"><%= Spree::Money.new(line_total) %></td>
-        </tr>
-        <tr bgcolor="#ffffff" valign="top">
-          <td colspan='2'>
+              <%= link_to Spree::Money.new(i.recent_price), recent_price_url, target: i.id, title: recent_price_history(i) %>
+            </td>
+            <td align="center"><%= Spree::Money.new(line_total) %></td>
+          </tr>
+          <tr bgcolor="#ffffff" valign="top">
+            <td colspan='2'>
 
-            <% begin %>
-              <% barcode = Barby::Code39.new(i.sku) %>
-              <%= barcode.to_html.html_safe %>
-            <% rescue %>
-              <!-- No barcode available -->
-            <% end %>
-          </td>
-          <td colspan='8'>
-            &nbsp;
-          </td>
-        </tr>
-
+              <% begin %>
+                <% barcode = Barby::Code39.new(i.sku) %>
+                <%= barcode.to_html.html_safe %>
+              <% rescue %>
+                <!-- No barcode available -->
+              <% end %>
+            </td>
+            <td colspan='8'>
+              &nbsp;
+            </td>
+          </tr>
+        <% end %>
       <% end %>
       <tr>
         <td colspan='3'>&nbsp;</td>
