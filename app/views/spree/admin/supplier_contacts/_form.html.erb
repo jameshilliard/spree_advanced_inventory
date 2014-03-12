@@ -1,7 +1,9 @@
+<%= render :partial => 'spree/shared/error_messages', :locals => { :target => @supplier_contact } %>
 <div data-hook="admin_supplier_form_fields">
   <div class="alpha eighteen columns omega">
   
     <div class="eight columns alpha">
+
       <fieldset data-hook="new-supplier-contact" class=" no-border-bottom">
         <legend align="center"><%= t(:edit_supplier_contact) %></legend>
 
@@ -9,6 +11,7 @@
 
           <div data-hook="supplier_contact_name" class="field">
             <%= f.label :name, t(:name) %>
+            <abbr title="required">*</abbr>
             <%= f.text_field :name, :class => 'fullwidth' %>
           </div>
 
@@ -19,6 +22,7 @@
 
           <div data-hook="supplier_contact_email" class="field">
             <%= f.label :email, t(:email_address) %>
+            <abbr title="required">*</abbr>
             <%= f.text_field :email, :class => 'fullwidth' %>
           </div>
 
@@ -61,7 +65,7 @@
 
           <div data-hook="supplier_contact_country" class="field">
             <%= f.label :country, t(:country) %>
-            <%= f.collection_select :country, available_countries, :name, :name, {}, {:class => 'select2 fullwidth'} %>
+            <%= f.collection_select :country, available_countries, :name, :name, { prompt: "Select a country"}, {:class => 'select2 fullwidth'} %>
           </div>
 
         <% end  %>

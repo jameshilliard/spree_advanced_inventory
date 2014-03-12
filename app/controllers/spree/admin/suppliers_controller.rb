@@ -27,6 +27,37 @@ module Spree
         end
       end 
 
+      def create
+        @supplier = Spree::Supplier.new(params[:supplier])
+        
+        if @new_supplier_contact 
+          @new_supplier_contact.supplier = @supplier
+        end
+        
+        if @supplier.valid? and @new_supplier_contact and @new_supplier_contact.valid?
+          @supplier.save
+          flash[:success] = "Supplier and contact saved"
+          redirect_to edit_admin_supplier_url(@supplier)
+        else
+          logger.info @supplier.valid?
+          logger.info @new_supplier_contact.will_save?
+          render "new"
+        end
+      end
+
+      def update
+        if @new_supplier_contact and @new_supplier_contact.will_save? and @new_supplier_contact.valid? and @supplier.update_attributes(params[:supplier])
+          @new_supplier_contact.save
+          flash[:success] = "Supplier updated and contact created"
+          redirect_to edit_admin_supplier_url(@supplier)
+        elsif (not @new_supplier_contact or not @new_supplier_contact.will_save?) and @supplier.update_attributes(params[:supplier])
+          flash[:success] = "Supplier updated"
+          redirect_to edit_admin_supplier_url(@supplier)
+        else
+          render "edit"
+        end
+      end
+
       def setup_new_supplier_contact
         @new_supplier_contact = Spree::SupplierContact.new
 
@@ -40,12 +71,12 @@ module Spree
           params[:supplier][:supplier_contacts_attributes] and 
           params[:supplier][:supplier_contacts_attributes]["0"]
 
-          logger.info "\n\n*** #{params[:supplier][:supplier_contacts_attributes]["0"].inspect}"
           @new_supplier_contact = Spree::SupplierContact.new(params[:supplier][:supplier_contacts_attributes]["0"])
         else
-          logger.info "\n\n--- New supplier contact"
           setup_new_supplier_contact
         end
+
+        @new_supplier_contact.valid?
       end
 
     end

@@ -1,25 +1,27 @@
-<%= render :partial => 'spree/shared/error_messages', :locals => { :target => @supplier } %>
 <div data-hook="admin_supplier_form_fields">
   <div class="alpha eighteen columns omega">
-  
+    <h3>Fields with a * are required</h3>
+     
     <div class="eight columns alpha">
+      <%= render :partial => 'spree/shared/error_messages', :locals => { :target => @supplier } %>
       <fieldset data-hook="suppliers" class=" no-border-bottom">
         <legend align="center"><%= t(:supplier_details) %></legend>
         
-        
-
         <div data-hook="name" class="field">
           <%= f.label :name, t(:name) %>
+          <abbr title="required">*</abbr>
           <%= f.text_field :name, :class => 'fullwidth' %>
         </div>
 
         <div data-hook="abbreviation" class="field">
           <%= f.label :abbreviation, t(:vendor_code) %>
+          <abbr title="required">*</abbr>
           <%= f.text_field :abbreviation, :class => 'fullwidth' %>
         </div>
 
         <div data-hook="account_number" class="field">
           <%= f.label :account_number, t(:account_number) %>
+          <abbr title="required">*</abbr>
           <%= f.text_field :account_number, :class => 'fullwidth' %>
         </div>
 
@@ -30,6 +32,7 @@
         
         <div data-hook="email" class="field">
           <%= f.label :email, t(:email_address) %>
+          <abbr title="required">*</abbr>
           <%= f.text_field :email, :class => 'fullwidth' %>
         </div>
 
@@ -40,6 +43,7 @@
 
         <div data-hook="phone" class="field">
           <%= f.label :phone, t(:phone_number) %>
+            <abbr title="required">*</abbr>
           <%= f.text_field :phone, :class => 'fullwidth' %>
         </div>
 
@@ -52,8 +56,6 @@
           <%= f.label :comments, t(:comments) %>
           <%= f.text_area :comments, :class => 'fullwidth', :rows => 5, :cols => 20 %>
         </div>
-
-
 
         <div data-hook="intl_phone" class="field">
           <%= f.label :intl_phone, t(:international_phone_number) %>
@@ -94,14 +96,15 @@
 
         <div data-hook="country" class="field">
           <%= f.label :country, t(:country) %>
-          <%= f.collection_select :country, available_countries, :name, :name, {}, {:class => 'select2 fullwidth'} %>
+          <%= f.collection_select :country, available_countries, :name, :name, {prompt: "Select a country"}, {:class => 'select2 fullwidth'} %>
         </div>
 
       </fieldset>
     </div>
 
     <div class="eight columns omega">
-       <% unless @supplier.supplier_contacts.size == 0 %>
+      <%= render :partial => 'spree/shared/error_messages', :locals => { :target => @new_supplier_contact } %>
+      <% unless @supplier.supplier_contacts.size == 0 %>
         <fieldset data-hook="supplier-contacts" class=" no-border-bottom">
           <legend align="center"><%= t(:existing_contacts) %></legend>
 
@@ -122,6 +125,7 @@
 
           <div data-hook="supplier_contact_name" class="field">
             <%= sc.label :name, t(:name) %>
+            <abbr title="required">*</abbr>
             <%= sc.text_field :name, :class => 'fullwidth' %>
           </div>
 
@@ -132,6 +136,7 @@
 
           <div data-hook="supplier_contact_email" class="field">
             <%= sc.label :email, t(:email_address) %>
+            <abbr title="required">*</abbr>
             <%= sc.text_field :email, :class => 'fullwidth' %>
           </div>
 
@@ -174,7 +179,7 @@
 
           <div data-hook="supplier_contact_country" class="field">
             <%= sc.label :country, t(:country) %>
-            <%= sc.collection_select :country, available_countries, :name, :name, {}, {:class => 'select2 fullwidth'} %>
+            <%= sc.collection_select :country, available_countries, :name, :name, {prompt: "Select a country"}, {:class => 'select2 fullwidth'} %>
           </div>
 
         <% end  %>

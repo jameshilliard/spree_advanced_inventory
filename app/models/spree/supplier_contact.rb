@@ -3,13 +3,13 @@ class Spree::SupplierContact < ActiveRecord::Base
 
   attr_accessible :address1, :address2, :address3, :city, :country, :email, :fax, :job_title, :name, :phone, :state, :supplier, :url, :zip, :supplier_id
 
-  validates :email, :name, presence: true
+  validates :email, presence: { message: "for contact must be provided" }, unless: "name.blank?"
+  validates :name, presence: { message: "for contact must be provided" }, unless: "email.blank?"
 
   scope :eligible_for_select, lambda {
     where{
       (supplier.name != "") &
       (supplier.email != "") &
-      (supplier.phone != "") &
       (name != "") &
       (email != "")
     }.
@@ -19,5 +19,9 @@ class Spree::SupplierContact < ActiveRecord::Base
 
   def name_with_supplier
     "#{supplier.name} - #{name}"
+  end
+
+  def will_save?
+    attributes['name'].blank?
   end
 end

@@ -11,6 +11,24 @@ module Spree
         end
       end
 
+      def destroy
+        @supplier_contact = Spree::SupplierContact.find(params[:id])
+        @supplier = @supplier_contact.supplier
+        if @supplier.supplier_contacts.size > 1
+
+          if @supplier_contact.destroy
+            flash[:success] = "Contact removed"
+          else
+            flash[:notice] = "Could not remove that contact"
+          end
+
+        else
+          flash[:error] = "Cannot remove the last contact.  Please add a new one first."
+        end
+
+        redirect_to edit_admin_supplier_url(@supplier)
+      end
+
       def load_data
         @supplier_contact = (params[:id] ?
                              Spree::SupplierContact.find(params[:id]) :

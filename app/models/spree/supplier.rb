@@ -11,7 +11,8 @@ class Spree::Supplier < ActiveRecord::Base
     reject_if: proc { |attributes| attributes['name'].blank? }
 
   validates :account_number, :email, :name, :abbreviation, :phone, presence: true
-
+  validate :must_have_one_contact
+  validates_associated :supplier_contacts
 
   def to_s
     abbreviation ? abbreviation : name
@@ -29,4 +30,11 @@ class Spree::Supplier < ActiveRecord::Base
     zip
   end
 
+  def must_have_one_contact
+    if supplier_contacts.size == 0
+      errors.add(:supplier_contacts, "need at least one entry:")
+    else
+      true
+    end
+  end
 end
