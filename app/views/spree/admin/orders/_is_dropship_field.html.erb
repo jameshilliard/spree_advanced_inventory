@@ -1,4 +1,9 @@
-<% unless @order.is_quote or request.original_url =~ /new/ or request.xhr? or (@order.shipment_state and @order.shipment_state == "shipped") %>
+<% unless @order.is_quote or 
+     request.original_url =~ /new/ or 
+     request.xhr? or 
+     (@order.shipment_state and @order.shipment_state == "shipped") or
+     (@order.respond_to?(:picked_at) and @order.picked_at != nil)
+   %>
   <%= label_tag :is_dropship, "Dropship?" %>
   <br/>
   <%= select_tag 'order[is_dropship]', 
