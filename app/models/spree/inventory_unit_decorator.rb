@@ -46,7 +46,9 @@ Spree::InventoryUnit.class_eval do
 
     #create units if configured
     if Spree::Config[:create_inventory_units]
-      create_units(order, variant, sold, back_order)
+      Spree::InventoryUnit.transaction do
+        create_units(order, variant, sold, back_order)
+      end
     end
   end 
 
@@ -58,7 +60,9 @@ Spree::InventoryUnit.class_eval do
     end
 
     if Spree::Config[:create_inventory_units]
-      destroy_units(o, v, q)
+      Spree::InventoryUnit.transaction do
+        destroy_units(o, v, q)
+      end
     end
   end
   
