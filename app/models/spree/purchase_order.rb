@@ -306,7 +306,12 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   def send_completed_notice
     if not dropship and status_changed? and status == "Completed" and status_was != "Completed"
-      Spree::PurchaseOrderMailer.completed_notice(self).deliver
+      begin
+        Spree::PurchaseOrderMailer.completed_notice(self).deliver
+      rescue Exception => e
+        Rails.logger.error "*** Could not e-mail completion notice for #{number}"
+        Rails.logger.error "*** #{e.message}"
+      end
     end
   end
 end
