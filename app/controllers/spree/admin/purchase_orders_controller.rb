@@ -117,40 +117,40 @@ module Spree
         if request.put? or request.post?
           params[:purchase_order][:purchase_order_line_items_attributes].each do |k,line_item|
 
-            l = Spree::PurchaseOrderLineItem.where(purchase_order_id: @purchase_order.id,
-                                                   variant_id: line_item["variant_id"]).first
+            if line_item["variant_id"].to_i > 0
+              variant = Spree::Variant.find(line_item["variant_id"])
 
-            if l
-
-              if line_item["quantity"].to_i > 0 and not line_item["quantity"].blank?
-
-                l.update_attributes(quantity: line_item["quantity"],
-                                    comment: line_item["comment"],
-                                    price: line_item["price"])
-              else
-                l.destroy
-
+              if variant and line_item["price"].to_f == 0.0
+                line_item["price"] = variant.recent_price
               end
 
-            else
-              logger.info line_item.inspect
+              l = Spree::PurchaseOrderLineItem.where(purchase_order_id: @purchase_order.id,
+                                                     variant_id: line_item["variant_id"]).first
 
-              if not line_item["variant_id"].blank? and
-                not line_item["quantity"].blank? and 
-                line_item["variant_id"].to_i > 0 and
-                line_item["quantity"].to_i > 0 
-                
+              if l
+                if line_item["quantity"].to_i > 0 and not line_item["quantity"].blank?
+                  l.update_attributes(quantity: line_item["quantity"],
+                                      comment: line_item["comment"],
+                                      price: line_item["price"])
+                else
+                  l.destroy
 
-                Spree::PurchaseOrderLineItem.create(variant_id: line_item["variant_id"],
-                                                    purchase_order_id: @purchase_order.id,
-                                                    quantity: line_item["quantity"].to_i,
-                                                    comment: line_item["comment"],
-                                                    price: line_item["price"].to_f,
-                                                    user_id: spree_current_user.id)
+                end
+              else
+                if not line_item["variant_id"].blank? and
+                  not line_item["quantity"].blank? and 
+                  line_item["variant_id"].to_i > 0 and
+                  line_item["quantity"].to_i > 0 
+
+                  Spree::PurchaseOrderLineItem.create(variant_id: line_item["variant_id"],
+                                                      purchase_order_id: @purchase_order.id,
+                                                      quantity: line_item["quantity"].to_i,
+                                                      comment: line_item["comment"],
+                                                      price: line_item["price"].to_f,
+                                                      user_id: spree_current_user.id)
+                end
               end
             end
-
-
           end
 
           redirect_to edit_admin_purchase_order_path(@purchase_order.number)
