@@ -8,7 +8,7 @@ Spree::InventoryUnit.class_eval do
   end
 
   def self.reserved
-    joins(:order).where("spree_orders.payment_state = ? and spree_inventory_units.is_dropship = false and spree_inventory_units.is_quote = false and spree_inventory_units.state = ?", "balance_due", "sold")
+    joins(:order).where("(spree_orders.payment_state = ? or spree_orders.payment_state = ?)  and spree_inventory_units.is_dropship = false and spree_inventory_units.is_quote = false and spree_inventory_units.state = ?", "balance_due", "failed", "sold")
   end
 
   def set_stock_type
