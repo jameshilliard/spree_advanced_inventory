@@ -130,7 +130,7 @@
             <td class="align-center"><%= link_to purchase_order.number, edit_admin_purchase_order_path(purchase_order) %></td>
             <td class="small">
               <% if purchase_order.supplier %>
-                <%= link_to purchase_order.supplier, edit_admin_supplier_path(purchase_order.supplier), target: "_BLANK" %>
+                <%= link_to purchase_order.supplier, edit_admin_supplier_path(purchase_order.supplier) %>
               <% else %>
                 <%= purchase_order.supplier %>
               <% end %>
@@ -144,7 +144,7 @@
             <td class="align-center" class="small">
               <% if purchase_order.orders and purchase_order.orders.size > 0 %>
                 <% purchase_order.orders.each do |o| %>
-                  <%= link_to o.number, admin_order_url(o), target: "_NEW" %><br/>
+                  <%= link_to o.number, admin_order_url(o) %><br/>
                 <% end %>
               <% else %>
                  None
@@ -197,7 +197,6 @@
                                       admin_purchase_order_submit_path(purchase_order) + ".#{purchase_order.hardcopy_extension}", 
                                       no_text: true, 
                                       style: "margin-bottom: 4px",
-                                      target: "_NEW",
                                       confirm: "E-mail invoice to #{purchase_order.supplier.email} and then view #{purchase_order.hardcopy_extension.upcase}?")  %>
               <% end %>
                           
@@ -205,7 +204,6 @@
                                     "Download #{purchase_order.hardcopy_extension.upcase}", 
                                     admin_purchase_order_path(id: purchase_order.number, format:  purchase_order.hardcopy_extension), 
                                     style: "margin-bottom: 4px",
-                                    target: "_NEW",
                                     no_text: true)  %>
               <br/>
             </td>

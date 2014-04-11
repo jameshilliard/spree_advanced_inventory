@@ -81,7 +81,7 @@
 
           <td>
             <% if not supplier.url.blank? %>
-              <%= link_to supplier.name, supplier.url, target: "_NEW" %>
+              <%= link_to supplier.name, supplier.url %>
             <% else %>
               <%= supplier.name %>
             <% end %>
