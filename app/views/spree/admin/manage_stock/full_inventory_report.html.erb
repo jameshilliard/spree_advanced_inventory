@@ -15,7 +15,7 @@
     <strong><%= link_to "ALL", admin_full_inventory_report_url  %></strong>
     
     <% ("a".."z").each do |l| %>
-      <%= link_to l.upcase, admin_full_inventory_report_url + "?first_letter=#{l}" %>&nbsp;
+      <%= link_to l.upcase, admin_full_inventory_report_url + "?first_letter=#{l}&hide_backorders=#{params[:hide_backorders]}&disable_payment_captures=#{params[:disable_payment_captures]}" %>&nbsp;
     <% end %>
 
     <br/>
@@ -23,6 +23,7 @@
     <%= form_tag admin_full_inventory_report_path, {method: "GET"} do %>
       <%= text_field_tag :sku, params[:sku], size: 16, placeholder: "Search by SKU" %>
       <label><%= check_box_tag :hide_backorders, true, params[:hide_backorders] %> Hide backorders?</label>
+      <label><%= check_box_tag :disable_payment_captures, true, params[:disable_payment_captures] %> Disable payment capturing?</label>
       <%= hidden_field_tag :first_letter, params[:first_letter] %>
       <%= hidden_field_tag :page, params[:page] %>
       <%= submit_tag "Go" %>

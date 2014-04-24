@@ -1,4 +1,5 @@
 Spree::AppConfiguration.class_eval do
+  preference :advanced_inventory_disable_payment_captures, :string
   preference :advanced_inventory_office_address1, :string
   preference :advanced_inventory_office_address2, :string
   preference :advanced_inventory_office_company, :string

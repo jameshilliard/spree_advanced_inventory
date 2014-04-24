@@ -22,7 +22,16 @@ module Spree
 
         end
 
+        if params[:disable_payment_captures] == "true"
+          Spree::Config.advanced_inventory_disable_payment_captures = "true"
+        else
+          params.delete(:disable_payment_captures)
+          Spree::Config.advanced_inventory_disable_payment_captures = "false"
+        end
 
+        if params[:hide_backorders] and params[:hide_backorders] != "true"
+          params.delete(:hide_backorders)
+        end
         render layout: false
       end
 
