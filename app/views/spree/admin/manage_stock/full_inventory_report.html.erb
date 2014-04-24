@@ -12,7 +12,7 @@
   <body>
 
   <div style="font-size: 1.4em; margin: 0 auto; text-align: center; width: 100%;">
-    <strong><%= link_to "ALL", admin_full_inventory_report_url  %></strong>
+    <strong><%= link_to "ALL", admin_full_inventory_report_url + "?hide_backorders=#{params[:hide_backorders]}&disable_payment_captures=#{params[:disable_payment_captures]}" %></strong>
     
     <% ("a".."z").each do |l| %>
       <%= link_to l.upcase, admin_full_inventory_report_url + "?first_letter=#{l}&hide_backorders=#{params[:hide_backorders]}&disable_payment_captures=#{params[:disable_payment_captures]}" %>&nbsp;
@@ -113,10 +113,10 @@
         <% end %>
       <% end %>
       <tr>
-        <td colspan='3'>&nbsp;</td>
-        <td colspan='2' align='right'><%= Spree::Money.new(queue_total) %></td>
+        <td colspan='4'>&nbsp;</td>
+        <td align='center'><%= Spree::Money.new(queue_total) %></td>
         <td align='center' style='border-left: 1px #fff solid;'><%= Spree::Money.new(reserve_total) %></td>
-        <td colspan='2' align='center' style='border-left: 1px #fff solid;'><%= Spree::Money.new(available_total) %></td>
+        <td colspan='2' align='left' style='border-left: 1px #fff solid;'><%= Spree::Money.new(available_total) %></td>
         <td colspan='2' align="right"><strong><%= Spree::Money.new(reserve_total + available_total) %></strong></td>
       </tr>
   </table>
