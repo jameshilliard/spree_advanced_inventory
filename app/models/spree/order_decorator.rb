@@ -140,7 +140,7 @@ Spree::Order.class_eval do
 
     # Our app allows payment capturing to be turned off so we check if that support
     # exists first and if it does we test if payments could be captured
-    if not responds_to?(:can_capture_payments) or can_capture_payments
+    if not respond_to?(:can_capture_payments?) or can_capture_payments?
       if (cc_total.to_f + non_cc_total.to_f) == total.to_f
         pending_payments.each do |p|
           begin
@@ -153,12 +153,14 @@ Spree::Order.class_eval do
       else
         unless payment_state == "paid"
           update_staff_comments("Payment totals did not match order total")
+          self.save
         end
       end
     else
       # Payment captures can be disabled and are currently not possible so store
       # the reason why in the staff comments
       update_staff_comments("Could not auto capture payment #{no_payment_capture_reason}")
+      self.save
     end
   end
 
