@@ -138,19 +138,27 @@ Spree::Order.class_eval do
     cc_total = pending_credit_card_payment_total
     non_cc_total = pending_check_payment_total
 
-    if (cc_total.to_f + non_cc_total.to_f) == total.to_f
-      pending_payments.each do |p|
-        begin
-          p.capture!
-          p.save
-        rescue Spree::Core::GatewayError => ge
-          update_staff_comments(ge.message)
+    # Our app allows payment capturing to be turned off so we check if that support
+    # exists first and if it does we test if payments could be captured
+    if not responds_to?(:can_capture_payments) or can_capture_payments
+      if (cc_total.to_f + non_cc_total.to_f) == total.to_f
+        pending_payments.each do |p|
+          begin
+            p.capture!
+            p.save
+          rescue Spree::Core::GatewayError => ge
+            update_staff_comments(ge.message)
+          end
+        end
+      else
+        unless payment_state == "paid"
+          update_staff_comments("Payment totals did not match order total")
         end
       end
     else
-      unless payment_state == "paid"
-        update_staff_comments("Payment totals did not match order total")
-      end
+      # Payment captures can be disabled and are currently not possible so store
+      # the reason why in the staff comments
+      update_staff_comments("Could not auto capture payment #{no_payment_capture_reason}")
     end
   end
 
