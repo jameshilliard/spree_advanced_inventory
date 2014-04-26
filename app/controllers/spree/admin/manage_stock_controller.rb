@@ -9,6 +9,75 @@ module Spree
 
       end
 
+      def update_by_sku
+        @inventory = nil
+        @variant = nil
+        @product = nil
+
+        if request.post?
+          if params[:sku] and params[:sku].size > 0
+            @variant = Spree::Variant.where(sku: params[:sku]).first
+
+            if @variant
+              if not @variant.cost_price
+                @variant.cost_price = @variant.recent_price || 0.0
+              end
+              @product = @variant.product
+              @total_reserved = @variant.inventory_units.reserved.size
+              @total_queued = @variant.inventory_units.queued.size
+
+              if params[:section]
+                @variant.section = params[:section]
+              end
+
+              if params[:cost_price]
+                @variant.cost_price = params[:cost_price]
+              end
+              
+              if params[:total_on_hand]
+                updated_count = params[:total_on_hand].to_i - @total_reserved
+                if updated_count >= 0
+                  @variant.count_on_hand = updated_count
+                else
+                  flash[:error] = "TOTAL STOCK minus RESERVED STOCK must not be a negative number"
+                end
+              end
+              @total_on_hand =  @total_reserved + (@variant.count_on_hand > 0 ? @variant.count_on_hand : 0)
+
+              if @variant.changed? and params[:commit] == "Save"
+                if @variant.save
+                  flash[:success] = "#{@product.name.split(":").first} #{@variant.options_text.split(":").last} updated"
+                else
+                  flash[:error] = @variant.errors.full_messages.join("<br/>")
+                end
+              end
+            end
+          end
+          
+          if params[:disable_payment_captures] == "true"
+            Spree::Config.advanced_inventory_disable_payment_captures = "true"
+            @select_disabled = true
+            @select_enabled = false
+          else
+            Spree::Config.advanced_inventory_disable_payment_captures = "false"
+            @select_disabled = false
+            @select_enabled = true
+          end
+        else
+
+          if Spree::Config.advanced_inventory_disable_payment_captures == "true"
+            params[:disable_payment_captures] = "true"
+            @select_disabled = true
+            @select_enabled = false
+          else
+            params[:disable_payment_captures] = "false"
+            @select_disabled = false
+            @select_enabled = true
+          end
+        end
+        render layout: false
+      end
+
       def full_inventory_report
         @inventory = Spree::FullInventory.where{ (count_on_hand != 0) | (reserved_units != 0)}.order("title asc, sku asc")
 

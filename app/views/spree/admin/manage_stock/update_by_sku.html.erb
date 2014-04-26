@@ -1,0 +1,118 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+    <title>Inventory Update<%= @variant ? " - #{@variant.sku} - #{@product.name}" : "" %></title> 
+    <style>
+      table.barby-barcode { border-spacing: 0; width: 230px; height: 40px; }
+      tr.barby-row {}
+      td.barby-cell { width: 3px; height: 3px; }
+      td.barby-cell.on { background: #000; }
+    </style>
+  </head>
+  <body>
+  <%= form_tag admin_update_by_sku_path, id: "update-sku-form", method: "post"  do %>
+    <center>
+      <fieldset data-role="controlgroup" data-type="horizontal">
+        <legend>Payment capture:</legend>
+        <%= radio_button_tag :disable_payment_captures, "true", @select_disabled %>
+        <%= label_tag :disable_payment_captures_true, "Disabled" %>
+        <%= radio_button_tag :disable_payment_captures, "false", @select_enabled %>
+        <%= label_tag :disable_payment_captures_false, "Enabled" %>        
+      </fieldset>
+    </center>
+    <%= text_field_tag :sku, params[:sku], placeholder: "Search by SKU", "data-clear-btn" => "true" %>
+    <script>
+      $(document).ready(function(){ 
+        $('input[type=text]').click(function() {
+            $(this).select();
+        });
+        setTimeout(function(){$("#sku").focus();}, 500);
+      });
+    </script>    
+    <%= submit_tag "Search" %>
+    <br/>
+    <br/>
+    <% if @variant %>
+      <h1 class="ui-bar ui-bar-a ui-corner-all">
+        <% if @product.images and @product.master_images %>
+          <%= mini_image(@product, align: "top", hspace: "10", width: 80) %>
+        <% end %>
+        <%= @product.name.split(":").first %>
+        &mdash; 
+        <%= @variant.options_text %>
+      </h1>
+ 
+      <% if flash[:error] %>
+        <script>
+$( "<div class='ui-body ui-body-a ui-corner-all error'><h1><%= flash[:error] %></h1></div>" )
+  .css({ "display": "block", "opacity": 0.96, "background-color": "#990000", "color": "#efefef", "z-index": "3", "text-shadow": "0 !important" })
+  .appendTo( $.mobile.pageContainer )
+  .delay( 2000 )
+  .fadeOut( 4000, function() {
+    $( this ).remove();
+  });
+        </script>
+      <% elsif flash[:success] %>
+        <script>
+$( "<div class='ui-body ui-body-a ui-corner-all success'><h1><%= flash[:success] %></h1></div>" )
+  .css({ "display": "block", "opacity": 0.96, "background-color": "#009900", "color": "#efefef", "z-index": "3", "text-shadow": "0 !important" })
+  .appendTo( $.mobile.pageContainer )
+  .delay( 2000 )
+  .fadeOut( 4000, function() {
+    $( this ).remove();
+  });
+        </script>
+
+      <% end %>
+
+       <div class="ui-body ui-body-a ui-corner-all">
+        <center>
+          <fieldset data-role="controlgroup" data-type="horizontal">
+            <legend>Inventory Section</legend>
+            <% 1.upto(8) do |i| %>
+              <%= radio_button_tag "section", i, @variant.section == i %>
+              <%= label_tag "section_#{i}", i %>
+            <% end %>
+          </fieldset>
+
+        <br/>
+        <br/>
+        <div class="ui-grid-a">
+          <div class="ui-block-a"><div class="ui-bar ui-bar-a">
+            <%= number_field_tag "total_on_hand", @total_on_hand, "data-clear-btn" => "true" %>
+            <%= label_tag "total_on_hand", "Total stock counted" %>
+          </div></div>
+          <div class="ui-block-b"><div class="ui-bar ui-bar-a">
+            <%= text_field_tag "cost_price", @variant.cost_price, placeholder: "Our cost", "data-clear-btn" => "true" %>
+            <%= label_tag "cost_price", "Our cost" %>
+          </div></div>
+        </div>
+        <br/>
+        <br/>
+        <%= submit_tag "Save" %>
+        <br/>
+        <br/>
+        <div class="ui-grid-a">
+          <div class="ui-block-a"><div class="ui-bar ui-bar-a">
+              <%= @variant.count_on_hand > 0 ? @variant.count_on_hand : 0 %> available to order<br/>
+              <%= link_to "#{@total_reserved} allocated to unpaid orders (reserved)", url_for_reserved_order_search(@variant), target: "_NEW" %>
+              <%= link_to "#{@total_queued} allocated to paid orders (queued)", url_for_queued_order_search(@variant), target: "_NEW"%>
+
+          </div></div>
+          <% if @total_on_hand and @variant.cost_price %>
+            <div class="ui-block-b"><div class="ui-bar ui-bar-a">
+                <strong>Cost for <%= @total_on_hand %> units<br/><%= Spree::Money.new(@total_on_hand * @variant.cost_price) %></strong>
+            </div></div>
+          <% end %>
+        </div>
+      </center>
+      </div> 
+    <% end %>
+  <% end %>
+
+  </body>
+</html>

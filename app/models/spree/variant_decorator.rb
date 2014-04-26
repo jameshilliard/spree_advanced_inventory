@@ -4,7 +4,7 @@ Spree::Variant.class_eval do
   # C => Consignment
   # B => Buyback
 
-  attr_accessible :stock_type
+  attr_accessible :stock_type, :section
 
   before_validation :ensure_sku_stock_type
 
