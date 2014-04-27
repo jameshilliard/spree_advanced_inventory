@@ -106,6 +106,10 @@ $( "<div class='ui-body ui-body-a ui-corner-all success'><h1><%= flash[:success]
           <% if @total_on_hand and @variant.cost_price %>
             <div class="ui-block-b"><div class="ui-bar ui-bar-a">
                 <strong>Cost for <%= @total_on_hand %> units<br/><%= Spree::Money.new(@total_on_hand * @variant.cost_price) %></strong>
+                <br/>
+                <br/>
+                Recent PO history:<br/>
+                <%= recent_price_history(@variant).gsub(/\n/, "<br/>").html_safe %>
             </div></div>
           <% end %>
         </div>
