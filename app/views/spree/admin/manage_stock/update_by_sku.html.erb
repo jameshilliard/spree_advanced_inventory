@@ -37,17 +37,15 @@
   <% end %>
 
   <%= form_tag admin_update_sku_path, id: "update-sku-form", method: "post"  do %>
-    <br/>
-    <br/>
     <% if @variant %>
-      <h1 class="ui-bar ui-bar-a ui-corner-all">
+      <h4 class="ui-bar ui-bar-a ui-corner-all">
         <% if @product.images and @product.master_images %>
-          <%= mini_image(@product, align: "top", hspace: "10", width: 80) %>
+          <%= mini_image(@product, align: "left", valign: "middle", hspace: "10", width: 50) %>
         <% end %>
         <%= @product.name.split(":").first %>
-        &mdash; 
+        <br/>
         <%= @variant.options_text %>
-      </h1>
+      </h4>
  
       <% if flash[:error] %>
         <script>

@@ -34,8 +34,11 @@ module Spree
 
         if params[:variant_id]
           @variant = Spree::Variant.find(params[:variant_id])
+
         elsif params[:sku] and params[:sku].size > 0
-          @variant = Spree::Variant.where(sku: params[:sku]).first
+          sku_search = params[:sku] # Squeel is strange about searching directly with params
+          @variant = Spree::Variant.where{(sku == sku_search) & (deleted_at == nil) & (is_master == false)}.first
+
         end
         
         if @variant
@@ -47,6 +50,8 @@ module Spree
           @total_reserved = @variant.inventory_units.reserved.size
           @total_queued = @variant.inventory_units.queued.size
           @total_on_hand =  @total_reserved + (@variant.count_on_hand > 0 ? @variant.count_on_hand : 0)
+          
+          @variant.update_column(:last_scanned_at, Time.new)
         end
 
       end
@@ -91,6 +96,26 @@ module Spree
         render layout: false
       end
 
+      def last_scanned_at
+        @last_scanned_at = Time.new
+        @variants = nil
+
+        if params[:last_scan_date]
+          last_scanned = @last_scanned_at = Time.parse(params[:last_scan_date].gsub(/\//, "-") + " 12:00:00")
+          logger.info "\n\n*** #{@last_scanned_at}\n"
+          @variants = Spree::Variant.where{(last_scanned_at != nil) & 
+                                           (last_scanned_at >= last_scanned)}
+        else
+          @variants = Spree::Variant.where{(last_scanned_at == nil) & ((count_on_hand > 0) | (count_on_hand < 0))}
+        end
+
+        @variants = @variants.where{(is_master == false) &
+                                    (deleted_at == nil)}.
+        joins(:product).
+        select("spree_variants.*, spree_products.name, spree_products.permalink").
+        order("spree_products.name asc")
+      end
+
       def full_inventory_report
         @inventory = Spree::FullInventory.where{ (count_on_hand != 0) | (reserved_units != 0)}.order("title asc, sku asc")
 
@@ -102,6 +127,10 @@ module Spree
             @inventory = @inventory.where{(title =~ "#{l}%")}
           end
 
+        end
+
+        if not params[:disable_payment_captures]
+          params[:disable_payment_captures] = Spree::Config.advanced_inventory_disable_payment_captures
         end
 
         if params[:disable_payment_captures] == "true"

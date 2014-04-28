@@ -34,6 +34,9 @@ Spree::Core::Engine.routes.draw do
     get 'manage_stock/update_by_sku' => 'manage_stock#update_by_sku', 
       as: 'update_by_sku'
     
+    get 'manage_stock/last_scanned_at' => 'manage_stock#last_scanned_at', 
+      as: 'last_scanned_at'
+    
     post 'manage_stock/update_sku' => 'manage_stock#update_sku', 
       as: 'update_sku'
 
