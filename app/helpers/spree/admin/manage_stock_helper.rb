@@ -11,11 +11,11 @@ module Spree
       end
 
       def url_for_reserved_order_search(variant)
-        admin_orders_path + "?q[variants_sku_cont]=#{variant.sku}&q[shipment_state_not_eq]=shipped&q[payment_state_not_eq]=paid"
+        admin_orders_path + "?q[variants_sku_cont]=#{variant.sku}&q[shipment_state_not_eq]=shipped&q[payment_state_not_eq]=paid&q[is_dropship_eq]=false"
       end
 
       def url_for_queued_order_search(variant)
-        admin_orders_path + "?q[variants_sku_cont]=#{variant.sku}&q[shipment_state_not_eq]=shipped&q[payment_state_eq]=paid"
+        admin_orders_path + "?q[variants_sku_cont]=#{variant.sku}&q[shipment_state_not_eq]=shipped&q[payment_state_eq]=paid&q[is_dropship_eq]=false"
       end
       
       def recent_price_history(variant)
