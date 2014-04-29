@@ -39,14 +39,14 @@ module Spree
         elsif params[:sku] and params[:sku].size > 0
           params[:sku].gsub!(/\D/,"")
 
-          if params[:sku].size == 16 and params[:sku] =~ /^011/
-            params[:sku] = params[:sku][3..16]
-          elsif params[:sku].size == 10
+          if params[:sku].size == 10 
             i = Lisbn.new(params[:sku])
 
             if i.valid?
               params[:sku] = i.isbn13
             end
+          elsif params[:sku].size != 13
+            params[:sku] = ean_barcode_to_isbn13(params[:sku])
           end
 
           sku_search = params[:sku] # Squeel is strange about searching directly with params
@@ -114,6 +114,41 @@ module Spree
         end
 
         render layout: false
+      end
+
+      def ean_barcode_to_isbn13(s)
+        s.gsub!(/^011978/, "")
+        s.gsub!(/^01978/, "")
+
+        s = s[0..(s.size - 2)]
+
+        if s.size == 9
+          isbn10 = ""
+          check = 0
+          counter = 1
+
+          s.scan(/\w/).each do |d|
+            isbn10 += "#{d}"
+            check += d.to_i * counter
+            counter += 1
+          end
+
+          check = check % 11
+
+          if check == 10
+            check = "X"
+          end
+
+          isbn10 += "#{check}"
+          s = Lisbn.new(isbn10)
+          if s.valid?
+            s.isbn13
+          else
+            nil
+          end
+        else
+          nil
+        end
       end
 
       def last_scanned_at
