@@ -8,5 +8,6 @@ gem 'spree_print_invoice', github: "zkarpinski/spree_print_invoice", branch: 'lo
 gem 'has_barcode'
 gem 'barby'
 gem 'pry'
+gem 'lisbn'
 
 gemspec
