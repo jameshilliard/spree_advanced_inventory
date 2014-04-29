@@ -4,6 +4,7 @@ module Spree
       require 'barby'
       require 'barby/barcode/bookland'
       require 'barby/outputter/html_outputter'
+      require 'lisbn'
 
       before_filter :load_variant_from_sku, only: [:update_by_sku, :update_sku]
 
@@ -36,6 +37,18 @@ module Spree
           @variant = Spree::Variant.find(params[:variant_id])
 
         elsif params[:sku] and params[:sku].size > 0
+          params[:sku].gsub!(/\D/,"")
+
+          if params[:sku].size == 16 and params[:sku] =~ /^011/
+            params[:sku] = params[:sku][3..16]
+          elsif params[:sku].size == 10
+            i = Lisbn.new(params[:sku])
+
+            if i.valid?
+              params[:sku] = i.isbn13
+            end
+          end
+
           sku_search = params[:sku] # Squeel is strange about searching directly with params
           @variant = Spree::Variant.where{(sku == sku_search) & (deleted_at == nil) & (is_master == false)}.first
 
@@ -50,6 +63,11 @@ module Spree
           @total_reserved = @variant.inventory_units.reserved.size
           @total_queued = @variant.inventory_units.queued.size
           @total_on_hand =  @total_reserved + (@variant.count_on_hand > 0 ? @variant.count_on_hand : 0)
+          @backordered = 0
+
+          if @variant.count_on_hand < 0
+            @backordered = @variant.count_on_hand.abs
+          end
           
           @variant.update_column(:last_scanned_at, Time.new)
         end
@@ -67,10 +85,12 @@ module Spree
         
         if params[:total_on_hand]
           updated_count = params[:total_on_hand].to_i - @total_reserved
-          if updated_count >= 0
+          if updated_count >= 0 and @variant.count_on_hand >= 0
             @variant.count_on_hand = updated_count
-          else
+          elsif updated_count < 0
             flash[:error] = "TOTAL STOCK minus RESERVED STOCK must not be a negative number"
+          elsif @variant.count_on_hand < 0 
+            flash[:error] = "Cannot update backordered variants (hint: receive inventory normally)"
           end
         end
 

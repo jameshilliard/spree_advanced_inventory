@@ -40,17 +40,21 @@
     <% if @variant %>
       <h4 class="ui-bar ui-bar-a ui-corner-all">
         <% if @product.images and @product.master_images %>
-          <%= mini_image(@product, align: "left", valign: "middle", hspace: "10", width: 50) %>
+          <%= link_to("#{mini_image(@product, align: "left", valign: "middle", hspace: "10", width: 50)} 
+                      #{@product.name.split(":").first} &ndash;
+                      #{@variant.options_text}
+                      ".html_safe, 
+                      edit_admin_product_variant_url(@product,@variant), target: "_NEW") %>
+        <% else %>
+          <%= link_to @product.name.split(":").first, edit_admin_product_variant_url(@product, @variant) %>
+
         <% end %>
-        <%= @product.name.split(":").first %>
-        <br/>
-        <%= @variant.options_text %>
       </h4>
  
       <% if flash[:error] %>
         <script>
 $( "<div class='ui-body ui-body-a ui-corner-all error'><h1><%= flash[:error] %></h1></div>" )
-  .css({ "display": "block", "opacity": 0.96, "background-color": "#990000", "color": "#efefef", "z-index": "3", "text-shadow": "0 !important" })
+  .css({ "display": "block", "opacity": 0.96, "background-color": "#990000", "color": "#ffffff", "z-index": "3", "text-shadow": "0 !important" })
   .appendTo( $.mobile.pageContainer )
   .delay( 2000 )
   .fadeOut( 4000, function() {
@@ -60,7 +64,7 @@ $( "<div class='ui-body ui-body-a ui-corner-all error'><h1><%= flash[:error] %><
       <% elsif flash[:success] %>
         <script>
 $( "<div class='ui-body ui-body-a ui-corner-all success'><h1><%= flash[:success] %></h1></div>" )
-  .css({ "display": "block", "opacity": 0.96, "background-color": "#009900", "color": "#efefef", "z-index": "3", "text-shadow": "0 !important" })
+  .css({ "display": "block", "opacity": 0.96, "background-color": "#009900", "color": "#ffffff", "z-index": "3", "text-shadow": "0 !important" })
   .appendTo( $.mobile.pageContainer )
   .delay( 2000 )
   .fadeOut( 4000, function() {
@@ -101,6 +105,9 @@ $( "<div class='ui-body ui-body-a ui-corner-all success'><h1><%= flash[:success]
         <div class="ui-grid-a">
           <div class="ui-block-a"><div class="ui-bar ui-bar-a">
               <%= @variant.count_on_hand > 0 ? @variant.count_on_hand : 0 %> available to order<br/>
+              <% if @backordered > 0 %>
+                <%= link_to "#{@backordered} units on backorder", url_for_backordered_order_search(@variant), target: "_NEW" %>
+              <% end %>
               <%= link_to "#{@total_reserved} allocated to unpaid orders (reserved)", url_for_reserved_order_search(@variant), target: "_NEW" %>
               <%= link_to "#{@total_queued} allocated to paid orders (queued)", url_for_queued_order_search(@variant), target: "_NEW"%>
 
