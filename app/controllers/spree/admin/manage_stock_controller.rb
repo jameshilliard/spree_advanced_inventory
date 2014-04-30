@@ -156,10 +156,9 @@ module Spree
         @variants = nil
 
         if params[:last_scan_date]
-          last_scanned = @last_scanned_at = Time.parse(params[:last_scan_date].gsub(/\//, "-") + " 12:00:00")
-          logger.info "\n\n*** #{@last_scanned_at}\n"
+          last_scanned = @last_scanned_at = Time.parse(params[:last_scan_date].gsub(/\//, "-") + " 00:00:00")
           @variants = Spree::Variant.where{(last_scanned_at != nil) & 
-                                           (last_scanned_at >= last_scanned)}
+                                           (last_scanned_at < last_scanned)}
         else
           @variants = Spree::Variant.where{(last_scanned_at == nil) & ((count_on_hand > 0) | (count_on_hand < 0))}
         end

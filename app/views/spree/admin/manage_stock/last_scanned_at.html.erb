@@ -9,7 +9,7 @@
   .inventory-row { padding: 4px 0px; }
 </style>
 <%= form_tag admin_last_scanned_at_path, {method: "GET"} do %>
-  <%= text_field_tag :last_scan_date, params[:last_scan_date], placeholder: "Date last scanned", class: "datepicker datepicker_from", size: 20 %>
+  <%= text_field_tag :last_scan_date, params[:last_scan_date], placeholder: "Show books not scanned after this date", class: "datepicker datepicker_from", size: 50 %>
   <%= submit_tag "Filter" %>
   &nbsp;
   <%= link_to "Reset", admin_last_scanned_at_path %>
@@ -17,7 +17,7 @@
 <br/>
 <h3>Showing
 <% if params[:last_scan_date] %>
-  inventory scanned on/after <%= @last_scanned_at.strftime("%m/%d/%Y") %>
+  not scanned since <%= @last_scanned_at.strftime("%m/%d/%Y") %>
 <% else %>
   unscanned inventory
 <% end %>
