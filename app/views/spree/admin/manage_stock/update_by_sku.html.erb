@@ -81,7 +81,7 @@
             <center>
               <fieldset data-role="controlgroup" data-type="horizontal">
                 <legend>Inventory Section</legend>
-                <% 1.upto(8) do |i| %>
+                <% 1.upto(10) do |i| %>
                   <%= radio_button_tag "section", i, @variant.section == i %>
                   <%= label_tag "section_#{i}", i %>
                 <% end %>
