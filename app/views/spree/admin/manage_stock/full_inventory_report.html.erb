@@ -96,7 +96,7 @@
             </td>
             <td align="center"><%= Spree::Money.new(line_total) %></td>
           </tr>
-          <tr bgcolor="#ffffff" valign="top">
+          <tr bgcolor="#ffffff" valign="middle">
             <td colspan='2'>
 
               <% begin %>
@@ -106,8 +106,16 @@
                 <!-- No barcode available -->
               <% end %>
             </td>
-            <td colspan='8'>
-              &nbsp;
+            <td colspan='8' align='center'>
+              <% if i.last_scanned_at %>
+                <% if i.last_scanned_at < 31.days.ago %>
+                  <em><%= i.last_scanned_at.strftime("%m/%d/%Y") %></em>
+                <% else %> 
+                  <%= i.last_scanned_at.strftime("%m/%d %l:%M %P") %>
+                <% end  %>
+              <% else %>
+                <em>Unscanned</em>
+              <% end %>
             </td>
           </tr>
         <% end %>
