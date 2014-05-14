@@ -5,6 +5,7 @@ Spree::Variant.class_eval do
   # B => Buyback
 
   attr_accessible :stock_type, :section, :last_scanned_at
+  attr_accessor :best_unit_price
 
   before_validation :ensure_sku_stock_type
 
@@ -87,25 +88,32 @@ Spree::Variant.class_eval do
     return l.first
   end
 
-  def recent_price
-    p = 0.0
+  def weighted_average_cost
+    unless @best_unit_price 
+      rp = last_n_purchase_order_line_items(30)
+      rp_count = rp.size
 
-    rp = last_n_purchase_order_line_items(30)
+      if rp_count > 0
+        if rp_count > 1
+          p = purchase_order_line_items.where{(price != nil) & (price > 0.0)}.select("sum(price * quantity) / sum(quantity) as wavco").first.wavco.to_f
+        else
+          p = rp.first.price.to_f
+        end
 
-    if rp and rp.size == 1
-      p = rp.first.price.to_f
+      elsif cost_price and cost_price > 0.0
+        p = cost_price.to_f
 
-    elsif rp and rp.size > 0
-      p = rp.sum(:price).to_f / rp.size
+      end
 
-    elsif cost_price and cost_price > 0.0
-      p = cost_price.to_f
-
+      @best_unit_price = sprintf("%0.2f", p).to_f
     end
 
-    p = sprintf("%0.2f", p).to_f
+    return @best_unit_price
+  end
 
-    return p
+  # Will deprecate this inaccurately named method
+  def recent_price
+    weighted_average_cost
   end
 
   def increment!(attribute, by = 1)
