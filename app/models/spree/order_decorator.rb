@@ -166,7 +166,8 @@ Spree::Order.class_eval do
 
   def update_staff_comments(comment)
     if respond_to?(:staff_comments)
-      comment = "* Autopay problem: #{comment} on #{Time.new("%m/%d %l:%M %P")}"
+      t = Time.current.strftime("%m/%d %l:%M %P")
+      comment = "* Autopay problem: #{comment} on #{t}"
       update_attributes_without_callbacks({ :staff_comments => "#{staff_comments}\n#{comment}\n" })
     end
   end
