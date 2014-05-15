@@ -90,6 +90,7 @@ Spree::Variant.class_eval do
 
   def weighted_average_cost
     unless @best_unit_price 
+      p = 0.0
       rp = last_n_purchase_order_line_items(30)
       rp_count = rp.size
 
@@ -97,10 +98,14 @@ Spree::Variant.class_eval do
         if rp_count > 1
           p = purchase_order_line_items.where{(price != nil) & (price > 0.0)}.select("sum(price * quantity) / sum(quantity) as wavco").first.wavco.to_f
         else
-          p = rp.first.price.to_f
+          line_item = rp.first
+
+          if line_item and line_item.price
+            p = line_item.price.to_f
+          end
         end
 
-      elsif cost_price and cost_price > 0.0
+      elsif cost_price != nil and cost_price.to_f > 0.0
         p = cost_price.to_f
 
       end
