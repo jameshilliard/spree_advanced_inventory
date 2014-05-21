@@ -12,7 +12,7 @@ module Spree
         @suppliers = @search.result.includes([:supplier_contacts]).
           page(params[:page]).
           per(params[:per_page] || Spree::Config[:orders_per_page]).
-          order("name asc")
+          order("spree_suppliers.name asc")
 
         respond_with(@suppliers)        
       end
