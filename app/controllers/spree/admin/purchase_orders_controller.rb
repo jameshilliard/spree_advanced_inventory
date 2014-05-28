@@ -108,7 +108,7 @@ module Spree
         
         total_line_items = @purchase_order.purchase_order_line_items ? @purchase_order.purchase_order_line_items.size : 0
 
-        @line_item_limit = 10 - total_line_items
+        @line_item_limit = 20 - total_line_items
 
         1.upto(@line_item_limit).each do |num|
           @purchase_order.purchase_order_line_items.build

@@ -5,6 +5,25 @@ Spree::Order.class_eval do
 
   before_save :dropship_conversion
   before_validation :empty_nil_slug
+  validate :check_is_dropship
+  
+  HUMANIZED_ATTRIBUTES = {
+    :is_dropship => "Dropship"
+  }
+
+  def self.human_attribute_name(attr, options={})
+    HUMANIZED_ATTRIBUTES[attr.to_sym] || super
+  end
+
+  def check_is_dropship
+    if is_dropship and has_normal_purchase_orders
+      errors.add(:is_dropship, "cannot be Yes while this order is associated with regular POs")
+    end 
+  end
+
+  def has_normal_purchase_orders
+    purchase_orders.where(dropship: false).size > 0 ? true : false
+  end
 
   def to_select
     value = "#{number} - From: #{email} - $#{total}"
