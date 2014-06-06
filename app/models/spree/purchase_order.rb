@@ -208,7 +208,11 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     end
 
     # This changes on hand to reflect the above inventory units being sold
-    if qty_adjust > 0
+    if qty_adjust > 0 and v.count_on_hand < 0
+      if v.respond_to?(:reason)
+        v.reason = "Received #{qty_adjust} units from PO #{number} for order #{o.number}"
+      end
+
       v.count_on_hand = v.count_on_hand + qty_adjust
       v.save
     end
@@ -219,6 +223,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   def stock_remaining_units(variant, qty)
     # Any remaining quantity should be received normally
     if qty > 0 
+      if variant.respond_to?(:reason)
+        variant.reason = "Received #{qty} units from PO #{number}"
+      end
+
       variant.receive(qty)
     end
   end

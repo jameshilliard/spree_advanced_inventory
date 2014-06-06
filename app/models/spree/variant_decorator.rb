@@ -121,24 +121,6 @@ Spree::Variant.class_eval do
     weighted_average_cost
   end
 
-  def increment!(attribute, by = 1)
-    Spree::Variant.transaction do
-      raise ArgumentError("Invalid attribute: #{attribute}") unless attribute_names.include?(attribute.to_s)
-      original_value_sql = "CASE WHEN #{attribute} IS NULL THEN 0 ELSE #{attribute} END"
-      self.class.update_all("#{attribute} = #{original_value_sql} + #{by.to_i}", "id = #{id}")
-    end
-    reload
-  end
-
-  def decrement!(attribute, by = 1)
-    Spree::Variant.transaction do
-      raise ArgumentError("Invalid attribute: #{attribute}") unless attribute_names.include?(attribute.to_s)
-      original_value_sql = "CASE WHEN #{attribute} IS NULL THEN 0 ELSE #{attribute} END"
-      self.class.update_all("#{attribute} = #{original_value_sql} - #{by.to_i}", "id = #{id}")
-    end
-    reload
-  end
-
   private
 
     def process_backorders
@@ -161,6 +143,11 @@ Spree::Variant.class_eval do
               i.fill_backorder
             end
             new_level -= backordered_units.length
+
+            if respond_to?(:reason)
+              self.reason = "Filling #{backordered_units.length} backordered units from general stock"
+              log_changes
+            end
           end
 
           Spree::Order.transaction do
@@ -179,6 +166,11 @@ Spree::Variant.class_eval do
               end
             end
             self.update_attribute_without_callbacks(:count_on_hand, new_level)
+
+            if respond_to?(:reason)
+              self.reason = "count_on_hand set to #{new_level}"
+              log_changes
+            end
           end
         end
       end

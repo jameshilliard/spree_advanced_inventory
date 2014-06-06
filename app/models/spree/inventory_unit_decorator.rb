@@ -41,7 +41,12 @@ Spree::InventoryUnit.class_eval do
 
     #set on_hand if configured
     if self.track_levels?(variant) and order.use_stock
+      if variant.respond_to?(:reason)
+        variant.reason = "Allocating #{quantity} units to #{order.number} as #{sold} sold / #{back_order} backordered"
+      end
+
       variant.decrement!(:count_on_hand, quantity)
+
     end
 
     #create units if configured
@@ -52,16 +57,21 @@ Spree::InventoryUnit.class_eval do
     end
   end 
 
-  def self.decrease(o, v, q)
+  def self.decrease(order, variant, quantity)
 
     # Do not recreate stock levels for dropships
-    if self.track_levels?(v) and o.use_stock
-      v.increment!(:count_on_hand, q)
+    if self.track_levels?(variant) and order.use_stock
+      if variant.respond_to?(:reason)
+        variant.reason = "Order #{order.number} no longer wants #{quantity} units"
+      end
+
+      variant.increment!(:count_on_hand, quantity)
+      
     end
 
     if Spree::Config[:create_inventory_units]
       Spree::InventoryUnit.transaction do
-        destroy_units(o, v, q)
+        destroy_units(order, variant, quantity)
       end
     end
   end
