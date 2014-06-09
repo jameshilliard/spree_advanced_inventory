@@ -161,9 +161,12 @@ module Spree
       def submit
         @purchase_order = find_resource
 
+        @purchase_order.status = "Submitted"
+        @purchase_order.save validate: false
+
         # Check for delayed_job support or fork
         if Spree::PurchaseOrderMailer.respond_to?(:delay)
-          Spree::PurchaseOrderMailer.delay.email_supplier(@purchase_order, false)
+          Spree::PurchaseOrderMailer.delay(run_at: 1.minute.from_now).email_supplier(@purchase_order, false)
 
         else
           ::ActiveRecord::Base.clear_all_connections!
@@ -174,9 +177,6 @@ module Spree
           end
           ::ActiveRecord::Base.establish_connection
         end
-
-        @purchase_order.status = "Submitted"
-        @purchase_order.save validate: false
 
         respond_with(@purchase_order) do |format|
           format.rtf { send_data(@purchase_order.save_rtf, type: "application/rtf; charset=utf-8; header=present", disposition: "attachment; filename=#{@purchase_order.number}.rtf") }
