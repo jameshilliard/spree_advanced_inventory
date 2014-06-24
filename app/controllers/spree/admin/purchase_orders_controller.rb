@@ -14,6 +14,10 @@ module Spree
       before_filter :update_orders, only: [:update]
 
       def index
+        @total_shipping = 0.0
+        @total_tax = 0.0
+        @total = 0.0
+
         session[:return_to] = request.original_url
 
         params[:q] ||= {}
@@ -45,10 +49,14 @@ module Spree
           params[:q].delete(:created_at_lt)
         end
 
+        if params[:per_page] == "All"
+          params[:per] = 99999999
+        end
+
         @search = Spree::PurchaseOrder.ransack(params[:q])
         @purchase_orders = @search.result(distinct: true).includes([:purchase_order_line_items, :user, :address, :variants]).
           page(params[:page]).
-          per(params[:per_page] || Spree::Config[:orders_per_page])
+          per(params[:per] || 50)
 
         # Restore dates
         params[:q][:created_at_gt] = created_at_gt
