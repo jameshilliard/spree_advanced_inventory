@@ -13,7 +13,7 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     :supplier_contact_id, :user_id, :comments, :terms, :order_id,
     :purchase_order_line_items_attributes, :discount, :shipping, :deposit,
     :shipping_method_id, :address_attributes, :email_subject, :auto_capture_orders,
-    :entered_at, :completed_at, :submitted_at, :tax
+    :entered_at, :completed_at, :submitted_at, :tax, :supplier_invoice_number
 
   accepts_nested_attributes_for :purchase_order_line_items,
    :reject_if => Proc.new { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
@@ -38,6 +38,39 @@ class Spree::PurchaseOrder < ActiveRecord::Base
 
   def self.override_sort
     Spree::PurchaseOrder.with_exclusive_scope { yield }
+  end
+
+  def order_line_items
+    line_items = Array.new
+
+    orders.each do |o|
+      o.line_items.each do |l|
+        unless line_items.include?(l)
+          line_items.push(l)
+        end
+      end
+    end
+
+    return line_items
+  end
+
+  def gross_profit_percentage
+    if status == "Completed" and orders.size > 0
+      total_cost = 0.0
+      total_revenue = 0.0
+
+      purchase_order_line_items.each do |i|
+        total_cost += i.quantity.to_f * i.price.to_f
+      end
+
+      order_line_items.each do |l|
+        total_revenue += l.quantity.to_f * l.price.to_f
+      end 
+
+      sprintf("%0.2f%", ((total_revenue - total_cost) / total_revenue) * 100)
+    else
+      ""
+    end
   end
 
   def receive_dropship_line_items
