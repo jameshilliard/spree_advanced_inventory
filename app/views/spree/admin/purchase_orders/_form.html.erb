@@ -97,27 +97,35 @@
           <%= f.text_area :comments, class: 'fullwidth', rows: 3 %>
         </div>
         <div data-hook="purchase_order_adjustments" class="field">
-          <%= f.label :balance_adjustments, t(:balance_adjustments) %>
+          <%= f.label :book_keeping %>
           <table width="100%" cellspacing="3" cellpadding="0">
           <thead>
             <th>Tax</th>              
             <th>Shipping</th>
+            <th>Supplier Inv #</th>
           </thead>
 
           <tr valign="top">
-            <td width="50%">
+            <td width="33%">
               <%= f.text_field :tax, 
                 class: 'fullwidth', 
                   placeholder: "tax" %>
             </td>
-            <td width="50%">
+            <td width="33%">
 
               <%= f.text_field :shipping, 
                 class: 'fullwidth', 
                   placeholder: "Shipping" %>
             </td>
+            <td width="33%">
+
+              <%= f.text_field :supplier_invoice_number, 
+                class: 'fullwidth', 
+                  placeholder: "Supplier Invoice #" %>
+            </td>
            </tr>
-          </table>
+           
+       </table>
 
         </div>
       <% if @purchase_order.status != "Submitted" and @purchase_order.status != "Completed" %>
