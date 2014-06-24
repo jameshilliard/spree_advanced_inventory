@@ -32,6 +32,11 @@
           <br/>
           <%= f.select :status_cont, Spree::PurchaseOrder.states, {:include_blank => true}, :class => 'select2 fullwidth'%>
         </div>
+
+        <div class="field">
+          <%= label_tag nil, "Was tax collected?" %>
+          <%= f.select :tax_present, {"Yes" => true, "No" => false},  {include_blank: true}, class: "select2 fullwidth" %>
+        </div>
       </div>
 
       <div class="four columns">
@@ -53,8 +58,13 @@
         
         <div class="field">
           <%= label_tag nil, t(:supplier) %>
-          <%= f.text_field :supplier_name_cont %>
+          <%= f.text_field :supplier_name_cont, placeholder: "Name contains" %>
         </div>
+
+        <div class="field">
+          <%= label_tag nil, "Supplier Invoice #" %>
+          <%= f.text_field :supplier_invoice_number_cont %>
+        </div>        
       </div>
 
       <div class="four columns">
@@ -62,9 +72,15 @@
           <%= label_tag nil, t(:po_num) %>
           <%= f.text_field :number_cont %>
         </div>
+
         <div class="field">
-          <%= label_tag nil, t(:staff_member_email) %>
-          <%= f.text_field :user_email_start %>
+          <%= label_tag nil, t(:product_search) %>
+          <%= f.text_field :variants_sku_cont, placeholder: "SKU", class: "fullwidth" %>
+        </div>
+        
+        <div class="field">
+          <%= label_tag nil, "Owner" %>
+          <%= f.text_field :user_email_start, placeholder: "Staff member's name or e-mail" %>
         </div>
       </div>
 
@@ -77,8 +93,15 @@
         </div>
 
         <div class="field">
-          <%= label_tag nil, t(:product_search) %>
-          <%= f.text_field :variants_sku_cont, placeholder: "SKU", class: "fullwidth" %>
+          <%= label_tag nil, "Country" %>
+          <br/>
+          <%= f.collection_select :address_country_id_eq, available_countries, :id, :name, { include_blank: true}, {:class => 'select2 fullwidth'} %>
+        </div>
+
+        <div class="field">
+          <%= label_tag nil, "State" %>
+          <br/>
+          <%= f.collection_select :address_state_id_eq, Spree::State.all, :id, :name,  { include_blank: true}, {:class => 'select2 fullwidth'} %>
         </div>
       </div>
     
@@ -115,14 +138,19 @@
         <th>TYPE</th>
         <th>NUMBER</th>
         <th>SUPPLIER</th>
-        <th>ORDERS</th>
-        <th>STATUS</th>
+        <th>SHIPPING</th>
+        <th>TAX</th>
         <th>TOTAL</th>
         <th class="actions"></th>
       </tr>
     </thead>
     <tbody>
-      <% @purchase_orders.each do |purchase_order|%>
+    <% @purchase_orders.each do |purchase_order|%>
+      <% 
+        @total_shipping += purchase_order.shipping.to_f
+        @total_tax += purchase_order.tax.to_f
+        @total += purchase_order.total.to_f
+      %>
         <% unless purchase_order.status.blank? or purchase_order.status == "New" %>
           <tr id="<%= spree_dom_id purchase_order %>" data-hook="rate_row" class="<%= cycle('odd', 'even')%>">
             <td class="align-center"><%= purchase_order.user.email.split("@").first.titleize %></td>
@@ -135,43 +163,22 @@
                 <%= purchase_order.supplier %>
               <% end %>
 
-              <% if purchase_order.supplier and purchase_order.supplier.phone %>
+              <% if purchase_order.supplier_invoice_number %>
                 <br/>
-                <%= purchase_order.supplier.phone %>
+                <%= purchase_order.supplier_invoice_number %>
               <% end %>
 
             </td>
             <td class="align-center" class="small">
-              <% if purchase_order.orders and purchase_order.orders.size > 0 %>
-                <% purchase_order.orders.each do |o| %>
-                  <%= link_to o.number, admin_order_url(o) %><br/>
-                <% end %>
-              <% else %>
-                 None
-              <% end %>
+              <%= Spree::Money.new(purchase_order.shipping) %>
             </td>
             <td class="align-center">
-              <%= purchase_order.status %>
-              <br/>
-              <span class="small">
-              <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
-                <%= purchase_order.submitted_at ? purchase_order.submitted_at.strftime("%m/%d/%Y %l:%M %P<br/>").html_safe : "" %>
-                <br/>
-                <%= link_to "Mark as complete?", admin_purchase_order_complete_path(purchase_order) %>
-
-              <% elsif purchase_order.status == "Completed" %>
-                <%= purchase_order.completed_at ? purchase_order.completed_at.strftime("%m/%d/%Y %l:%M %P") : "" %>
-
-              <% elsif purchase_order.status == "Entered" %>
-                <%= purchase_order.entered_at ? purchase_order.entered_at.strftime("%m/%d/%Y %l:%M %P") : "" %>
-                <br/>
-                <%= link_to "Mark as submitted?", admin_purchase_order_submitted_path(purchase_order) %>
-
-              <% end %>
-              </span>
-              
+              <%= Spree::Money.new(purchase_order.tax) %>
             </td>
-            <td class="align-center"><%= number_to_currency(purchase_order.total) %></td>
+            <td class="align-center">
+              <%= number_to_currency(purchase_order.total) %><br/>
+              <%= purchase_order.gross_profit_percentage %>
+            </td>
 
             <td class="actions">
               <%= link_to_with_icon("icon-edit", 
@@ -209,25 +216,62 @@
             </td>
           </tr>
           <tr data-hook="rate_row" class="<%= cycle('even','odd')%>">
-            <td colspan="7" style="border-bottom: 1px #333 dashed !important">
-              <span style="float: left">
-                <%= line_item_details(purchase_order.purchase_order_line_items).html_safe %>
-              </span>
-              <span style="width: 250px; display: block; float: right; text-align: right">
-                Ship to <%= purchase_order.address.firstname %> <%= purchase_order.address.lastname %>
-                <% unless not purchase_order.shipping_method %>
-                  <br/>
-                  <%= purchase_order.shipping_method.name.upcase %>
+            <td colspan="4" style="border-bottom: 1px #333 dashed !important">
+              <%= line_item_details(purchase_order.purchase_order_line_items).html_safe %>
+            </td>
+            <td class="align-center" class="small" style="border-bottom: 1px #333 dashed !important">
+              <% if purchase_order.orders and purchase_order.orders.size > 0 %>
+                <% purchase_order.orders.each do |o| %>
+                  <%= link_to o.number, admin_order_url(o) %><br/>
                 <% end %>
-              </span>
+              <% else %>
+                 No orders
+              <% end %>
+            </td>
+            <td class="align-center" class="small" style="border-bottom: 1px #333 dashed !important">
+              <%= purchase_order.status %>
+              <br/>
+              <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
+                <%= purchase_order.submitted_at ? purchase_order.submitted_at.strftime("%m/%d/%Y<br/>%l:%M %P").html_safe : "" %>
+                <br/>
+                <%= link_to "Mark as complete?", admin_purchase_order_complete_path(purchase_order) %>
+
+              <% elsif purchase_order.status == "Completed" %>
+                <%= purchase_order.completed_at ? purchase_order.completed_at.strftime("%m/%d/%Y<br/>%l:%M %P").html_safe : "" %>
+
+              <% elsif purchase_order.status == "Entered" %>
+                <%= purchase_order.entered_at ? purchase_order.entered_at.strftime("%m/%d/%Y<br/>%l:%M %P").html_safe : "" %>
+                <br/>
+                <%= link_to "Mark as submitted?", admin_purchase_order_submitted_path(purchase_order) %>
+
+              <% end %>
+            </td>
+            <td class="align-center" class="small" style="border-bottom: 1px #333 dashed !important">
+              <% unless not purchase_order.shipping_method %>
+                <%= purchase_order.shipping_method.name.upcase %> to
+              <% end %>
+              <%= link_to "#{purchase_order.address.firstname} #{purchase_order.address.lastname}",  
+                admin_purchase_orders_url + 
+                "?q[address_firstname_eq]=#{purchase_order.address.firstname}" +
+                "&q[address_lastname_eq]=#{purchase_order.address.lastname}"
+              %>
             </td>
           </tr>
         <% end %>
       <% end %>
-
+      <tr class="even">
+        <td colspan="4">&nbsp;</td>
+        <td class="align-center"><strong><%= Spree::Money.new(@total_shipping) %></strong></td>
+        <td class="align-center"><strong><%= Spree::Money.new(@total_tax) %></strong></td>
+        <td class="align-center"><strong><%= Spree::Money.new(@total) %></strong></td>
+      </tr>
     </tbody>
   </table>
-  <%= paginate @purchase_orders %>
+  <% unless params[:per_page] %>
+    <%= paginate @purchase_orders %>
+  <% end %>
+  <br/>
+  <h3><center><%= link_to "Show All Results", request.original_url + "&per_page=All" %><center></h3>
 <% end %>
 
 
