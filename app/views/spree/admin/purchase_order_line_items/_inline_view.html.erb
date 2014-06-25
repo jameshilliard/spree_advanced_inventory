@@ -1,5 +1,5 @@
 <tr valign="top">
-  <td width="40%">
+  <td>
     <%= line_item.variant.product.name.split(":").first %>
    
     <br/>
@@ -20,8 +20,10 @@
     On hand: <%= line_item.variant.on_hand %>
 
   </td>
-  <td width="30%"><%= line_item.quantity  %></td>
-  <td width="30%"><%= number_to_currency(line_item.price) %></td>
+  <td width="10%" class="align-center"><%= line_item.quantity  %></td>
+  <td width="10%" class="align-center"><%= line_item.gross_profit_percentage %></td>
+  <td width="10%" class="align-center"><%= number_to_currency(line_item.price) %></td>
+  
 </tr>
 
 
