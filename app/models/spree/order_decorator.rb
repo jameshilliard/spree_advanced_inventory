@@ -1,6 +1,7 @@
 Spree::Order.class_eval do
   has_many :order_purchase_orders
   has_many :purchase_orders, through: :order_purchase_orders
+  has_many :suppliers, through: :purchase_orders
   attr_accessible :is_dropship, :inventory_adjusted, :is_quote
 
   before_save :dropship_conversion

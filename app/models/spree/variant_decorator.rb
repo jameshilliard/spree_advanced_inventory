@@ -12,6 +12,7 @@ Spree::Variant.class_eval do
   has_many :purchase_order_line_items
   has_many :purchase_orders, through: :purchase_order_line_items
   has_many :orders, through: :line_items
+  has_many :suppliers, through: :purchase_orders
 
   def short_name
     product.name.split(":").first
