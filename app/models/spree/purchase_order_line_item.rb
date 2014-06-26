@@ -3,11 +3,12 @@ class Spree::PurchaseOrderLineItem < ActiveRecord::Base
   belongs_to :variant
   belongs_to :line_item
   belongs_to :user
+  has_one :supplier, through: :purchase_order
 
   has_many :received_purchase_order_line_items
 
   attr_accessible :price, :quantity, :purchase_order_id, :variant_id,
-    :user_id, :comment
+    :user_id, :comment, :returnable
 
   validates :variant_id, presence: true
   validates :quantity, :price, numericality: true
