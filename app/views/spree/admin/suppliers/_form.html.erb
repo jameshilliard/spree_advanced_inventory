@@ -57,6 +57,30 @@
           <%= f.text_area :comments, :class => 'fullwidth', :rows => 5, :cols => 20 %>
         </div>
 
+        <div data-hook="discount_quantities" class="field four columns alpha" >
+          <%= f.label :discount_quantities, "Non-returnable discount qty" %>
+          <%= f.text_area :discount_quantities, :rows => 5, :cols => 30, placeholder:  "Enter cut off one per line" %>
+        </div>
+        
+        <div data-hook="discount_rates" class="field four columns omega" >
+          <%= f.label :discount_rates, "Non-returnable discount rates" %>
+          <%= f.text_area :discount_rates, :rows => 5, :cols => 30, placeholder: "Enter whole numbers one per line, ie: 30 for 30%" %>
+        </div>
+        
+        <div class="clear"></div>
+
+        <div data-hook="returnable_quantities" class="field four columns alpha" >
+          <%= f.label :returnable_quantities, "Returnable discount qty" %>
+          <%= f.text_area :returnable_quantities, :rows => 5, :cols => 30, placeholder:  "Enter cut off one per line" %>
+        </div>
+        
+        <div data-hook="returnable_rates" class="field four columns omega" >
+          <%= f.label :returnable_rates, "Returnable discount rates" %>
+          <%= f.text_area :returnable_rates, :rows => 5, :cols => 30, placeholder: "Enter whole numbers one per line, ie: 30 for 30%" %>
+        </div>        
+
+        <div class="clear"></div>
+
         <div data-hook="intl_phone" class="field">
           <%= f.label :intl_phone, t(:international_phone_number) %>
           <%= f.text_field :intl_phone, :class => 'fullwidth' %>
