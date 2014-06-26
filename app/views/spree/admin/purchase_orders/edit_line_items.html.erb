@@ -15,6 +15,15 @@
 
         <div class="clear"></div>
 
+        <div data-hook="purchase_order_supplier" class="field">
+          <%= f.label :supplier_contact_id, t(:supplier_and_contact) %> 
+          <%= f.collection_select :supplier_contact_id, 
+            Spree::SupplierContact.eligible_for_select, 
+            :id, 
+            :name_with_supplier, 
+            {},  
+            {class: 'fullwidth select2' } %>
+        </div>
 
         <% counter = 0 %>
         <%= f.fields_for :purchase_order_line_items  do |l| %>
