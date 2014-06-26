@@ -25,29 +25,36 @@
             {class: 'fullwidth select2' } %>
         </div>
 
+        <div class="clear"></div>
+        
         <% counter = 0 %>
         <%= f.fields_for :purchase_order_line_items  do |l| %>
-            <div data-hook="add_product_name" style="float: left">
-          <% if l.object.new_record? %>
-            <%= l.text_field :variant_id, 
-              class: "variant_autocomplete", 
-		          placeholder: "Search for a product", 
-              style: "width: 300px" %>
-          <% else %>
-            <%= text_field_tag "variant_product_name#{l.object.variant.id}", 
-              "#{l.object.variant.product.name.split(":").first} SKU: #{l.object.variant.sku}", 
-                class: "field", 
-                disabled: true,
-                style: "width: 300px" %>
+          <div data-hook="add_product_name" class="twelve columns alpha omega" style="float: left; border-bottom: 1px #d8d8d8 solid; padding-bottom: 10px; margin-bottom: 10px;">
+            <div class="field"><label>Line item #<%= counter + 1 %></label></div>
 
-              <%= l.hidden_field :variant_id, value: l.object.variant_id %>
-              <%= l.hidden_field :id, value: l.object.id %>
+            <% if l.object.new_record? %>
+              <%= l.text_field :variant_id, 
+                class: "variant_autocomplete fullwidth", 
+                placeholder: "Search for a product"%>
+            <% else %>
+              <%= text_field_tag "variant_product_name#{l.object.variant.id}", 
+                "#{l.object.variant.product.name.split(":").first} SKU: #{l.object.variant.sku}", 
+                  class: "field fullwidth", 
+                  disabled: true%>
 
-          <% end %>
-          <%= l.text_field :comment, class: "field", placeholder: "Line item comment", size: 20, default: "" %>
-          <%= l.text_field :quantity, class: "field", placeholder: "Quantity", size: 5, default: "1" %>
-          <%= l.text_field :price, class: "field", placeholder: "Cost", size: 5  %>
+                <%= l.hidden_field :variant_id, value: l.object.variant_id %>
+                <%= l.hidden_field :id, value: l.object.id %>
+
+            <% end %>
+            <div class="clear"></div>
+
+            <div class="field three columns alpha">
+              <%= l.select :returnable, {"Returnable" => true, "Non-returnable" => false }, { include_blank: false}, class: "select2"  %>
             </div>
+            <div class="field four columns"> <%= l.text_field :comment, class: "field", placeholder: "Line item comment", size: 40, default: "" %></div>
+            <div class="field two columns"><%= l.text_field :quantity, class: "field", placeholder: "Quantity", size: 10, default: "1" %></div>
+            <div class="field two columns omega"><%= l.text_field :price, class: "field", placeholder: "Cost", size: 10  %></div>
+          </div>
 
           <% counter += 1 %>
         <% end %>
@@ -104,7 +111,6 @@
   <div class="clear"></div>
   <br/>
 
-
   <div class="form-buttons filter-actions actions" data-hook="buttons">
     <%= button t(:continue), 'icon-arrow-right' %>
     <span class="or"><%= t(:or) %></span>
@@ -120,5 +126,6 @@
 <% end %>
 
 <script>
+  
   check_for_unsaved_changes = true;
 </script>
