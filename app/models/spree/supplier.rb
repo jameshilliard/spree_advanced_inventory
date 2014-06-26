@@ -2,7 +2,8 @@ class Spree::Supplier < ActiveRecord::Base
   attr_accessible :account_number, :nr_account_number, :address1, :address2,
     :address3, :city, :country, :email, :fax, :name, :phone, :state, :url,
     :zip, :abbreviation, :intl_phone, :intl_fax, :supplier_contacts_attributes,
-    :rtf_template, :comments, :po_comments, :discount_quantities, :discount_rates
+    :rtf_template, :comments, :po_comments, :discount_quantities, :discount_rates,
+    :returnable_quantities, :returnable_rates
 
   has_many :supplier_contacts, dependent: :destroy, inverse_of: :supplier
   has_many :purchase_orders
@@ -29,10 +30,18 @@ class Spree::Supplier < ActiveRecord::Base
             id, variant.id).size > 0 ?
             true : false
   end
+
+  def discounts_available?
+    discount_array.size > 0 ? true : false
+  end
+
+  def price_at_quantity(variant, qty, returnable = false)
+    variant.price * (1 - (quantity_discount(qty.to_f, returnable) / 100.0).to_d)
+  end
   
-  def quantity_discount(quantity)
-    d = discount_array
-    q = quantity_array
+  def quantity_discount(quantity, returnable = false)
+    d = discount_array(returnable)
+    q = quantity_array(returnable)
 
     i = 0
 
@@ -56,8 +65,14 @@ class Spree::Supplier < ActiveRecord::Base
 
   end
 
-  def quantity_array
-    qa = discount_quantities.split(/\n/)
+  def quantity_array(returnable = false)
+    quantities = discount_quantities
+
+    if returnable and returnable == "true" or returnable == true
+      quantities = returnable_quantities
+    end
+
+    qa = quantities.split(/\n/)
 
     index = 0
 
@@ -70,8 +85,14 @@ class Spree::Supplier < ActiveRecord::Base
     return qa
   end
 
-  def discount_array
-    da = discount_rates.split(/\n/)
+  def discount_array(returnable = false)
+    rates = discount_rates
+
+    if returnable and returnable == "true" or returnable == true
+      rates = returnable_rates
+    end
+
+    da = rates.split(/\n/)
 
     index = 0
 
