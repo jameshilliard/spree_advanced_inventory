@@ -49,12 +49,19 @@ module Spree
           params[:q].delete(:created_at_lt)
         end
 
+        if params[:q][:supplier_invoice_number_blank] == "true"
+          @null_supplier_invoice = true
+          params[:q].delete(:supplier_invoice_number_cont)
+        else
+          @null_supplier_invoice = false
+        end
+
         if params[:per_page] == "All"
           params[:per] = 99999999
         end
 
         @search = Spree::PurchaseOrder.ransack(params[:q])
-        @purchase_orders = @search.result(distinct: true).includes([:purchase_order_line_items, :user, :address, :variants]).
+        @purchase_orders = @search.result(distinct: true).includes([:purchase_order_line_items, :user, :address, :variants, :orders]).
           page(params[:page]).
           per(params[:per] || 50)
 
