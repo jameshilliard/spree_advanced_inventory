@@ -130,6 +130,15 @@ module Spree
         end
 
         if request.put? or request.post?
+          if params[:purchase_order][:supplier_contact_id]
+            contact = Spree::SupplierContact.find(params[:purchase_order][:supplier_contact_id])
+
+            if contact
+              @purchase_order.update_column(:supplier_contact_id, contact.id)
+              @purchase_order.update_column(:supplier_id, contact.supplier_id)
+            end
+          end
+
           params[:purchase_order][:purchase_order_line_items_attributes].each do |k,line_item|
             
             if line_item["id"].to_i > 0
