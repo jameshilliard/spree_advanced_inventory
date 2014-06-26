@@ -141,20 +141,27 @@ module Spree
 
           params[:purchase_order][:purchase_order_line_items_attributes].each do |k,line_item|
             
-            if line_item["id"].to_i > 0
-              l = Spree::PurchaseOrderLineItem.find(line_item["id"])
+            if line_item["variant_id"].to_i > 0 
+              variant = Spree::Variant.find(line_item["variant_id"])
+            end
 
-              variant = l.variant
-
-              if variant and line_item["price"].to_f == 0.0
+            if variant and line_item["price"].to_f == 0.0
+              if @purchase_order.supplier and @purchase_order.supplier.discounts_available?
+                line_item["price"] = @purchase_order.supplier.price_at_quantity(variant, line_item["quantity"], line_item["returnable"])
+              else
                 line_item["price"] = variant.recent_price
               end
+            end
+
+            if line_item["id"].to_i > 0
+              l = Spree::PurchaseOrderLineItem.find(line_item["id"])
 
               if l
                 if line_item["quantity"].to_i > 0 and not line_item["quantity"].blank?
                   l.update_attributes(quantity: line_item["quantity"],
                                       comment: line_item["comment"],
-                                      price: line_item["price"])
+                                      price: line_item["price"],
+                                      returnable: line_item["returnable"])
                 else
                   l.destroy
 
@@ -171,6 +178,7 @@ module Spree
                                                       quantity: line_item["quantity"].to_i,
                                                       comment: line_item["comment"],
                                                       price: line_item["price"].to_f,
+                                                      returnable: line_item["returnable"],
                                                       user_id: spree_current_user.id)
               end
             end
