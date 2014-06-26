@@ -15,7 +15,7 @@
     <%= search_form_for [:admin, @search] do |f| %>
       <div class="field-block alpha four columns">
         <div class="field">
-          <%= label_tag nil, t(:name) %>
+          <%= label_tag nil, "Vendor name" %>
           <%= f.text_field :name_cont %>
         </div>
       </div>
@@ -23,7 +23,7 @@
 
       <div class="four columns ">
         <div class="field">
-          <%= label_tag nil, t(:vendor_id) %>
+          <%= label_tag nil, "Vendor Code" %>
           <%= f.text_field :abbreviation_cont %>
         </div>
       </div>
