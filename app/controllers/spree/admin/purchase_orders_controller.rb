@@ -131,16 +131,15 @@ module Spree
 
         if request.put? or request.post?
           params[:purchase_order][:purchase_order_line_items_attributes].each do |k,line_item|
+            
+            if line_item["id"].to_i > 0
+              l = Spree::PurchaseOrderLineItem.find(line_item["id"])
 
-            if line_item["variant_id"].to_i > 0
-              variant = Spree::Variant.find(line_item["variant_id"])
+              variant = l.variant
 
               if variant and line_item["price"].to_f == 0.0
                 line_item["price"] = variant.recent_price
               end
-
-              l = Spree::PurchaseOrderLineItem.where(purchase_order_id: @purchase_order.id,
-                                                     variant_id: line_item["variant_id"]).first
 
               if l
                 if line_item["quantity"].to_i > 0 and not line_item["quantity"].blank?
@@ -151,9 +150,10 @@ module Spree
                   l.destroy
 
                 end
-              else
-                if not line_item["variant_id"].blank? and
-                  not line_item["quantity"].blank? and 
+              end
+            else
+              if not line_item["variant_id"].blank? and
+                not line_item["quantity"].blank? and 
                   line_item["variant_id"].to_i > 0 and
                   line_item["quantity"].to_i > 0 
 
@@ -163,7 +163,6 @@ module Spree
                                                       comment: line_item["comment"],
                                                       price: line_item["price"].to_f,
                                                       user_id: spree_current_user.id)
-                end
               end
             end
           end

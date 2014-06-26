@@ -16,9 +16,9 @@
         <div class="clear"></div>
 
 
+        <% counter = 0 %>
         <%= f.fields_for :purchase_order_line_items  do |l| %>
             <div data-hook="add_product_name" style="float: left">
-
           <% if l.object.new_record? %>
             <%= l.text_field :variant_id, 
               class: "variant_autocomplete", 
@@ -31,7 +31,8 @@
                 disabled: true,
                 style: "width: 300px" %>
 
-            <%= l.hidden_field :variant_id %>
+              <%= l.hidden_field :variant_id, value: l.object.variant_id %>
+              <%= l.hidden_field :id, value: l.object.id %>
 
           <% end %>
           <%= l.text_field :comment, class: "field", placeholder: "Line item comment", size: 20, default: "" %>
@@ -39,7 +40,7 @@
           <%= l.text_field :price, class: "field", placeholder: "Cost", size: 5  %>
             </div>
 
-
+          <% counter += 1 %>
         <% end %>
 
         <div class="clear"></div>
