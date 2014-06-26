@@ -57,13 +57,14 @@
 
         
         <div class="field">
-          <%= label_tag nil, t(:supplier) %>
-          <%= f.text_field :supplier_name_cont, placeholder: "Name contains" %>
+          <%= label_tag nil, "Supplier / Invoice #" %>
+          <%= f.text_field :supplier_name_cont, placeholder: "Supplier name", size: 12, style: "width: 48% !important" %>
+          <%= f.text_field :supplier_invoice_number_cont, placeholder: "Invoice #", size: 12, style: "width: 48% !important" %>
         </div>
 
         <div class="field">
-          <%= label_tag nil, "Supplier Invoice #" %>
-          <%= f.text_field :supplier_invoice_number_cont %>
+          <br/>
+          <label><%= f.check_box :supplier_invoice_number_blank, { checked: @null_supplier_invoice }, true, false %> No supplier invoice #</label>
         </div>        
       </div>
 
@@ -74,8 +75,9 @@
         </div>
 
         <div class="field">
-          <%= label_tag nil, t(:product_search) %>
-          <%= f.text_field :variants_sku_cont, placeholder: "SKU", class: "fullwidth" %>
+          <%= label_tag nil, "Product / Order search" %>
+          <%= f.text_field :variants_sku_cont, placeholder: "SKU",  size: 12, style: "width: 48% !important" %>
+          <%= f.text_field :orders_number_cont, placeholder: "Order number",  size: 12, style: "width: 48% !important" %>
         </div>
         
         <div class="field">
