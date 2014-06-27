@@ -15,6 +15,8 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     :shipping_method_id, :address_attributes, :email_subject, :auto_capture_orders,
     :entered_at, :completed_at, :submitted_at, :tax, :supplier_invoice_number
 
+  attr_accessor :status_values
+
   accepts_nested_attributes_for :purchase_order_line_items,
    :reject_if => Proc.new { |attributes| attributes['variant_id'].blank? or attributes['variant_id'].to_i == 0 }
 
@@ -30,8 +32,6 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   validates :shipping, numericality: true, unless: Proc.new { |a| a.shipping.blank? }
   validates :deposit, numericality: true, unless: Proc.new { |a| a.deposit.blank? }
   validates :tax, numericality: true, unless: Proc.new { |a| a.tax.blank? }
-
-  default_scope order("spree_purchase_orders.created_at desc")
   validate :prevent_completion_when_not_received_fully
 
   scope :complete, lambda { where{(status == "Completed")} }
@@ -115,19 +115,47 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     return true
   end
 
+  def set_status_time(new_status, new_time = Time.current)
+    unless status_time(new_status)
+      logger.info "\n\n*** Setting new time for #{new_status} = #{new_time}"
+      update_column("#{new_status.downcase}_at", new_time)
+    end
+  end
+
+  def status_time(s)
+    unless s == "New"
+      attributes["#{s.downcase}_at"]
+    else
+      created_at
+    end
+  end
+
+  def check_previous_status(new_status)
+    @status_values.each do |k,v|
+      if k == new_status and not status_time(v[:previous])
+        set_status_time(v[:previous], updated_at)
+        check_previous_status(v[:previous])
+      end
+    end
+  end
+
   def update_times
-    if status == "Entered" and not entered_at
-      self.entered_at = Time.current
-    elsif status == "Submitted" and not submitted_at
-      self.submitted_at = Time.current
-    elsif status == "Completed" and not completed_at
-      self.completed_at = Time.current
-    end
 
-    if submitted_at and not entered_at
-      self.entered_at = submitted_at
-    end
+    @status_values = {
+        "New" => { previous: nil, next: "Entered" },
+        "Entered" => { previous: "New", next: "Submitted" },
+        "Submitted" => { previous: "Entered", next: "Completed" },
+        "Completed" => { previous: "Submitted", next: nil }
+    }
 
+    check_previous_status(status)
+    logger.info status_time(status)
+    logger.info status_changed?
+
+    if status_changed?
+      set_status_time(status)
+    end
+    logger.info status_time(status)
     return true
   end
 
