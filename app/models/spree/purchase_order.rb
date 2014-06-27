@@ -180,6 +180,10 @@ class Spree::PurchaseOrder < ActiveRecord::Base
     status == "Submitted" and not dropship
   end
 
+  def fully_received?
+    received_purchase_order_line_items.sum(:quantity) == purchase_order_line_items.sum(:quantity)
+  end
+
   def can_be_fully_received?
     can_be_received? and received_purchase_order_line_items.size == 0
   end
