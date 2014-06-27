@@ -19,19 +19,17 @@ bounding_box [0,370], :width => 540, :height => 300 do
     #move_down 2
     content = []
     @purchase_order.purchase_order_line_items.each do |item|
-      row = [ item.variant.sku, item.variant.product.name.split(":").first]
+      row = [ item.variant.sku, item.variant.product.name.split(":").first + " - " (item.returnable ? "Returnable" : "Non-returnable")]
       row << number_to_currency(item.price) unless @hide_prices
       row << item.quantity
       row << number_to_currency(item.price * item.quantity) unless @hide_prices
       content << row
 
-      unless item.comment.blank?
-        row = ["",item.comment]
-        row << "" unless @hide_prices
-        row << "" 
-        row << "" unless @hide_prices
-        content << row
-      end
+      row = ["", (item.comment.blank? ? "" : item.comment) ]
+      row << "" unless @hide_prices
+      row << "" 
+      row << "" unless @hide_prices
+      content << row
     end
 
 
