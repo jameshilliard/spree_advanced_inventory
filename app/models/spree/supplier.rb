@@ -66,10 +66,10 @@ class Spree::Supplier < ActiveRecord::Base
   end
 
   def quantity_array(returnable = false)
-    quantities = discount_quantities
+    quantities = discount_quantities ? discount_quantities : []
 
     if returnable and returnable == "true" or returnable == true
-      quantities = returnable_quantities
+      quantities = returnable_quantities ? returnable_quantities : []
     end
 
     qa = quantities.split(/\n/)
@@ -86,10 +86,10 @@ class Spree::Supplier < ActiveRecord::Base
   end
 
   def discount_array(returnable = false)
-    rates = discount_rates
+    rates = discount_rates ? discount_rates : []
 
     if returnable and returnable == "true" or returnable == true
-      rates = returnable_rates
+      rates = returnable_rates ? returnable_rates : []
     end
 
     da = rates.split(/\n/)
