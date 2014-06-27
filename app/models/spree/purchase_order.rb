@@ -32,9 +32,18 @@ class Spree::PurchaseOrder < ActiveRecord::Base
   validates :tax, numericality: true, unless: Proc.new { |a| a.tax.blank? }
 
   default_scope order("spree_purchase_orders.created_at desc")
+  validate :prevent_completion_when_not_received_fully
 
   scope :complete, lambda { where{(status == "Completed")} }
   scope :incomplete, lambda { where{(status != "Completed")} }
+
+  def prevent_completion_when_not_received_fully
+    if status_changed? and status == "Completed" and not fully_received? and not dropship
+      errors.add(:status, "cannot be complete when not fully received")
+      self.status = "Submitted"
+      update_column(:completed_at, nil)
+    end
+  end
 
   def self.override_sort
     Spree::PurchaseOrder.with_exclusive_scope { yield }
