@@ -39,15 +39,27 @@ module Spree
         if params[:q][:status_cont] == "Submitted"
           params[:q][:submitted_at_lt] = params[:q][:created_at_lt]
           params[:q][:submitted_at_gt] = params[:q][:created_at_gt]
+          params[:q][:s] = "spree_purchase_orders.submitted_at desc"
           params[:q].delete(:created_at_gt)
           params[:q].delete(:created_at_lt)
 
         elsif params[:q][:status_cont] == "Completed"
           params[:q][:completed_at_lt] = params[:q][:created_at_lt]
           params[:q][:completed_at_gt] = params[:q][:created_at_gt]
+          params[:q][:s] = "spree_purchase_orders.completed_at desc"
           params[:q].delete(:created_at_gt)
           params[:q].delete(:created_at_lt)
+        elsif params[:q][:status_cont] == "Entered"
+          params[:q][:entered_at_lt] = params[:q][:created_at_lt]
+          params[:q][:entered_at_gt] = params[:q][:created_at_gt]
+          params[:q][:s] = "spree_purchase_orders.entered_at desc"
+          params[:q].delete(:created_at_gt)
+          params[:q].delete(:created_at_lt)
+        else
+          params[:q][:s] = "spree_purchase_orders.created_at desc"
         end
+
+        logger.info "\n\n*** #{params[:q][:s]}"
 
         if params[:q][:supplier_invoice_number_blank] == "true"
           @null_supplier_invoice = true
@@ -63,7 +75,8 @@ module Spree
         @search = Spree::PurchaseOrder.ransack(params[:q])
         @purchase_orders = @search.result(distinct: true).includes([:purchase_order_line_items, :user, :address, :variants, :orders]).
           page(params[:page]).
-          per(params[:per] || 50)
+          per(params[:per] || 50).
+          order(params[:q][:s] + " NULLS LAST")
 
         # Restore dates
         params[:q][:created_at_gt] = created_at_gt
