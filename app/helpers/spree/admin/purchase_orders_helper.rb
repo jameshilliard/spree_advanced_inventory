@@ -33,5 +33,15 @@ module Spree::Admin::PurchaseOrdersHelper
     return item_list
   end
 
+  def show_status_time(po)
+    status_time = po.status_time(po.status)
+
+    if status_time
+      pretty_time(status_time)
+    else
+      "N/A"
+    end
+  end
+
 end
 

@@ -127,11 +127,11 @@
     <colgroup>
       <col style="width: 5%">
     	<col style="width: 10%">
+      <col style="width: 5%">
       <col style="width: 10%">
       <col style="width: 10%">
       <col style="width: 10%">
-      <col style="width: 10%">
-      <col style="width: 10%">
+      <col style="width: 15%">
       <col style="width: 8%">
     </colgroup>
     <thead>
@@ -233,16 +233,12 @@
             <td class="align-center" class="small" style="border-bottom: 1px #333 dashed !important">
               <%= purchase_order.status %>
               <br/>
+              <%= show_status_time(purchase_order) %>
               <% if purchase_order.status == "Submitted" and purchase_order.dropship %>
-                <%= purchase_order.submitted_at ? purchase_order.submitted_at.strftime("%m/%d/%Y<br/>%l:%M %P").html_safe : "" %>
                 <br/>
                 <%= link_to "Mark as complete?", admin_purchase_order_complete_path(purchase_order) %>
 
-              <% elsif purchase_order.status == "Completed" %>
-                <%= purchase_order.completed_at ? purchase_order.completed_at.strftime("%m/%d/%Y<br/>%l:%M %P").html_safe : "" %>
-
               <% elsif purchase_order.status == "Entered" %>
-                <%= purchase_order.entered_at ? purchase_order.entered_at.strftime("%m/%d/%Y<br/>%l:%M %P").html_safe : "" %>
                 <br/>
                 <%= link_to "Mark as submitted?", admin_purchase_order_submitted_path(purchase_order) %>
 
@@ -250,7 +246,7 @@
             </td>
             <td class="align-center" class="small" style="border-bottom: 1px #333 dashed !important">
               <% unless not purchase_order.shipping_method %>
-                <%= purchase_order.shipping_method.name.upcase %> to
+                <%= purchase_order.shipping_method.name.upcase %> <br/>
               <% end %>
               <%= link_to "#{purchase_order.address.firstname} #{purchase_order.address.lastname}",  
                 admin_purchase_orders_url + 
