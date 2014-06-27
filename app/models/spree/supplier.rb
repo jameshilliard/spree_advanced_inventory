@@ -8,7 +8,7 @@ class Spree::Supplier < ActiveRecord::Base
   has_many :supplier_contacts, dependent: :destroy, inverse_of: :supplier
   has_many :purchase_orders
   has_many :purchase_order_line_items, through: :purchase_orders
-  has_many :variants, through: :purchase_order_line_items
+  has_many :variants, through: :purchase_order_line_items, uniq: true
   has_many :line_items, through: :variants
   has_many :orders, through: :line_items
 
