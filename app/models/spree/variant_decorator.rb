@@ -117,9 +117,21 @@ Spree::Variant.class_eval do
     return @best_unit_price
   end
 
+  def ebook?
+    if sku =~ /-ebook/i
+      true
+    else
+      false
+    end
+  end
+  
   # Will deprecate this inaccurately named method
   def recent_price
-    weighted_average_cost
+    if not ebook?
+      weighted_average_cost
+    else
+      0.0
+    end
   end
 
   private
