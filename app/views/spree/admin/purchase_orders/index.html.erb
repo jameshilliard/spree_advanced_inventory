@@ -219,7 +219,7 @@
           </tr>
           <tr data-hook="rate_row" class="<%= cycle('even','odd')%>">
             <td colspan="4" style="border-bottom: 1px #333 dashed !important">
-              <%= line_item_details(purchase_order.purchase_order_line_items).html_safe %>
+              <%= line_item_details(purchase_order, purchase_order.purchase_order_line_items).html_safe %>
             </td>
             <td class="align-center" class="small" style="border-bottom: 1px #333 dashed !important">
               <% if purchase_order.orders and purchase_order.orders.size > 0 %>

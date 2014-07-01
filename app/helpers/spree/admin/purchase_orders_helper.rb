@@ -1,10 +1,8 @@
 module Spree::Admin::PurchaseOrdersHelper
-  def line_item_details(line_items)
+  def line_item_details(po, line_items)
     item_list = ""
 
-    po = line_items.first.purchase_order
-
-    unless line_items.size == 0
+    if po and line_items and line_items.size > 0
       item_list = "<span class='small'>"
       line_items.each do |l|
 
@@ -26,9 +24,9 @@ module Spree::Admin::PurchaseOrdersHelper
       if po.can_be_fully_received? and 
         item_list += "#{link_to 'Receive Whole PO?', admin_receive_entire_po_path(po), confirm: "Ok to confirm this entire purchase order?"}".html_safe
       end
-    end
+      item_list += "</span><br/>".html_safe
 
-    item_list += "</span><br/>".html_safe
+    end
 
     return item_list
   end
