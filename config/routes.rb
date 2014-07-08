@@ -9,12 +9,12 @@ Spree::Core::Engine.routes.draw do
 
       end
 
-      match 'edit_line_items'
-      match 'submit'
-      match 'submitted'
-      match 'complete'
-      match 'source'
-      match 'item'
+      get 'edit_line_items'
+      get 'submit'
+      get 'submitted'
+      get 'complete'
+      get 'source'
+      get 'item'
 
     end
 
@@ -40,10 +40,10 @@ Spree::Core::Engine.routes.draw do
     post 'manage_stock/update_sku' => 'manage_stock#update_sku', 
       as: 'update_sku'
 
-    match 'manage_stock/update' => 'manage_stock#update',
+    get 'manage_stock/update' => 'manage_stock#update',
       as: 'stock_update'
 
-    match 'manage_stock/:purchase_order_id/receive_entire_po' => 'manage_stock#receive_entire_po',
+    get 'manage_stock/:purchase_order_id/receive_entire_po' => 'manage_stock#receive_entire_po',
       as: 'receive_entire_po'
     
     get "advanced_inventory_settings" => "advanced_inventory_settings#show",
