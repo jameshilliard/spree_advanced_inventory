@@ -1,5 +1,5 @@
 Spree::InventoryUnit.class_eval do
-  attr_accessible :is_dropship, :is_quote
+  attr_accessor :is_dropship, :is_quote
 
   before_validation :set_stock_type
 
